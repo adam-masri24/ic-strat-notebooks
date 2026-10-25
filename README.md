@@ -4,7 +4,7 @@ Two research notebooks on a 0DTE SPX iron condor strategy (10-wide wings), alrea
 
 | notebook | what it covers |
 |---|---|
-| [`ic_analysis.ipynb`](strategies/ic_strat/notebooks/ic_analysis.ipynb) | The IC strategy built one setting at a time (a greedy cascade from the raw export), why each setting is there, why Thursdays are skipped, the tranche selection (by Sharpe and by drawdown), why there is no stop, drawdowns by tranche, a feature ranking, and an A/B test of the 10-day vs the 20-day SMA with t-scores. |
+| [`ic_analysis.ipynb`](strategies/ic_strat/notebooks/ic_analysis.ipynb) | The IC strategy built one setting at a time (a greedy cascade from the raw export), why each setting is there, why Thursdays are skipped, the tranche selection (by Sharpe and by drawdown), why there is no stop, drawdowns by tranche, a feature ranking, an A/B test of the 10-day vs the 20-day SMA with t-scores, and the 2026 drawdown in the backtester's log. |
 | [`correlation_mo.ipynb`](strategies/ic_strat/notebooks/correlation_mo.ipynb) | Why the IC strategy and two other condor books (MO1, MO2) are almost uncorrelated despite similar setups, and what running them together does. |
 
 **The strategy:** no Thursdays; SPX at or below its open at entry; SPX above its 10-day SMA; VIX9D/VIX between 0.87 and 1.02 at entry;
@@ -16,7 +16,7 @@ The notebooks only call the code in `strategies/ic_strat/analysis/` and explain 
 
 - `final_version.py`: the strategy, its scoring (the backtester's Sharpe) and most of the studies;
 - `backtester_rules.py`: the filters measured the way the backtester measures them;
-- `cascade.py`, `tranche_drawdown.py`, `thursday.py`: the cascade, the drawdown study and the Thursday diagnosis;
+- `cascade.py`, `tranche_drawdown.py`, `thursday.py`, `log_2026.py`: the cascade, the drawdown study, the Thursday diagnosis and the 2026 drawdown in the backtest log;
 - `correlation_mo.py`: the IC vs MO correlation study;
 - `notebook_display.py`: compact chart output, so GitHub renders the notebooks.
 

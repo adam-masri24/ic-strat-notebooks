@@ -63,7 +63,8 @@ other features, and test the 10-day SMA against the 20-day.
 | 11 | Drawdowns by tranche: where the losses come from, and whether to cut the 7 further |
 | 12 | Feature ranking and correlation |
 | 13 | A/B with everything on: above the 10-day SMA vs the 20-day |
-| 14 | Summary |
+| 14 | The 2026 drawdown, in the backtester's own log (past the end of the export) |
+| 15 | Summary |
 
 **How to read the numbers.**
 
@@ -115,6 +116,7 @@ from strategies.ic_strat.analysis import final_version as fv
 from strategies.ic_strat.analysis import cascade as cs
 from strategies.ic_strat.analysis import tranche_drawdown as td
 from strategies.ic_strat.analysis import thursday as th
+from strategies.ic_strat.analysis import log_2026 as lg
 from strategies.ic_strat.analysis.notebook_display import compact_figures
 
 compact_figures()   # charts as compact PNGs, so GitHub renders the notebook
@@ -1003,7 +1005,118 @@ md(r"""| drawdown-picked tranches, everything else on | trades | total P/L | Sha
   strategy's 7). The 10-day's edge is real in direction and in drawdown, but how big it looks depends on which tranches it's paired with.""")
 
 # ---------------------------------------------------------------------------
-md(r"""## 14. Summary
+md(r"""## 14. The 2026 drawdown, in the backtester's own log
+
+Everything above is rebuilt from the 20-tranche export, which ends 2026-05-07. **The backtester's log of the live strategy** (the 7
+tranches, no Thursdays, held to expiry) runs to 2026-09-28, and it shows a drawdown the rest of this notebook can't see: from a peak on
+2026-05-11, **-$13.4k by 2026-06-17**, three and a half times anything in the four years before, and **not recovered** by the end of the
+log.
+
+First, a check that the log and this notebook describe the same strategy, on the sessions both cover:""")
+
+code(r"""
+log = lg.load_log()
+lc = lg.condors(log)
+rec = lg.reconcile(log, panel)
+print(f"sessions both cover: {rec.attrs['window'][0]:%Y-%m-%d} to {rec.attrs['window'][1]:%Y-%m-%d}")
+display(rec.round(2))
+""")
+
+md(r"""| 2022-05-31 to 2026-05-07 | trades | total P/L | Sharpe | max drawdown |
+|---|---|---|---|---|
+| the backtester's log | 1,446 | $111.3k | 2.51 | -$3.8k |
+| this notebook's rebuild | 1,450 | $112.0k | 2.53 | -$3.8k |
+
+**The rebuild matches the backtester's log almost exactly** (4 trades and $0.7k apart over four years), so the rest of the notebook is the
+live strategy. The difference is what came after 2026-05-07.""")
+
+code(r"""
+ldaily = lg.daily_matrix(log)
+leps = td.episodes(ldaily)
+td.fig_underwater(ldaily, leps); plt.show()
+display(leps.round(0))
+dd_start, dd_end = leps.iloc[0]["peak"] + pd.Timedelta(days=1), leps.iloc[0]["trough"]
+display(td.episode_contrib(ldaily, leps).round(0))
+""")
+
+md(r"""| drawdown (backtester's log) | peak | trough | recovered | depth |
+|---|---|---|---|---|
+| **2026** | **2026-05-11** | **2026-06-17** | **not by 2026-09-28** | **-$13.4k** |
+| next deepest | 2024-12-02 | 2025-03-21 | 2025-05-21 | -$3.8k |
+| third | 2023-11-28 | 2023-12-20 | 2023-12-29 | -$2.5k |
+
+- **Every tranche lost in it** (-$1.2k to -$2.8k each, 14:53 the most): it isn't one weak tranche, it is whole days going wrong.
+- **After the trough the strategy traded 8 sessions to the end of September and made +$2.1k**; the book was still $11.3k below its peak.
+
+**What happened: three days.**""")
+
+code(r"""
+display(lg.before_vs_drawdown(lc, log, dd_start, dd_end).round(2))
+display(lg.worst_days(lc).round(2))
+""")
+
+md(r"""| the log's worst days | P/L | condors | lost a full wing | side that broke | VIX at entry | SPX from entry to close |
+|---|---|---|---|---|---|---|
+| **2026-05-12** (Tue) | **-$5.2k** | 7 | **7** | call (-$6.0k) | 19.0 | **+0.55%** |
+| **2026-06-17** (Wed) | **-$4.8k** | 7 | **6** | put (-$5.5k) | 16.9 | **-1.15%** |
+| **2026-06-16** (Tue) | **-$3.6k** | 7 | **5** | put (-$4.7k) | 15.9 | -0.34% |
+| 2024-12-10 (Tue) | -$2.4k | 4 | 2 | put | 14.1 | -0.29% |
+| 2023-05-23 (Tue) | -$1.7k | 3 | 1 | put | 17.9 | -0.46% |
+
+- **The whole drawdown is three sessions:** on 2026-05-12, 06-16 and 06-17 all seven tranches were open and SPX ran through one side of
+  nearly all of them. Together they lose $13.6k; the other three sessions of the drawdown net +$0.2k.
+- **Each of the three is worse than any day in the four years before** (the previous worst, 2024-12-10, lost $2.4k with 4 condors open). A
+  day with all seven tranches open and one side broken costs about $5k: that is the strategy's real worst day, and in 2022-2025 it never
+  happened.
+- **VIX gave no warning:** it was 16-19 at entry, normal for the strategy (17.7 on average before). The moves after entry were 0.3-1.2%,
+  against 0.20% on an average day.
+
+| | before the drawdown | the drawdown |
+|---|---|---|
+| condors / sessions | 723 / 187 | 31 / 6 |
+| win rate | 81% | **26%** |
+| average loss per losing condor | -$399 | **-$657** |
+| condors that lost a full wing | 37 (5%) | **19 (61%)** |
+| average credit per condor | $325 | **$245** |
+| SPX move from entry to close (absolute) | 0.20% | **0.53%** |
+| short put breached | 15% | **48%** |
+
+**Why 2026 hurts more: less credit for each breach.**""")
+
+code(r"""
+ly = lg.by_year(log, lc)
+lg.fig_by_year(ly); plt.show()
+display(ly.round(2))
+""")
+
+md(r"""| year | SPX (median) | credit per spread | short strike from spot | condors | full-wing losses | avg P/L per condor | worst day |
+|---|---|---|---|---|---|---|---|
+| 2022 | 3,951 | $145 | 0.52% | 115 | 9 | +$183 | -$1.6k |
+| 2023 | 4,341 | $175 | 0.21% | 164 | 8 | +$161 | -$1.7k |
+| 2024 | 5,310 | $175 | 0.16% | 179 | 8 | +$137 | -$2.4k |
+| 2025 | 6,444 | $150 | 0.22% | 212 | 12 | +$130 | -$1.6k |
+| **2026 (to Sep)** | **7,369** | **$130** | 0.29% | 115 | **22** | **+$4** | **-$5.2k** |
+
+- **The credit has been shrinking since 2024** ($175 -> $150 -> $130 a spread) while the wing stays 10 points: a breached spread now loses
+  up to $870 against $825 before, and a winning one pays less. Each full-wing loss takes more winning trades to earn back (about 6.7
+  winners in 2026 against 4.7 in 2023-24).
+- **The strikes are not closer:** they sit further from spot in 2026 (0.29%) than in 2023-25. What changed is the size of the moves (0.25% from
+  entry to close on average in 2026, against 0.18% in 2024-25) and how many hit all seven tranches the same day.
+- **22 of the 59 full-wing losses in the whole log came in 2026**, 18 of them in those three days.
+
+**What it says about the strategy:**
+
+- **The risk was always there, it just hadn't shown up.** Seven tranches spread over three hours on one day, with no stop, are close to one
+  big position: a day that runs through one side costs ~$5k. The four years before simply had no such day on a day the filters let through.
+- **The likely trigger is scheduled news.** 2026-06-16 and 06-17 were the days of a Fed (FOMC) meeting, with the decision on the 17th; the
+  Thursday analysis (Section 3) found the same pattern: the strategy's worst days are days the market moves more than VIX priced, often
+  macro days. This data has no economic calendar, so this is a hypothesis: **an event-day filter (no trading on FOMC decision days, and
+  possibly CPI days) is the change most worth backtesting.**
+- **The tranche study (Section 11) said the drawdowns were shallow:** on the rebuild they were (-$3.8k). The log shows the tail those four
+  years didn't contain, and it is the number to size the strategy on.""")
+
+# ---------------------------------------------------------------------------
+md(r"""## 15. Summary
 
 **The greedy cascade, step by step:**
 
@@ -1032,6 +1145,10 @@ day (76% of days positive), an average win of $285 a condor against an average l
 - **The 7 tranches are the smallest, steadiest set:** the smallest drawdown and the most P/L per $ of drawdown of the sets tested. Adding
   11:13 and 13:33 (forward selection's peak) scores a higher Sharpe (2.73) for $29.8k more and a deeper drawdown; the previous 15, 2.69 for
   $68.4k more. None of the 7 should be cut: each made money every year and each one's removal lowers Sharpe.
+
+- **The backtester's log shows a 2026 drawdown the export doesn't reach:** -$13.4k from 2026-05-11 to 06-17, not recovered by 2026-09-28,
+  from three days on which all seven tranches lost a full wing (Section 14). The rebuild matches the log to 2026-05-07; size the strategy on
+  that tail, not on the -$3.8k of 2022-2026, and backtest an event-day (FOMC/CPI) filter.
 
 **What this notebook doesn't establish:** out-of-sample performance (apart from the walk-forward checks); the backtester's totals on these
 settings (the rules were matched trade by trade against a backtest on earlier settings, with the 20-day SMA; the 10-day and the 7 tranches
