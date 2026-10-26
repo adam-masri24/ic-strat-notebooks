@@ -58,7 +58,7 @@ other features, and test the 10-day SMA against the 20-day.
 |---|---|
 | 2 | The greedy search, and the cascade it builds: trades, P/L and Sharpe at each step |
 | 3-8 | One section per step, in the greedy order: what the setting does to the book built so far, why, and where its threshold sits |
-| 9 | The call stop: why the strategy doesn't use one |
+| 9 | The call and put stops: why the strategy uses neither |
 | 10 | With everything on: is each threshold still at its best? |
 | 11 | Drawdowns by tranche: where the losses come from, and whether to cut the 7 further |
 | 12 | Feature ranking and correlation |
@@ -707,7 +707,7 @@ sit from spot, +0.89 with the credit).
   against 2.48 with no cap), and the drawdown is $1.1k smaller.""")
 
 # ---------------------------------------------------------------------------
-md(r"""## 9. The call stop: why the strategy doesn't use one
+md(r"""## 9. The call and put stops: why the strategy uses neither
 
 Not a step: the strategy holds every condor to expiry. Here the finished strategy (all six settings) gets a call-side stop at every level,
 replayed the backtester's way: it fires when the call spread's worst intraday loss reached X% of its credit (never on the 16:00 settlement
@@ -734,6 +734,43 @@ md(r"""| call stop at $0.20 slippage | fires on | total P/L | Sharpe | max drawd
   36-70% of condors and Sharpe falls to -0.18 to 1.02).
 - **What the backtest can't show is a day far worse than any in these four years.** Going without a stop accepts that risk; the -$3.8k
   drawdown is the worst the data shows, not the worst possible.""")
+
+md(r"""### The same test on the puts
+
+The same replay on the put side: a put-side stop at every level, filled where the option chain first crossed it, plus $0.20 per contract
+slippage and fees (blue; $0 slippage in grey), the call side held to expiry. The dotted line is the strategy, with no stop. Same 1,450
+trades at every level.""")
+
+code(r"""
+fv.fig_stop(study.stops_put, note=f"The put stop on the finished strategy ({int(ct.iloc[-1]['trades']):,} trades): every level against no stop", side="put"); plt.show()
+display(study.stops_put.loc[fv.EXIT_SLIPPAGE].round(2))
+""")
+
+md(r"""| put stop at $0.20 slippage | fires on | total P/L | Sharpe | max drawdown | 2022-24 / 2025-26 |
+|---|---|---|---|---|---|
+| **none (strategy)** | | **$112.0k** | **2.60** | **-$3.8k** | **2.44 / 2.92** |
+| 100% | 39% of condors | $62.9k | 1.29 | -$4.7k | 1.57 / 0.72 |
+| 200% | 22% | $77.9k | 1.64 | -$7.8k | 2.11 / 0.72 |
+| 300% | 16% | $83.9k | 1.77 | -$4.6k | 2.07 / 1.13 |
+| 400% | 10% | $90.2k | 1.91 | -$4.5k | 2.10 / 1.51 |
+
+| a 400% stop on each side | fires on | spreads stopped | of them, would have expired winning | P/L of the stopped spreads: stopped / held | cost of the stop | Sharpe |
+|---|---|---|---|---|---|---|
+| call side | 4% of condors | 32 | 31% | -$21.1k / -$14.9k | -$6.2k | 2.46 |
+| **put side** | **10%** | **71** | **42%** | **-$41.7k / -$19.9k** | **-$21.8k** | **1.91** |
+
+- **A put stop costs far more than a call stop:** the 400% put stop takes Sharpe from 2.60 to 1.91 and P/L down $21.8k (the call stop:
+  2.46, -$6.2k), and it makes the drawdown deeper (-$4.5k), not shallower. Even with no slippage the best put stop scores 1.96. Only the 75%
+  level trims the drawdown (to -$3.2k), at a Sharpe of 1.03.
+- **The put side touches its stop twice as often and recovers more often:** 71 put spreads reached 400% against 32 calls, and 42% of
+  those puts would have expired winning (31% of the calls). Stopping them turns -$19.9k of held losses into -$41.7k.
+- **The reason is the entry rule:** the strategy sells its condor after SPX has dipped below its open, in an uptrend (above its 10-day
+  SMA). Those intraday dips usually revert by the close, so a put that is deep in trouble at 13:00 is often fine at 16:00, and a stop
+  sells it at the worst point.
+- **It hurts most in 2025-26** (2.92 -> 1.51 at 400%).
+- **The 2026 drawdown (Section 14) can't be tested here:** its two put-side days (2026-06-16 and 06-17) are after the option-chain data
+  ends. Whether a put stop would have cut them is a question for the backtester, but over 2022-2026 a put stop costs much more than it
+  saves.""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 10. With everything on: is each threshold still at its best?
@@ -1140,8 +1177,9 @@ day (76% of days positive), an average win of $285 a condor against an average l
 - **The 10-day SMA is the most important setting:** removing it costs 1.28 Sharpe and triples the drawdown. With everything on it beats the
   20-day in every year (t = 1.73 on the Sharpe difference, p = 0.08: significant at 10%, not at 5%); the edge is lower risk, not more
   money. On the drawdown-picked tranches it still leads (2.29 against 1.97, a third of the drawdown) but not significantly (p = 0.38).
-- **No stop:** on this strategy every call-stop level lowers Sharpe and P/L and none reduces the drawdown (Section 9). The cost is exposure to
-  a day worse than any in this sample.
+- **No stop:** on this strategy every call-stop level lowers Sharpe and P/L and none reduces the drawdown, and a put stop is worse still
+  (400%: Sharpe 1.91, -$21.8k; 42% of the stopped puts would have expired winning) (Section 9). The cost is exposure to a day worse than any
+  in this sample.
 - **The 7 tranches are the smallest, steadiest set:** the smallest drawdown and the most P/L per $ of drawdown of the sets tested. Adding
   11:13 and 13:33 (forward selection's peak) scores a higher Sharpe (2.73) for $29.8k more and a deeper drawdown; the previous 15, 2.69 for
   $68.4k more. None of the 7 should be cut: each made money every year and each one's removal lowers Sharpe.

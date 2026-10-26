@@ -38,6 +38,7 @@ from src.paths import SPX_DATA_ROOT, STRATEGY_DATA_ROOT, VIX_DATA_ROOT
 VIX_OHLC = VIX_DATA_ROOT / "ohlc"
 SPX_OPTIONS_OHLC = SPX_DATA_ROOT / "options_ohlc"
 STOP_FILL_CACHE = STRATEGY_DATA_ROOT / "ic_strat" / "spx" / "derived" / "call_stop_fills.parquet"
+PUT_STOP_FILL_CACHE = STRATEGY_DATA_ROOT / "ic_strat" / "spx" / "derived" / "put_stop_fills.parquet"
 MARKET_TZ = "America/New_York"
 
 START_CAPITAL = 200_000
@@ -111,25 +112,25 @@ def spot_vs_sma_pct(spot: pd.Series, dates: pd.Series, closes: pd.Series, window
 
 
 # --------------------------------------------------------------------------- #
-# call stop, replayed from the option chain
+# call and put stops, replayed from the option chain
 # --------------------------------------------------------------------------- #
-def _strikes(legs: str) -> tuple[float, float]:
-    found = dict((k, float(s)) for s, k in re.findall(r"(\d+(?:\.\d+)?) C (STO|BTO)", legs))
+def _strikes(legs: str, right: str = "C") -> tuple[float, float]:
+    found = dict((k, float(s)) for s, k in re.findall(rf"(\d+(?:\.\d+)?) {right} (STO|BTO)", legs))
     return found["STO"], found["BTO"]
 
 
-def _chain_fills(calls: pd.DataFrame) -> pd.DataFrame:
-    """For every call spread on a session with chain data: the fill (% loss of credit) at each stop level,
-    NaN where the spread never reached that level before 16:00. Index (date, entry_time)."""
+def _chain_fills(calls: pd.DataFrame, right: str = "C") -> pd.DataFrame:
+    """For every spread of one side (``right`` "C" or "P") on a session with chain data: the fill (% loss of credit)
+    at each stop level, NaN where the spread never reached that level before 16:00. Index (date, entry_time)."""
     rows = []
     for day, grp in calls.groupby("date"):
         path = SPX_OPTIONS_OHLC / f"SPXW_{day:%Y%m%d}_ohlc.parquet"
         if not path.exists():
             continue
         ch = pd.read_parquet(path, columns=["strike", "right", "quote_datetime", "close"])
-        ch = ch[ch["right"] == "C"].pivot_table(index="quote_datetime", columns="strike", values="close")
+        ch = ch[ch["right"] == right].pivot_table(index="quote_datetime", columns="strike", values="close")
         for r in grp.itertuples():
-            ks, kl = _strikes(r.legs)
+            ks, kl = _strikes(r.legs, right)
             if ks not in ch or kl not in ch:
                 continue
             t0 = pd.Timestamp(f"{day:%Y-%m-%d} {r.entry_time}")
@@ -158,17 +159,33 @@ def call_stop_fills(spreads: pd.DataFrame, refresh: bool = False) -> pd.DataFram
     return fills
 
 
+def put_stop_fills(spreads: pd.DataFrame, refresh: bool = False) -> pd.DataFrame:
+    """Chain-replayed stop fills for every put spread, cached under ``data/`` (rebuilt when stale)."""
+    puts = spreads[spreads["side"] == "put"]
+    if PUT_STOP_FILL_CACHE.exists() and not refresh:
+        cached = pd.read_parquet(PUT_STOP_FILL_CACHE)
+        cached.columns = [int(c) for c in cached.columns]
+        if set(STOP_LEVELS) <= set(cached.columns):
+            return cached
+    fills = _chain_fills(puts, "P")
+    PUT_STOP_FILL_CACHE.parent.mkdir(parents=True, exist_ok=True)
+    fills.rename(columns=str).to_parquet(PUT_STOP_FILL_CACHE)
+    return fills
+
+
 def call_side_pl(spreads: pd.DataFrame, stop_pct: float | None, slippage: float,
-                 fills: pd.DataFrame | None = None) -> tuple[pd.Series, pd.Series]:
-    """Call-side P/L under a stop at ``stop_pct``% of the credit, and whether it fired; index (date, entry_time).
+                 fills: pd.DataFrame | None = None, side: str = "call") -> tuple[pd.Series, pd.Series]:
+    """One side's P/L (``side`` "call" or "put") under a stop at ``stop_pct``% of its credit, and whether it fired;
+    index (date, entry_time).
 
     A stopped spread loses its fill % of the credit plus ``slippage`` (capped at the wing), the opening
     fees and the closing fees ($1.94).
     """
-    calls = spreads[spreads["side"] == "call"].set_index(["date", "entry_time"])
+    calls = spreads[spreads["side"] == side].set_index(["date", "entry_time"])
     if stop_pct is None:
         return calls["p_l"], pd.Series(False, index=calls.index)
-    fills = call_stop_fills(spreads) if fills is None else fills
+    if fills is None:
+        fills = call_stop_fills(spreads) if side == "call" else put_stop_fills(spreads)
     level = min(STOP_LEVELS, key=lambda lv: abs(lv - stop_pct))
     # Whether it fires: the export's worst intraday loss (the backtester's own quotes) reached the stop,
     # and not only on the settlement print. The chain's trade prints are too noisy to decide this.
@@ -183,3 +200,9 @@ def call_side_pl(spreads: pd.DataFrame, stop_pct: float | None, slippage: float,
     cap = calls["wing_width"] * 100 - calls["premium"]
     stopped = -np.minimum(fill_pct / 100 * calls["premium"] + slippage, cap) - calls["opening_commissions_fees"] - 1.94
     return calls["p_l"].where(~hit, stopped), pd.Series(hit, index=calls.index)
+
+
+def put_side_pl(spreads: pd.DataFrame, stop_pct: float | None, slippage: float,
+                fills: pd.DataFrame | None = None) -> tuple[pd.Series, pd.Series]:
+    """Put-side P/L under a stop at ``stop_pct``% of its credit, and whether it fired (see ``call_side_pl``)."""
+    return call_side_pl(spreads, stop_pct, slippage, fills, side="put")

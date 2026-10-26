@@ -927,6 +927,29 @@ def tranche_high_pairs(corr: pd.DataFrame, threshold: float = 0.7) -> pd.DataFra
 SLIPPAGES = (0.0, EXIT_SLIPPAGE)
 
 
+def put_condor_pl(panel: pd.DataFrame, spreads: pd.DataFrame, stop_pct: float | None,
+                  slippage: float = EXIT_SLIPPAGE) -> tuple[pd.Series, pd.Series]:
+    """Condor P/L with a put stop replayed from the chain (calls to expiry), and whether the stop fired."""
+    key = pd.MultiIndex.from_frame(panel[["date", "entry_time"]])
+    put, hit = br.put_side_pl(spreads, stop_pct, slippage)
+    call = spreads[spreads["side"] == "call"].set_index(["date", "entry_time"])["p_l"]
+    return (pd.Series(put.reindex(key).to_numpy() + call.reindex(key).to_numpy(), index=panel.index),
+            pd.Series(hit.reindex(key).fillna(False).to_numpy(bool), index=panel.index))
+
+
+def stop_scan_put(panel: pd.DataFrame, spreads: pd.DataFrame, cal: Calendars) -> pd.DataFrame:
+    """The strategy's condors with a put-side stop at every level, at $0 and $20 slippage (the call side held to
+    expiry): the same replay as ``stop_scan``, on the put spreads."""
+    book = panel[version_mask(panel, **STRATEGY)]
+    rows = []
+    for slip in SLIPPAGES:
+        for stop in [None, *br.STOP_LEVELS]:
+            pl, hit = put_condor_pl(book, spreads, stop, slip)
+            rows.append({"slippage": slip, "stop_pct": _fmt(stop), "put_stop_hit_rate": float(hit.mean() * 100),
+                         **score_pl(pl, book["date"], cal)})
+    return pd.DataFrame(rows).set_index(["slippage", "stop_pct"])
+
+
 def stop_scan(panel: pd.DataFrame, spreads: pd.DataFrame, cal: Calendars) -> pd.DataFrame:
     """The strategy's condors with the call stop at every level in ``br.STOP_LEVELS``, at $0 and $20 slippage.
 
@@ -1363,7 +1386,7 @@ def fig_calendar(wd: pd.DataFrame, tt: pd.DataFrame | None = None, note: str | N
     return fig
 
 
-def fig_stop(sc: pd.DataFrame, note: str | None = None):
+def fig_stop(sc: pd.DataFrame, note: str | None = None, side: str = "call"):
     """Sharpe and total P/L by call-stop level, at $20 exit slippage and $0 for reference."""
     with plt.rc_context(STYLE):
         fig, axes = plt.subplots(1, 2, figsize=(14, 4.4))
@@ -1378,7 +1401,7 @@ def fig_stop(sc: pd.DataFrame, note: str | None = None):
             ax.axhline(no_stop[col], color=INK, ls=":", lw=1.3,
                        label=f"no stop ({no_stop[col]:.2f})" if col == "sharpe" else f"no stop ({_k(no_stop[col])})")
             ax.set_xticks(x, labels)
-            ax.set_xlabel("call-side stop, % of the call credit")
+            ax.set_xlabel(f"{side}-side stop, % of the {side} credit")
             ax.set_title(f"{title} (the strategy has no stop: {no_stop[col]:.2f})" if col == "sharpe"
                          else f"{title} (the strategy has no stop: {_k(no_stop[col])})")
             if col == "total_pl":
@@ -1636,6 +1659,7 @@ class FinalStudy:
     weekdays: pd.DataFrame
     tranches: pd.DataFrame
     stops: pd.DataFrame
+    stops_put: pd.DataFrame
     sl_quintiles: pd.DataFrame
     sl_caps: pd.DataFrame
     sl_corr: dict[str, pd.DataFrame]
@@ -1666,6 +1690,7 @@ def compute_final_study(trades_csv: str | Path, term_structure_csv: str | Path |
         panel=panel, spreads=spreads, build_up=build_up(panel, cal), leave_one_out=loo,
         sweeps=sw, sweep_verdict=sweep_verdict(sw), trend=trend_swap(panel, cal),
         weekdays=weekday_table(panel), tranches=tranche_table(panel, cal), stops=stop_scan(panel, spreads, cal),
+        stops_put=stop_scan_put(panel, spreads, cal),
         sl_quintiles=slratio_quintiles(panel), sl_caps=slratio_caps(panel, cal), sl_corr=slratio_correlation(panel),
         addon_scan=scan, addon_test=addon_test(panel, cal), ranking=feature_ranking(loo, scan),
         feature_corr=feature_correlation(panel, feature_ranking(loo, scan)),
