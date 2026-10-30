@@ -31,8 +31,8 @@ md(r"""# SPX 0DTE Iron Condor, 10-wide, 20 tranches: the strategy, built one set
 
 **The trade.** An SPX iron condor expiring the same day: a short call spread and a short put spread, each 10 points wide, opened
 every 20 minutes (the export has 20 entries a day from 09:32) and held to the close. It makes money when SPX stays between the
-short strikes until 16:00. Inside the strategy each condor collects about **$326** (median $325: $175 call side, $145 put side), with
-short strikes a median 11.4 points (call) and 12.9 points (put) from spot.
+short strikes until 16:00. Inside the strategy each condor collects about **$325** (median $325: $175 call side, $145 put side), with
+short strikes a median 11.3 points (call) and 12.9 points (put) from spot.
 
 **The strategy: every setting used**, in the order the greedy cascade adds them (Section 2).
 
@@ -42,8 +42,8 @@ short strikes a median 11.4 points (call) and 12.9 points (put) from spot.
 | 2 | max SPX move up | **max 0%**: SPX at or below its 09:30 open at entry |
 | 3 | trend | **above the 10-day SMA**: SPX at entry against the average of the last 9 closes and the entry price |
 | 4 | term structure | **VIX9D/VIX: min 0.87, max 1.02**, read at each trade's entry minute |
-| 5 | entry times | **7 tranches: 11:33 AM, 11:53 AM, 12:13 PM, 1:13 PM, 1:53 PM, 2:13 PM, 2:53 PM** (the first seven forward selection adds) |
-| 6 | short/long ratio | **max 4** for the whole condor: the two short prices over the two long prices |
+| 5 | short/long ratio | **max 4** for the whole condor: the two short prices over the two long prices |
+| 6 | entry times | **7 tranches: 11:33 AM, 11:53 AM, 12:13 PM, 1:13 PM, 1:33 PM, 1:53 PM, 2:13 PM** (1:33 PM in place of 2:53 PM since 2026-10-30) |
 | | exit | **none: every condor held to expiry**. The 400% call stop is studied in Section 9 (why it isn't used), not as a step |
 | | always | 0DTE, exact strike offsets, 10-wide wings; 1 contract per trade; $0.97 per contract to open and to close, $0.05 entry slippage |
 
@@ -79,7 +79,7 @@ other features, and test the 10-day SMA against the 20-day.
   SMA) and **every condor is held to expiry**, as the strategy trades it. The call stop in Section 9 is replayed from each spread's
   worst intraday loss (never on the settlement print), filled where the SPXW option chain crossed it.
 - **2022-2024 vs 2025-2026**: each version is also scored on the two halves, as a stability check.
-- **Everything is in-sample**, apart from the walk-forward checks in Sections 7 and 11. Intervals are 95% session-bootstrap intervals.""")
+- **Everything is in-sample**, apart from the walk-forward checks in Sections 8 and 11. Intervals are 95% session-bootstrap intervals.""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 1. Setup and data
@@ -141,19 +141,19 @@ display(cs.greedy_view(casc.greedy))
 
 md(r"""| step | settings tried: Sharpe if added | added |
 |---|---|---|
-| 1 (raw book) | **no Thursdays 0.44**, max move 0.37, SMA10 0.35, tranches 0.12, ratio 0.00, band -0.11 | **no Thursdays** |
-| 2 | **max move 0.97**, SMA10 0.71, band 0.66, ratio 0.59, tranches 0.56 | **max move 0%** |
-| 3 | **SMA10 1.50**, band 1.39, ratio 1.15, tranches 1.03 | **above the 10-day SMA** |
-| 4 | **band 2.25**, ratio 1.74, tranches 1.66 | **VIX9D/VIX band** |
-| 5 | **tranches 2.48**, ratio 2.40 | **the 7 tranches** |
-| 6 | **ratio 2.60** | **short/long ratio <= 4** |
+| 1 (raw book) | **no Thursdays 0.44**, max move 0.37, SMA10 0.35, tranches 0.08, ratio 0.00, band -0.11 | **no Thursdays** |
+| 2 | **max move 0.97**, SMA10 0.71, band 0.66, tranches 0.60, ratio 0.59 | **max move 0%** |
+| 3 | **SMA10 1.50**, band 1.39, ratio 1.15, tranches 0.92 | **above the 10-day SMA** |
+| 4 | **band 2.25**, ratio 1.74, tranches 1.69 | **VIX9D/VIX band** |
+| 5 | **ratio 2.40**, tranches 2.35 | **short/long ratio <= 4** |
+| 6 | **tranches 2.49** | **the 7 tranches** |
 
 - **No Thursdays wins step 1** because Thursdays are where the raw book loses its money (Section 3); max move and the 10-day SMA are close
   behind (0.37, 0.35).
 - **The band only pays once the move and trend filters are on:** on the raw book it scores -0.11 (the worst of the entry filters); at step 4
   it adds the most of any step (+0.75).
-- **The tranche step is the fixed set of 7**; Section 7 shows they are the first seven forward selection picks at that point, and what a
-  selection by drawdown picks on its own.
+- **With 13:33 in the tranche set, the ratio cap now comes before the tranches** (2.40 against 2.35 at step 5). With 14:53 the tranches came
+  first.
 
 **The cascade it builds.** Each bar is a full version scored on all 998 sessions.""")
 
@@ -168,20 +168,21 @@ md(r"""| step | trades | total P/L | Sharpe | 2022-24 / 2025-26 | max drawdown |
 | 1. + no Thursdays | 31,768 | $155.6k | 0.44 | 0.58 / 0.13 | -$67.9k | 79.9% |
 | 2. + max move up 0% | 14,416 | $195.9k | 0.97 | 1.05 / 0.80 | -$33.6k | 81.7% |
 | 3. + above the 10-day SMA | 7,362 | $205.6k | 1.50 | 1.54 / 1.43 | -$22.5k | 81.9% |
-| 4. + VIX9D/VIX 0.87-1.02 | 4,630 | **$213.3k** | 2.25 | 2.16 / 2.48 | -$15.1k | 83.4% |
-| 5. + 7 forward-selected tranches | 1,582 | $113.4k | 2.48 | 2.33 / 2.83 | -$4.9k | 85.7% |
-| **6. + short/long ratio <= 4** | **1,450** | **$112.0k** | **2.60** | **2.44 / 2.92** | **-$3.8k** | **87.4%** |
+| 4. + VIX9D/VIX 0.87-1.02 | 4,630 | $213.3k | 2.25 | 2.16 / 2.48 | -$15.1k | 83.4% |
+| 5. + short/long ratio <= 4 | 3,940 | $211.4k | 2.40 | 2.30 / 2.61 | -$12.7k | 86.5% |
+| **6. + the 7 tranches** | **1,528** | **$115.5k** | **2.49** | **2.48 / 2.51** | **-$6.5k** | **87.3%** |
 
 **The raw book is a coin flip that loses slowly:** a condor wins 66% of the time, but an average win (+$254) is half an average loss
 (-$497), so the book drifts to -$7.5k with a -$113k drawdown.
 
 - **The first four steps build the money:** no Thursdays alone turns -$7.5k into +$155.6k; max move, the 10-day SMA and the band each add
   +0.5 to +0.75 Sharpe, and P/L peaks at $213.3k with the band.
-- **The 7 tranches and the ratio cap trade money for steadiness:** they cost $101.2k between them but take Sharpe from 2.25 to 2.60 and the
-  drawdown from -$15.1k to -$3.8k.
+- **The ratio cap and the 7 tranches trade money for steadiness:** they cost $97.8k between them but take Sharpe from 2.25 to 2.49 and the
+  drawdown from -$15.1k to -$6.5k.
 
-**The strategy: 1,450 trades, $112.0k, Sharpe 2.60, -$3.8k drawdown, 87.4% of trades winning**, held to expiry; +$599 on an average trading
-day (76% of days positive), an average win of $285 a condor against an average loss of $399.""")
+**The strategy: 1,528 trades, $115.5k, Sharpe 2.49, -$6.5k drawdown, 87.3% of trades winning**, held to expiry; +$635 on an average trading
+day (75% of days positive), an average win of $284 a condor against an average loss of $415. **With 14:53 instead of 13:33 it was 1,450
+trades, $112.0k, Sharpe 2.60, -$3.8k** (Section 8).""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 3. Step 1: no Thursdays, on the raw book
@@ -301,27 +302,27 @@ display(c["by_year"].round(0))
 
 md(r"""| strategy with Thursdays, per weekday | Mon | Tue | Wed | **Thu** | Fri |
 |---|---|---|---|---|---|
-| avg P/L per condor | +$174 | +$122 | +$143 | **-$22** | +$195 |
-| call / put side | +$100 / +$74 | +$61 / +$61 | +$85 / +$58 | **-$1 / -$21** | +$111 / +$85 |
-| short call / short put breached | 19% / 14% | 22% / 16% | 16% / 13% | **27% / 22%** | 15% / 15% |
-| VIX at the open | 17.4 | 17.5 | 17.8 | **16.5** | 16.7 |
-| sessions with a range above 1% | 4% | 11% | 23% | **32%** | 26% |
-| range / VIX-implied move | 0.54 | 0.58 | 0.72 | **0.80** | 0.72 |
+| avg P/L per condor | +$173 | +$129 | +$127 | **-$38** | +$189 |
+| call / put side | +$100 / +$73 | +$65 / +$65 | +$69 / +$58 | **-$16 / -$22** | +$120 / +$68 |
+| short call / short put breached | 19% / 13% | 21% / 15% | 16% / 12% | **28% / 21%** | 15% / 16% |
+| VIX at the open | 17.5 | 17.1 | 17.8 | **16.5** | 16.7 |
+| sessions with a range above 1% | 4% | 10% | 21% | **32%** | 24% |
+| range / VIX-implied move | 0.53 | 0.57 | 0.69 | **0.80** | 0.71 |
 
 | condor P/L on a Thursday dummy (strategy with Thursdays) | Thursday effect, $ per condor | t | p |
 |---|---|---|---|
-| Thursday alone | **-$176** | -3.32 | 0.001 |
-| + every feature known at entry | **-$181** | -3.54 | <0.001 |
-| + the session's range vs implied (an outcome) | -$122 | -2.77 | 0.006 |
+| Thursday alone | **-$189** | -3.39 | 0.001 |
+| + every feature known at entry | **-$192** | -3.58 | <0.001 |
+| + the session's range vs implied (an outcome) | -$134 | -2.88 | 0.004 |
 
 - **The same story inside the strategy:** entry conditions are ordinary (VIX is in fact the lowest, 16.5), but Thursdays move more than VIX
-  priced (0.80 against 0.54-0.72), both short strikes break more often, and the entry features explain none of the gap.
-- **The realized move explains about a third of it here** (-$181 -> -$122, still significant): even for the same range, Thursday condors do
+  priced (0.80 against 0.53-0.71), both short strikes break more often, and the entry features explain none of the gap.
+- **The realized move explains about a third of it here** (-$192 -> -$134, still significant): even for the same range, Thursday condors do
   worse, which fits an intraday shock (a release or a reversal) more than a steady trend.
-- **It is a low-VIX problem:** Thursdays lose with VIX under 18 (-$150 and -$64 a condor, against +$133 and +$189 on other days), where VIX
-  most underprices them (range / implied 0.91 and 0.78 against 0.66 and 0.56); above 18 the few Thursday trades (102) earn.
-- **Five bad Thursdays sink the rest:** the worst five lose $14.9k, more than all Thursdays together (-$4.5k); the other Thursdays make
-  +$10.4k. The median Thursday session still wins (+$202), but only 56% of them do, against 77% of other days.
+- **It is a low-VIX problem:** Thursdays lose with VIX under 18 (-$181 and -$61 a condor, against +$128 and +$182 on other days), where VIX
+  most underprices them (range / implied 0.89 and 0.78 against 0.64 and 0.56); above 18 the few Thursday trades (106) earn.
+- **Five bad Thursdays sink the rest:** the worst five lose $17.4k, more than all Thursdays together (-$8.1k); the other Thursdays make
+  +$9.4k. The median Thursday session still wins (+$159), but only 56% of them do, against 75% of other days.
 
 **Why no Thursdays, in one line:** not a VIX regime and nothing visible at entry, but Thursdays realise more movement than VIX prices at the
 open, mostly on a few big days each year (macro releases are the likely cause, untested here), and a short-volatility condor has no defence
@@ -546,20 +547,20 @@ display(pd.concat(casc.band_fine, axis=1).round(2))
 
 md(r"""| cap (VIX9D/VIX <=) | 0.99 | 1.00 | 1.01 | **1.02** | 1.03 | 1.04 | 1.05 |
 |---|---|---|---|---|---|---|---|
-| Sharpe | 2.32 | 2.35 | 2.45 | **2.60** | 2.38 | 2.49 | 2.47 |
+| Sharpe | 2.33 | 2.30 | 2.34 | **2.49** | 2.32 | 2.41 | 2.41 |
 
 | floor (VIX9D/VIX >=) | 0.84 | 0.85 | 0.86 | **0.87** | 0.88 | 0.89 | 0.90 |
 |---|---|---|---|---|---|---|---|
-| Sharpe | 2.17 | 2.27 | 2.43 | **2.60** | 2.47 | 2.31 | 2.02 |
+| Sharpe | 2.02 | 2.13 | 2.31 | **2.49** | 2.38 | 2.23 | 1.98 |
 
 **The economic reading:** 1.00 is where the curve inverts (VIX9D = VIX: the next week priced as more stressed than the next month). A cap
 of 1.02 says **flat or barely inverted is fine, clearly inverted is not**. A 2% tolerance on a one-minute reading of two noisy indices is
-reasonable on its own. The 0.87 floor shows the same pattern (2.60 against 2.27 at 0.85 and 2.31 at 0.89): below it the curve is so
+reasonable on its own. The 0.87 floor shows the same pattern (2.49 against 2.13 at 0.85 and 2.23 at 0.89): below it the curve is so
 calm that a move breaks it (Section 6's profile: the short put breached on 42% of condors under 0.80).
 
-- **Both edges are single-point peaks:** one step either way costs 0.13-0.22 Sharpe. Part of that height is the noise of fitting a threshold
+- **Both edges are single-point peaks:** one step either way costs 0.11-0.18 Sharpe. Part of that height is the noise of fitting a threshold
   on the same data; the robust reading is the zone around each edge, not the exact number.
-- **The zone holds up:** every cap from 1.01 to 1.05 scores 2.38-2.60, and every floor from 0.86 to 0.88 scores 2.43-2.60. Past 1.06 on
+- **The zone holds up:** every cap from 1.01 to 1.05 scores 2.32-2.49, and every floor from 0.86 to 0.88 scores 2.31-2.49. Past 1.06 on
   the cap (clearly inverted) and past 0.90 on the floor, Sharpe falls away, in both halves.
 
 **Is the peak statistically significant?** Two checks, both on the same resampled sessions for every value (2,000 session-bootstrap
@@ -575,44 +576,88 @@ for name, t in casc.band_sig.items():
 
 md(r"""| cap vs the strategy's 1.02 | 0.97 | 0.98 | 0.99 | 1.00 | 1.01 | 1.03 | 1.04 | 1.05 | 1.06 |
 |---|---|---|---|---|---|---|---|---|---|
-| Sharpe | 2.03 | 2.25 | 2.32 | 2.35 | 2.45 | 2.38 | 2.49 | 2.47 | 2.44 |
-| t (1.02 minus this) | **2.57** | 1.68 | 1.49 | 1.79 | 1.57 | 1.55 | 0.64 | 0.60 | 0.63 |
-| p | **0.010** | 0.094 | 0.137 | 0.074 | 0.116 | 0.122 | 0.520 | 0.550 | 0.528 |
+| Sharpe | 1.94 | 2.24 | 2.33 | 2.30 | 2.34 | 2.32 | 2.41 | 2.41 | 2.37 |
+| t (1.02 minus this) | **2.27** | 1.11 | 0.81 | 1.36 | 1.61 | 1.14 | 0.45 | 0.40 | 0.48 |
+| p | **0.023** | 0.265 | 0.417 | 0.172 | 0.107 | 0.256 | 0.650 | 0.692 | 0.630 |
 
 | floor vs the strategy's 0.87 | 0.84 | 0.85 | 0.86 | 0.88 | 0.89 | 0.90 | 0.91 | 0.92 |
 |---|---|---|---|---|---|---|---|---|
-| Sharpe | 2.17 | 2.27 | 2.43 | 2.47 | 2.31 | 2.02 | 1.90 | 1.64 |
-| t (0.87 minus this) | 1.46 | 1.43 | 1.28 | 1.64 | 1.83 | **2.93** | **3.01** | **3.66** |
-| p | 0.145 | 0.152 | 0.202 | 0.101 | 0.067 | **0.003** | **0.003** | **<0.001** |
+| Sharpe | 2.02 | 2.13 | 2.31 | 2.38 | 2.23 | 1.98 | 1.86 | 1.63 |
+| t (0.87 minus this) | 1.53 | 1.46 | 1.30 | 1.36 | 1.75 | **2.63** | **2.78** | **3.27** |
+| p | 0.126 | 0.144 | 0.195 | 0.175 | 0.079 | **0.009** | **0.005** | **0.001** |
 
-- **The intervals all overlap:** the strategy's Sharpe of 2.60 has a 95% interval of 1.75 to 3.45, and every cap and floor value's interval
+- **The intervals all overlap:** the strategy's Sharpe of 2.49 has a 95% interval of 1.64 to 3.40, and every cap and floor value's interval
   overlaps it. By the conservative check nothing is distinguishable.
-- **By the paired test, the exact peak isn't significant either.** No cap from 0.98 to 1.08 is significantly worse than 1.02 (p 0.07-0.55);
-  1.04-1.06 are statistically level with it (p ~0.5). **What is significant is the direction:** caps of 0.97 and tighter are clearly worse
-  (p 0.010 and below). Cutting off before the curve flattens costs real money; where exactly past 1.00 the cap sits does not, within
-  this data.
-- **The floor is the same picture:** 0.86-0.89 are level with 0.87 (p 0.07-0.20), and lowering it towards 0.80 isn't significantly worse
-  (p 0.11-0.15), but **raising it to 0.90 or above is clearly worse** (p 0.003 and below).
+- **By the paired test, the exact peak isn't significant either.** No cap from 0.98 to 1.08 is significantly worse than 1.02 (p 0.11-0.69);
+  1.04-1.06 are statistically level with it (p 0.6-0.7). **What is significant is the direction:** caps of 0.97 and tighter are clearly worse
+  (p 0.023 and below). Cutting off before the curve flattens costs real money; where exactly past 1.00 the cap sits does not, within this
+  data.
+- **The floor is the same picture:** 0.86-0.89 are level with 0.87 (p 0.08-0.20), and lowering it towards 0.80 isn't significantly worse
+  (p 0.13-0.16), but **raising it to 0.90 or above is clearly worse** (p 0.009 and below).
 - **So the band's message is robust, its exact numbers are not:** keep the curve between "not too calm" (a floor in the mid-0.80s) and
   "not clearly inverted" (a cap a little above 1.00). 0.87 and 1.02 are the best points of this sample, not significantly better than their
   neighbours.""")
 
 # ---------------------------------------------------------------------------
-md(r"""## 7. Step 5: the tranches, on the book after steps 1-4
+md(r"""## 7. Step 5: the short/long ratio <= 4, on the book after steps 1-4
 
-The book so far trades all 20 entry times. This step keeps the strategy's **7 tranches: 11:33, 11:53, 12:13, 13:13, 13:53, 14:13 and
-14:53**. They are the first seven tranches forward selection adds on this book (below). First, each tranche on this book and how
-correlated they are.""")
+The backtester caps one short/long ratio for the whole condor: the two short strikes' prices over the two long strikes'. Here the book still
+trades all 20 entry times (the tranches come next).""")
+
+code(r"""
+c = casc.ratio_corr
+display(c["summary"].round(3))
+print("partial rank correlation with P/L, controlling for what the ratio moves with:")
+display(c["partial"].round(3))
+print("what the ratio moves with (rank correlation):")
+display(c["related"].round(2))
+print("rank correlation with P/L by year:")
+display(c["by_year"].round(3))
+fv.fig_slratio(casc.ratio_quintiles, casc.ratio_caps, note=cs.note(ct, "ratio", "P/L by ratio, and the cap moved")); plt.show()
+display(casc.ratio_quintiles.round(1))
+display(casc.ratio_caps.round(2))
+""")
+
+md(r"""**A small positive correlation with a clear drop at the top.** Rank correlation with condor P/L +0.10 (interval +0.03 to +0.17); below its
+60th percentile (2.54) +0.44, above it -0.19. The ratio is strike distance in another form (-0.96 to -0.98 with how far the shorts sit from
+spot, +0.92 with the credit).
+
+| condor short/long ratio | trades | avg P/L | win rate | 2022-24 / 2025-26 |
+|---|---|---|---|---|
+| 1.25-1.80 | 930 | +$99 | 87% | +$103 / +$98 |
+| 1.80-2.12 | 924 | **+$122** | 81% | +$117 / +$131 |
+| 2.12-2.54 | 924 | +$101 | 73% | +$102 / +$97 |
+| 2.54-3.42 | 930 | +$111 | 70% | +$121 / +$79 |
+| **above 3.42** | 922 | **+$28** | **59%** | +$37 / **-$6** |
+
+| maximum ratio | trades | total P/L | Sharpe | max drawdown |
+|---|---|---|---|---|
+| 3.5 | 3,758 | $202.4k | 2.36 | -$11.2k |
+| **4 (strategy)** | **3,940** | **$211.4k** | **2.40** | -$12.7k |
+| 4.5 | 4,058 | $214.7k | 2.38 | -$15.0k |
+| 5 | 4,168 | $218.0k | 2.38 | -$14.9k |
+| no cap | 4,630 | $213.3k | 2.25 | -$15.1k |
+
+- **The richest fifth is where the ratio bites:** above about 3.4 condors earn $28 (and lose $6 in 2025-26) and win only 59%.
+- **A cap of 4 is the peak** (2.40): it removes 690 trades for $1.9k and takes the drawdown from -$15.1k to -$12.7k.""")
+
+# ---------------------------------------------------------------------------
+md(r"""## 8. Step 6: the tranches, on the book after steps 1-5
+
+The book so far trades all 20 entry times with the ratio cap on. This step keeps the strategy's **7 tranches: 11:33, 11:53, 12:13, 13:13,
+13:33, 13:53 and 14:13**. **13:33 replaced 14:53 in the live strategy** (green and red in the tables and charts below). First, each
+tranche on this book and how correlated they are.""")
 
 code(r"""
 cs.fig_tranches(casc.tranches, note=cs.note(ct, "tranches", "P/L by tranche, all 20")); plt.show()
 display(fv.highlight_dropped(casc.tranches, 2))
 """)
 
-md(r"""- **The strategy keeps six of the seven best earners:** 13:53 (+$166 a condor), 12:13 (+$156), 11:53 (+$152), 13:13 (+$142), 14:13 (+$139)
-  and 11:33 (+$133), plus 14:53 (+$114). 11:13, 13:33 and 12:53 earn a little more than 14:53 (+$122-128), but forward selection adds 14:53
-  first: it adds more to the book's Sharpe.
-- **The first hour earns the least:** 09:32-10:33 make $32-44 a condor. The last two are weak (15:33 +$23, 15:53 -$21).""")
+md(r"""- **With the ratio cap on, the afternoon earns the most per condor:** 13:53 (+$175), **14:53 (+$174)**, 14:13 (+$162), then 12:13 (+$156)
+  and 11:53 (+$152). **13:33 earns +$142**, level with 13:13 and above 11:33 (+$133).
+- **14:53 earns more per condor than 13:33 but trades on fewer days** (67 condors against 106): the ratio cap removes many of its late,
+  rich condors.
+- **The first hour earns the least** (09:32-10:33: $32-44 a condor); 15:33 and 15:53 earn nothing.""")
 
 code(r"""
 corr = casc.tranche_corr
@@ -624,10 +669,10 @@ display(fv.tranche_blocks(corr).round(2))
 display(fv.tranche_corr_by_gap(corr).round(2))
 """)
 
-md(r"""**Neighbouring tranches are close to the same trade.** Entries 20 minutes apart correlate 0.74 on average; 1 hour apart 0.51, 2 hours
-0.29, 3 hours 0.17, 4 hours 0.07. The 20 tranches are about **2.8 independent bets a day** (average pairwise correlation 0.33). The 7 are
-spread from 11:33 to 14:53, never more than an hour apart, so they share most of each day's risk: what they give up against all 20 is
-mostly the first and the last hour, the weakest tranches.""")
+md(r"""**Neighbouring tranches are close to the same trade.** Entries 20 minutes apart correlate 0.78 on average; 1 hour apart 0.51, 2 hours
+0.33, 3 hours 0.15, 4 hours 0.00. The 20 tranches are about **2.5 independent bets a day** (average pairwise correlation 0.36). The new 7
+run from 11:33 to 14:13, a tighter window than the previous set (to 14:53): 13:33 sits 20 minutes from both 13:13 and 13:53, the
+distance at which tranches move most alike.""")
 
 code(r"""
 fwd, wf = casc.selection, casc.walk_forward
@@ -642,24 +687,24 @@ print(f"chosen-each-year vs all 20, out of sample: Sharpe difference 95% interva
       f"better in {wf.attrs['p_selected_better']:.0%} of resamples")
 """)
 
-md(r"""**Forward selection on this book:** it starts with 11:53 (the best tranche alone), then adds 13:53, 12:13, 14:13, 11:33, 13:13 and 14:53:
-**the strategy's 7, in that order** (Sharpe 2.48 at step 7). It goes on to 11:13 (2.56) and 13:33, where it peaks (2.58, 9 tranches), is
-flat to 12 tranches and falls after.
+md(r"""**Forward selection on this book** (ratio cap on): it starts with 11:53, then adds 13:53, 12:13, 14:13, **14:53**, 11:33 and 13:13 (Sharpe
+2.60 at 7: the previous live set), then **13:33** eighth (2.66), 11:13 (2.73) and 14:33, and plateaus at 2.75 (10-12 tranches).
+
+- **The live 7 are not a forward-selection prefix any more:** they are the first six plus 13:33 (the eighth), skipping 14:53. That set
+  scores 2.49 here, against 2.60 for the first seven.
 
 **Walk-forward:** for each year from 2023, the selection is re-run on every earlier year only and its pick traded in the next year.
 
 | test year | tranches chosen | chosen on earlier years | the strategy's 7 | all 20 |
 |---|---|---|---|---|
-| 2023 | 11 | 1.25 ($24.2k) | 2.24 ($27.3k) | 2.43 ($56.3k) |
-| 2024 | 13 | 1.31 ($27.8k) | 2.05 ($26.0k) | 1.44 ($40.0k) |
-| 2025 | 12 | 2.03 ($31.5k) | 2.57 ($27.3k) | 2.31 ($49.8k) |
-| 2026 | 12 | 3.78 ($17.6k) | 3.59 ($11.7k) | 3.00 ($20.0k) |
-| **2023-26** | | **1.69 ($101.1k)** | **2.39 ($92.3k)** | 2.11 ($166.1k) |
+| 2023 | 10 | 1.34 ($20.9k) | 2.51 ($29.2k) | 2.76 ($56.0k) |
+| 2024 | 14 | 1.17 ($24.5k) | 2.18 ($27.7k) | 1.53 ($38.6k) |
+| 2025 | 13 | 2.35 ($34.9k) | 2.19 ($25.6k) | 2.52 ($53.4k) |
+| 2026 | 11 | 3.85 ($15.5k) | 3.62 ($11.5k) | 2.92 ($18.6k) |
+| **2023-26** | | **1.77 ($95.9k)** | **2.40 ($94.0k)** | 2.30 ($166.7k) |
 
-- **Re-chosen each year, the selection does worse than trading all 20** (1.69 against 2.11 out of sample; better in only 2% of resamples):
-  with little history it keeps too few tranches, and not always the right ones.
-- **The strategy's 7 score 2.39 over the same years**, ahead of all 20 (2.11), but that set was chosen on all the data, so part of its edge
-  is hindsight. It makes $92.3k against all 20's $166.1k.
+- **Re-chosen each year, the selection does worse than trading all 20** (1.77 against 2.30 out of sample; better in under 1% of resamples).
+- **The strategy's 7 score 2.40 over the same years**, a little ahead of all 20 (2.30), but chosen with hindsight.
 - **What holds every year is the first hour:** every walk-forward pick drops 09:32 and 10:33, and three of four drop 10:13.
 
 **Forward selection by drawdown, on its own terms.** A separate search that takes nothing from the strategy's tranche set: **every other
@@ -693,14 +738,10 @@ md(r"""**The drawdown path:**
 | 16 | 13:33 | 2,934 | $192.1k | 2.66 | -$7.8k | 24.7 |
 | 20 | all | 3,940 | $211.4k | 2.40 | -$12.7k | 16.6 |
 
-- **It peaks at 8 tranches: 10:53, 11:13, 11:33, 12:13, 13:53, 14:13, 14:53 and 15:53**, at $39.8 of P/L per $ of drawdown: 1,474 trades,
-  $102.8k, Sharpe 2.29 (2.28 / 2.31 in the two halves), drawdown -$2.6k.
-- **15:53 is a passenger:** with the ratio cap on it trades twice in four years, so it neither helps nor hurts; the working set is the
-  other seven.
-- **Past the peak, each tranche adds more drawdown than profit:** 11:53 and 13:13 still raise Sharpe (to 2.62 at 12) but deepen the
-  drawdown to -$4.1k; from 13 tranches on the drawdown grows fast (-$5.2k to -$12.7k).
-- **Drawdown and Sharpe point to different sizes:** the ratio peaks at 8 tranches with Sharpe 2.29; Sharpe keeps rising to 2.66 at 16
-  tranches, where the drawdown is three times as deep.""")
+- **It peaks at 8 tranches: 10:53, 11:13, 11:33, 12:13, 13:53, 14:13, 14:53 and 15:53** ($39.8 of P/L per $ of drawdown: $102.8k, Sharpe
+  2.29, drawdown -$2.6k). 15:53 trades twice in four years, so the working set is the other seven.
+- **By drawdown, 14:53 is the first tranche picked and 13:33 the 16th:** 13:33 adds the most drawdown per dollar earned of the midday
+  tranches (Section 11 shows why).""")
 
 md(r"""**Your 7 against the other sets, with every other setting on** (the finished strategy, only the tranches changed):""")
 
@@ -710,61 +751,20 @@ display(casc.tranche_sets.drop(columns="tranches").astype(float).round(2))
 
 md(r"""| tranche set (everything else on) | trades | total P/L | Sharpe | 2022-24 / 2025-26 | max drawdown | P/L per $ of drawdown |
 |---|---|---|---|---|---|---|
-| **the strategy's 7** | **1,450** | $112.0k | 2.60 | 2.44 / 2.92 | -$3.8k | 29.4 |
-| forward selection's peak (the 7 + 11:13, 13:33) | 1,892 | $141.9k | **2.73** | 2.64 / 2.93 | -$6.0k | 23.7 |
+| **the strategy's 7 (with 13:33)** | **1,528** | $115.5k | 2.49 | 2.48 / 2.51 | -$6.5k | 17.8 |
+| previous 7 (with 14:53) | 1,450 | $112.0k | 2.60 | 2.44 / **2.92** | -$3.8k | 29.4 |
+| forward selection's peak (11) | 2,054 | $150.7k | **2.75** | 2.64 / **2.99** | -$5.8k | 26.1 |
 | forward selection by drawdown (8) | 1,474 | $102.8k | 2.29 | 2.28 / 2.31 | **-$2.6k** | **39.8** |
-| previous live set (15) | 2,704 | $180.4k | 2.69 | 2.64 / 2.82 | -$6.5k | 27.6 |
+| earlier live set (15) | 2,704 | $180.4k | 2.69 | 2.64 / 2.82 | -$6.5k | 27.6 |
 | all 20 | 3,940 | **$211.4k** | 2.40 | 2.30 / 2.61 | -$12.7k | 16.6 |
 
-- **The drawdown pick has the smallest drawdown (-$2.6k) and the most P/L per $ of drawdown (39.8)**, but the lowest Sharpe here (2.29)
-  and the weakest 2025-26 (2.31).
-- **The 7 come next on drawdown (-$3.8k, 29.4)**, with the best 2025-26 Sharpe alongside the Sharpe pick.
-- **They don't have the highest Sharpe:** adding 11:13 and 13:33 (the 9) scores 2.73 for $29.8k more, and the previous 15 score 2.69 for
-  $68.4k more, each with a drawdown $2-3k deeper. Fewer tranches means fewer trading days, and every idle day pays the 4% hurdle.
-- **The trade-off is size against depth:** the 7 are the smallest, steadiest book; the 9 and the 15 score a higher Sharpe but draw down
-  further.""")
-
-# ---------------------------------------------------------------------------
-md(r"""## 8. Step 6: the short/long ratio <= 4, on the book after steps 1-5
-
-The backtester caps one short/long ratio for the whole condor: the two short strikes' prices over the two long strikes'.""")
-
-code(r"""
-c = casc.ratio_corr
-display(c["summary"].round(3))
-print("partial rank correlation with P/L, controlling for what the ratio moves with:")
-display(c["partial"].round(3))
-print("what the ratio moves with (rank correlation):")
-display(c["related"].round(2))
-print("rank correlation with P/L by year:")
-display(c["by_year"].round(3))
-fv.fig_slratio(casc.ratio_quintiles, casc.ratio_caps, note=cs.note(ct, "ratio", "P/L by ratio, and the cap moved")); plt.show()
-display(casc.ratio_quintiles.round(1))
-display(casc.ratio_caps.round(2))
-""")
-
-md(r"""**On the 7 tranches the ratio's relationship with P/L is a hump.** Rank correlation with condor P/L +0.16 (interval +0.05 to +0.26);
-below its 60th percentile (2.65) +0.51, above it -0.08. The ratio is strike distance in another form (-0.95 to -0.96 with how far the shorts
-sit from spot, +0.89 with the credit).
-
-| condor short/long ratio | trades | avg P/L | win rate | 2022-24 / 2025-26 |
-|---|---|---|---|---|
-| 1.25-1.87 | 318 | +$134 | 90% | +$89 / +$156 |
-| 1.87-2.23 | 316 | **+$197** | 87% | +$195 / +$201 |
-| 2.23-2.65 | 316 | +$188 | 82% | +$205 / +$152 |
-| 2.65-3.23 | 316 | +$117 | 72% | +$140 / +$37 |
-| above 3.23 | 316 | +$81 | **65%** | +$79 / +$93 |
-
-| maximum ratio | trades | total P/L | Sharpe | max drawdown |
-|---|---|---|---|---|
-| 3.5 | 1,350 | $104.4k | 2.49 | -$3.3k |
-| **4 (strategy)** | **1,450** | **$112.0k** | **2.60** | -$3.8k |
-| 4.5 | 1,502 | $113.8k | 2.57 | -$4.7k |
-| 5 | 1,552 | $113.0k | 2.50 | -$5.2k |
-| no cap | 1,582 | $113.4k | 2.48 | -$4.9k |
-
-- **On the 7 tranches the cap removes only 132 trades.** Those earn little ($1.3k between them) and add risk: a cap of 4 is the peak (2.60
-  against 2.48 with no cap), and the drawdown is $1.1k smaller.""")
+- **The swap (13:33 for 14:53) adds $3.4k and costs 0.11 Sharpe, and the drawdown is 70% deeper** (-$6.5k against -$3.8k): 13:33 lost the
+  most of any tranche in the winter 2024-25 drawdown, while 14:53 made money through it (Section 11). It is better in 2022-24 (2.48 against
+  2.44) and clearly worse in 2025-26 (2.51 against 2.92).
+- **13:33 is the better tranche on its own** (rank 6 by P/L against 11 for 14:53, Section 11's Pareto), **but the worse addition to the
+  other six:** it moves with 13:13 and 13:53 and adds to their bad stretch, where 14:53 diversifies it.
+- **Of the sets tested, the new 7 have the second-lowest P/L per $ of drawdown** (17.8, only ahead of all 20) and a drawdown as deep as the
+  earlier 15 tranches' (-$6.5k) with less than two-thirds of their P/L.""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 9. The call and put stops: why the strategy uses neither
@@ -772,7 +772,7 @@ md(r"""## 9. The call and put stops: why the strategy uses neither
 Not a step: the strategy holds every condor to expiry. Here the finished strategy (all six settings) gets a call-side stop at every level,
 replayed the backtester's way: it fires when the call spread's worst intraday loss reached X% of its credit (never on the 16:00 settlement
 print) and fills where the option chain first crossed it, plus **$0.20 per contract ($20) slippage** and fees (blue); $0 slippage for
-reference (grey); the dotted line is the strategy, with no stop. Every level trades the same 1,450 trades.""")
+reference (grey); the dotted line is the strategy, with no stop. Every level trades the same 1,528 trades.""")
 
 code(r"""
 fv.fig_stop(study.stops, note=f"The call stop on the finished strategy ({int(ct.iloc[-1]['trades']):,} trades): every level against no stop"); plt.show()
@@ -781,24 +781,24 @@ display(study.stops.loc[fv.EXIT_SLIPPAGE].round(2))
 
 md(r"""| call stop at $0.20 slippage | fires on | total P/L | Sharpe | max drawdown | 2022-24 / 2025-26 |
 |---|---|---|---|---|---|
-| **none (strategy)** | | **$112.0k** | **2.60** | **-$3.8k** | **2.44 / 2.92** |
-| 100% | 36% of condors | $56.8k | 1.02 | -$4.3k | 0.76 / 1.52 |
-| 200% | 16% | $87.1k | 1.91 | -$3.9k | 1.77 / 2.20 |
-| 300% | 9% | $98.1k | 2.23 | -$4.0k | 2.21 / 2.29 |
-| 400% | 4% | $105.8k | 2.46 | -$3.8k | 2.36 / 2.67 |
+| **none (strategy)** | | **$115.5k** | **2.49** | -$6.5k | **2.48 / 2.51** |
+| 100% | 36% of condors | $60.5k | 1.09 | -$6.3k | 0.97 / 1.33 |
+| 200% | 18% | $84.9k | 1.75 | -$6.3k | 1.74 / 1.76 |
+| 300% | 10% | $101.2k | 2.17 | -$7.1k | 2.37 / 1.75 |
+| 400% | 5% | $110.0k | 2.41 | -$6.5k | 2.47 / 2.27 |
 
-- **Every stop level lowers Sharpe and P/L, in both halves, and none makes the drawdown smaller.** The 400% stop the strategy used until now
-  costs 0.14 Sharpe and $6.2k for the same -$3.8k drawdown.
+- **Every call-stop level lowers Sharpe and P/L, and none cuts the drawdown by more than $0.4k.** The 400% stop costs 0.08 Sharpe and $5.5k
+  for the same -$6.5k drawdown.
 - **The entry filters already do the stop's job:** with SPX at or below the open and above its 10-day SMA, the call side rarely runs away, so a
   stopped call usually would have recovered by the close. Tight stops are ruined by slippage and real fills (at 25-100% the stop fires on
-  36-70% of condors and Sharpe falls to -0.18 to 1.02).
-- **What the backtest can't show is a day far worse than any in these four years.** Going without a stop accepts that risk; the -$3.8k
-  drawdown is the worst the data shows, not the worst possible.""")
+  36-71% of condors and Sharpe falls to -0.08 to 1.09).
+- **What the backtest can't show is a day far worse than any in these four years.** Going without a stop accepts that risk (Section 14
+  shows it arriving in 2026).""")
 
 md(r"""### The same test on the puts
 
 The same replay on the put side: a put-side stop at every level, filled where the option chain first crossed it, plus $0.20 per contract
-slippage and fees (blue; $0 slippage in grey), the call side held to expiry. The dotted line is the strategy, with no stop. Same 1,450
+slippage and fees (blue; $0 slippage in grey), the call side held to expiry. The dotted line is the strategy, with no stop. Same 1,528
 trades at every level.""")
 
 code(r"""
@@ -808,29 +808,26 @@ display(study.stops_put.loc[fv.EXIT_SLIPPAGE].round(2))
 
 md(r"""| put stop at $0.20 slippage | fires on | total P/L | Sharpe | max drawdown | 2022-24 / 2025-26 |
 |---|---|---|---|---|---|
-| **none (strategy)** | | **$112.0k** | **2.60** | **-$3.8k** | **2.44 / 2.92** |
-| 100% | 39% of condors | $62.9k | 1.29 | -$4.7k | 1.57 / 0.72 |
-| 200% | 22% | $77.9k | 1.64 | -$7.8k | 2.11 / 0.72 |
-| 300% | 16% | $83.9k | 1.77 | -$4.6k | 2.07 / 1.13 |
-| 400% | 10% | $90.2k | 1.91 | -$4.5k | 2.10 / 1.51 |
+| **none (strategy)** | | **$115.5k** | **2.49** | **-$6.5k** | **2.48 / 2.51** |
+| 100% | 40% of condors | $62.1k | 1.15 | -$6.8k | 1.47 / 0.50 |
+| 200% | 23% | $79.0k | 1.56 | -$10.3k | 2.08 / 0.45 |
+| 300% | 16% | $86.4k | 1.73 | -$8.6k | 2.09 / 0.93 |
+| 400% | 10% | $93.7k | 1.88 | -$8.1k | 2.12 / 1.36 |
 
 | a 400% stop on each side | fires on | spreads stopped | of them, would have expired winning | P/L of the stopped spreads: stopped / held | cost of the stop | Sharpe |
 |---|---|---|---|---|---|---|
-| call side | 4% of condors | 32 | 31% | -$21.1k / -$14.9k | -$6.2k | 2.46 |
-| **put side** | **10%** | **71** | **42%** | **-$41.7k / -$19.9k** | **-$21.8k** | **1.91** |
+| call side | 5% of condors | 35 | 26% | -$23.6k / -$18.1k | -$5.5k | 2.41 |
+| **put side** | **10%** | **74** | **42%** | **-$43.9k / -$22.1k** | **-$21.8k** | **1.88** |
 
-- **A put stop costs far more than a call stop:** the 400% put stop takes Sharpe from 2.60 to 1.91 and P/L down $21.8k (the call stop:
-  2.46, -$6.2k), and it makes the drawdown deeper (-$4.5k), not shallower. Even with no slippage the best put stop scores 1.96. Only the 75%
-  level trims the drawdown (to -$3.2k), at a Sharpe of 1.03.
-- **The put side touches its stop twice as often and recovers more often:** 71 put spreads reached 400% against 32 calls, and 42% of
-  those puts would have expired winning (31% of the calls). Stopping them turns -$19.9k of held losses into -$41.7k.
-- **The reason is the entry rule:** the strategy sells its condor after SPX has dipped below its open, in an uptrend (above its 10-day
-  SMA). Those intraday dips usually revert by the close, so a put that is deep in trouble at 13:00 is often fine at 16:00, and a stop
-  sells it at the worst point.
-- **It hurts most in 2025-26** (2.92 -> 1.51 at 400%).
-- **The 2026 drawdown (Section 14) can't be tested here:** its two put-side days (2026-06-16 and 06-17) are after the option-chain data
-  ends. Whether a put stop would have cut them is a question for the backtester, but over 2022-2026 a put stop costs much more than it
-  saves.""")
+- **A put stop costs far more than a call stop:** the 400% put stop takes Sharpe from 2.49 to 1.88 and P/L down $21.8k, and makes the drawdown
+  deeper (-$8.1k), not shallower. Even with no slippage the best put stop scores 1.93. Only the 25-75% levels trim the drawdown (to
+  -$4.9k to -$5.1k), at a Sharpe of 0.3-0.9.
+- **The put side touches its stop twice as often and recovers more often:** 74 put spreads reached 400% against 35 calls, and 42% of those
+  puts would have expired winning (26% of the calls).
+- **The reason is the entry rule:** the strategy sells after SPX has dipped below its open, in an uptrend (above its 10-day SMA). Those
+  intraday dips usually revert by the close, so a put deep in trouble at 13:00 is often fine at 16:00, and a stop sells it at the worst point.
+- **It hurts most in 2025-26** (2.51 -> 1.36 at 400%). The 2026 drawdown's put-side days (2026-06-16 and 06-17) are after the option-chain
+  data ends (2025-12-30), so they can't be tested here.""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 10. With everything on: is each threshold still at its best?
@@ -846,20 +843,20 @@ display(study.sl_caps.round(2))
 
 md(r"""| threshold | strategy | Sharpe | nearest alternatives | verdict |
 |---|---|---|---|---|
-| floor (VIX9D/VIX >=) | 0.87 | **2.60** | 0.85: 2.27; 0.89: 2.31 | **at the peak** |
-| cap (VIX9D/VIX <=) | 1.02 | **2.60** | 1.03: 2.38; 1.04: 2.49 | **at the peak** |
-| max move up | 0% | **2.60** | -0.05%: 2.26; +0.05%: 2.44 | **at the peak** |
-| SMA10 bar | 0% | **2.60** | -0.5%: 2.06; +0.5%: 2.22 | **at the peak** |
-| short/long cap | 4 | **2.60** | 3.5: 2.49; 4.5: 2.57 | **at the peak** |
+| floor (VIX9D/VIX >=) | 0.87 | **2.49** | 0.85: 2.13; 0.89: 2.23 | **at the peak** |
+| cap (VIX9D/VIX <=) | 1.02 | **2.49** | 1.03: 2.32; 1.04: 2.41 | **at the peak** |
+| max move up | 0% | **2.49** | -0.05%: 2.19; +0.05%: 2.31 | **at the peak** |
+| SMA10 bar | 0% | **2.49** | -0.5%: 1.90; +0.5%: 2.17 | **at the peak** |
+| short/long cap | 4 | **2.49** | 3.5: 2.48; 4.5: 2.43 | **at the peak** (3.5 is level) |
 
-**With everything on, every threshold is at the top of its sweep, by a clear margin.** The +0.5% SMA10 bar that led at step 3 was ahead only
-because the band wasn't on yet.""")
+**With everything on, every threshold is at the top of its sweep.** The +0.5% SMA10 bar that led at step 3 was ahead only because the band
+wasn't on yet. In 2025-26 alone, a slightly looser cap (1.04: 2.64 against 2.51) scores higher.""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 11. Drawdowns by tranche: where the losses come from, and whether to cut the 7 further
 
-Everything in this section is on **the finished strategy** (all six settings, held to expiry): 1,450 trades, $112.0k, Sharpe 2.60, max
-drawdown -$3.8k. First, the book's drawdowns: the equity curve, the curve below its last peak, and its five deepest drawdowns.""")
+Everything in this section is on **the finished strategy** (all six settings, held to expiry): 1,528 trades, $115.5k, Sharpe 2.49, max
+drawdown -$6.5k. First, the book's drawdowns: the equity curve, the curve below its last peak, and its five deepest drawdowns.""")
 
 code(r"""
 tdd = td.compute(panel)
@@ -869,14 +866,15 @@ display(tdd.episodes.round(0))
 
 md(r"""| drawdown | peak | trough | recovered | depth | sessions to the trough |
 |---|---|---|---|---|---|
-| **DD1** | 2024-12-02 | 2024-12-10 | 2025-05-21 | **-$3.8k** | 6 (115 under water) |
-| DD2 | 2023-11-28 | 2023-12-20 | 2023-12-29 | -$2.5k | 16 |
-| DD3 | 2024-10-03 | 2024-10-07 | 2024-11-12 | -$2.3k | 2 |
-| DD4 | 2025-05-27 | 2025-06-02 | 2025-06-17 | -$1.8k | 4 |
-| DD5 | 2023-05-22 | 2023-05-23 | 2023-05-30 | -$1.7k | 1 |
+| **DD1** | 2024-12-02 | 2025-03-21 | 2025-07-28 | **-$6.5k** | 74 (160 under water) |
+| DD2 | 2023-11-28 | 2023-12-13 | 2024-01-12 | -$3.0k | 11 |
+| DD3 | 2024-10-03 | 2024-10-07 | 2024-11-12 | -$2.0k | 2 |
+| DD4 | 2024-06-10 | 2024-06-11 | 2024-07-08 | -$1.9k | 1 |
+| DD5 | 2023-10-10 | 2023-11-06 | 2023-11-27 | -$1.8k | 19 |
 
-- **The deepest drawdown is -$3.8k, reached in six sessions in December 2024**; recovering took until May 2025 (115 sessions).
-- **The others are -$1.7k to -$2.5k**, each recovered within six weeks.
+- **The deepest drawdown is the winter of 2024-25: -$6.5k from December to March, eight months under water** (recovered at the end of July
+  2025). With 14:53 instead of 13:33 the same stretch cost -$3.8k and was over by May.
+- **The others are -$1.8k to -$3.0k**, each recovered within seven weeks.
 
 **Which tranches lost money in each drawdown**, from its peak to its trough:""")
 
@@ -885,39 +883,39 @@ td.fig_episode_heatmap(tdd.contrib, tdd.episodes); plt.show()
 display(tdd.contrib.round(0))
 """)
 
-md(r"""- **DD1 is the late-morning tranches:** 11:53 (-$1.15k), 12:13 (-$1.14k), 13:13 (-$0.8k) and 11:33 (-$0.7k); the three afternoon tranches
-  didn't lose in it.
-- **The others are spread out:** 13:13 lost in all five (-$0.3k to -$0.9k), and with 13:53-14:53 it carries most of DD2, DD4 and DD5.
+md(r"""- **DD1 is the midday core, led by 13:33** (-$2.1k), then 11:53 (-$1.7k), 12:13 (-$1.3k), 11:33 (-$0.8k) and 13:13 (-$0.7k); 13:53 and 14:13 held
+  up. **13:33 is the single biggest contributor to the strategy's deepest drawdown.**
+- **13:33 loses in all five drawdowns** (-$0.3k to -$2.1k); 13:13 in four.
 
 Each tranche's own drawdown, on one scale, and its P/L year by year:""")
 
 code(r"""
 td.fig_tranche_underwater(tdd.daily); plt.show()
 td.fig_by_year(tdd.by_year); plt.show()
-display(tdd.table.round(2))
+display(fv.highlight_dropped(tdd.table, 2))
 display(tdd.by_year.round(0))
 """)
 
 md(r"""| tranche | trades | total P/L | own max drawdown | P/L per $ of drawdown | losing years | in DD1 | book without it: Sharpe / P/L / max DD |
 |---|---|---|---|---|---|---|---|
-| 11:33 | 244 | $16.3k | -$1.9k | 8.8 | 0 | -$0.7k | -0.20 / -$16.3k / +$0.7k |
-| 11:53 | 238 | **$18.1k** | **-$2.1k** | 8.8 | 0 | **-$1.1k** | -0.22 / -$18.1k / +$0.8k |
-| 12:13 | 220 | $17.2k | -$1.8k | 9.6 | 0 | **-$1.1k** | -0.21 / -$17.2k / +$1.0k |
-| 13:13 | 230 | $16.4k | -$1.7k | 9.5 | 0 | -$0.8k | -0.16 / -$16.4k / +$0.8k |
-| 13:53 | 202 | $17.7k | -$1.6k | 11.1 | 0 | $0.0k | **-0.28** / -$17.7k / $0.0k |
-| 14:13 | 182 | $14.8k | -$1.5k | 9.8 | 0 | $0.0k | -0.22 / -$14.8k / $0.0k |
-| 14:53 | 134 | $11.7k | **-$0.9k** | **13.4** | 0 | $0.0k | -0.20 / -$11.7k / -$0.6k |
+| 11:33 | 244 | $16.3k | -$1.9k | 8.8 | 0 | -$0.8k | -0.21 / -$16.3k / +$0.8k |
+| 11:53 | 238 | **$18.1k** | -$2.1k | 8.8 | 0 | -$1.7k | -0.23 / -$18.1k / +$1.4k |
+| 12:13 | 220 | $17.2k | -$1.8k | 9.6 | 0 | -$1.3k | -0.21 / -$17.2k / +$1.2k |
+| 13:13 | 230 | $16.4k | -$1.7k | 9.5 | 0 | -$0.7k | -0.14 / -$16.4k / +$0.7k |
+| **13:33 (swapped in)** | 212 | $15.1k | **-$2.2k** | **6.8** | 0 | **-$2.1k** | **-0.09** / -$15.1k / **+$2.1k** |
+| 13:53 | 202 | $17.7k | -$1.6k | **11.1** | 0 | $0.0k | **-0.24** / -$17.7k / $0.0k |
+| 14:13 | 182 | $14.8k | -$1.5k | 9.8 | 0 | +$0.2k | -0.22 / -$14.8k / -$0.2k |
 
 (A single tranche's Sharpe isn't shown: on its own it never clears the 4% hurdle on $200k, so P/L per $ of drawdown compares them instead.
 "Book without it: max DD" is the change in the book's max drawdown: + means smaller.)
 
-- **All seven made money in every year**, $11.7k to $18.1k each.
-- **Dropping any one costs 0.16 to 0.28 Sharpe and $12k-18k.** The four late-morning tranches each carry part of DD1, so dropping one would
-  shrink it by $0.7k-1.0k, but each is among the best earners.
+- **All seven made money in every year**, $14.8k to $18.1k each.
+- **13:33 is the weakest of the seven by every risk measure:** the deepest own drawdown (-$2.2k), the lowest P/L per $ of drawdown (6.8),
+  the biggest share of DD1, and the smallest Sharpe cost if dropped (-0.09). Dropping it would shrink the max drawdown by $2.1k.
 
 **Cutting further, one tranche at a time.** Starting from the 7, each step drops the tranche whose removal gives the best book: by Sharpe
-(blue), or by max drawdown (orange). Each rule stops at the highest Sharpe or (by drawdown) the most P/L per $ of drawdown; the printed
-line under the chart names where.""")
+(blue), or by max drawdown (orange). The middle chart is P/L per $ of peak margin. Each rule stops at the highest Sharpe or (by drawdown)
+the most P/L per $ of drawdown; the printed line under the chart names where.""")
 
 code(r"""
 td.fig_elimination(tdd.paths); plt.show()
@@ -926,16 +924,15 @@ for crit, p in tdd.paths.items():
     display(p.drop(columns="tranches").round(2))
 """)
 
-md(r"""| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD | cut by drawdown: removed | Sharpe | P/L | max DD |
-|---|---|---|---|---|---|---|---|---|
-| **7 (strategy)** | | **2.60** | **$112.0k** | **-$3.8k** | | 2.60 | $112.0k | -$3.8k |
-| 6 | 13:13 | 2.43 | $95.7k | -$3.0k | 12:13 | 2.39 | $94.8k | -$2.8k |
-| 5 | 11:33 | 2.18 | $79.4k | -$2.3k | 13:13 | 2.14 | $78.5k | -$2.0k |
-| 4 | 14:53 | 1.86 | $67.7k | -$2.9k | 11:53 | 1.63 | $60.4k | -$1.4k |
+md(r"""| tranches kept | cut (both rules) | Sharpe | P/L | max DD | P/L per $ of margin |
+|---|---|---|---|---|---|
+| **7 (strategy)** | | **2.49** | **$115.5k** | -$6.5k | 18.9x |
+| 6 | **13:33** | 2.40 | $100.4k | **-$4.4k** | 19.1x |
+| 5 (by Sharpe) | 13:13 | 2.18 | $84.0k | -$3.7k | 19.2x |
+| 5 (by drawdown) | 11:53 | 2.13 | $82.3k | -$3.0k | 18.8x |
 
-- **By Sharpe there is nothing to cut:** every removal lowers it, so the rule keeps all 7.
-- **By drawdown every cut shrinks the drawdown, and the P/L with it:** at 4 tranches the drawdown is -$1.4k but the book makes $60.4k at
-  Sharpe 1.63.
+- **Both rules cut 13:33 first.** Without it the drawdown falls from -$6.5k to -$4.4k for 0.09 Sharpe and $15.1k.
+- **By Sharpe nothing is worth cutting** (every removal lowers Sharpe), so the rule keeps all 7; by drawdown it goes down to 4 tranches.
 
 **The same cut, starting from all 20 tranches** (every other setting on), to see how the curve goes and where the 7 sit on it:""")
 
@@ -948,31 +945,23 @@ for crit, p20 in tdd.paths20.items():
     display(p20.drop(columns="tranches").round(2))
 """)
 
-md(r"""| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD |
-|---|---|---|---|---|
-| 20 | | 2.40 | $211.4k | -$12.7k |
-| 16 | 10:33, 09:32, 10:13, 09:52 | 2.66 | $192.1k | -$7.8k |
-| 15 | 12:33 | 2.69 | $180.4k | -$6.5k |
-| 12 | 15:33, 10:53, 12:53 | **2.75** | $155.9k | -$6.0k |
-| 10 | 15:13, 15:53 | **2.75** | $150.5k | -$5.8k |
-| 9 | 14:33 | 2.73 | $141.9k | -$6.0k |
-| 8 | 11:13 | 2.66 | $127.1k | -$5.6k |
-| **7** | **13:33** | **2.60** | **$112.0k** | **-$3.8k** |
-| 6 | 13:13 | 2.43 | $95.7k | -$3.0k |
+md(r"""| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD | P/L per $ of margin |
+|---|---|---|---|---|---|
+| 20 | | 2.40 | $211.4k | -$12.7k | 14.7x |
+| 16 | 10:33, 09:32, 10:13, 09:52 | 2.66 | $192.1k | -$7.8k | 15.2x |
+| 12 | 12:33, 15:33, 10:53, 12:53 | **2.75** | $155.9k | -$6.0k | 16.6x |
+| 10 | 15:13, 15:53 | **2.75** | $150.5k | -$5.8k | 17.4x |
+| 8 | 14:33, 11:13 | 2.66 | $127.1k | -$5.6k | 18.3x |
+| **7** | **13:33** | **2.60** | **$112.0k** | **-$3.8k** | **18.5x** |
 
-- **Cutting by Sharpe from all 20 lands exactly on the strategy's 7:** it drops the first hour first, then 12:33, then the late tranches
-  (15:33, 15:13, 15:53) and 10:53, 12:53, 14:33, 11:13 and 13:33. The seven left are 11:33, 11:53, 12:13, 13:13, 13:53, 14:13 and 14:53.
-- **The Sharpe curve is a plateau from 10 to 12 tranches (2.75)**; going down to 7 costs 0.15 Sharpe and $38k but takes the drawdown from
-  -$5.6k to -$3.8k at the last step alone (cutting 13:33).
-- **Cutting by drawdown from 20 picks a different book** (it also stops at 11, Sharpe 2.24, drawdown -$3.9k), and its 7 aren't the
-  strategy's: the drawdown rule keeps weaker, rarely-traded tranches that smooth the curve.
-- **P/L per $ of margin (middle chart) rises all the way down to the 7:** each condor ties up one wing less its credit (~$700), and a set's
-  margin is its busiest day. All 20 tranches make 14.7x their peak margin over the four years ($211.4k on $14.4k); the 7 make **18.5x**
-  ($112.0k on $6.1k). Per tranche, $10.6k for all 20 against $16.0k for the 7. Cutting below 7 keeps raising P/L per $ of margin (to 20x)
-  but lowers Sharpe: fewer trading days, and every idle day pays the 4% hurdle.
+- **Cutting by Sharpe from all 20 lands on the previous 7 (with 14:53), not the new ones:** its last cut before 7 tranches is 13:33. The
+  new 7 are never on this path.
+- **P/L per $ of margin rises steadily down the path** (14.7x for all 20, 18.5x at the previous 7); the new 7 make 18.9x ($115.5k on $6.1k of
+  peak margin), about the same.
+- **Cutting by drawdown from 20 picks a different book** (it also stops at 11, Sharpe 2.24, drawdown -$3.9k).
 
 **Pareto: how the profit is spread across the tranches.** Each tranche's total P/L with every other setting on, largest first (blue: the
-strategy's 7), and the cumulative share of the profit (right axis):""")
+strategy's 7; green: 13:33, swapped in; red: 14:53, swapped out), and the cumulative share of the profit (right axis):""")
 
 code(r"""
 td.fig_pareto(tdd.pareto); plt.show()
@@ -986,22 +975,21 @@ md(r"""| rank | tranche | P/L | share | cumulative | P/L per $ of margin | trade
 | 3 | 12:13 | $17.2k | 8.1% | 25.1% | 19.4x | **yes** |
 | 4 | 13:13 | $16.4k | 7.7% | 32.8% | 18.7x | **yes** |
 | 5 | 11:33 | $16.3k | 7.7% | 40.5% | 18.4x | **yes** |
-| 6 | 13:33 | $15.1k | 7.1% | 47.6% | 17.2x | no |
+| **6** | **13:33** | **$15.1k** | **7.1%** | 47.6% | 17.2x | **yes (swapped in)** |
 | 7 | 14:13 | $14.8k | 7.0% | 54.6% | 17.5x | **yes** |
 | 8 | 11:13 | $14.7k | 7.0% | 61.6% | 16.5x | no |
 | 9 | 12:53 | $14.1k | 6.7% | 68.3% | 15.9x | no |
 | 10 | 12:33 | $11.7k | 5.5% | 73.8% | 13.3x | no |
-| 11 | 14:53 | $11.7k | 5.5% | 79.3% | 14.1x | **yes** |
+| **11** | **14:53** | **$11.7k** | **5.5%** | 79.3% | 14.1x | **no (swapped out)** |
 | 12 | 10:53 | $10.3k | 4.9% | 84.2% | 11.7x | no |
 | 13-20 | 14:33, first hour, 15:13, 15:33, 15:53 | $33.3k | 15.8% | 100% | 0.1-10.1x | no |
 
+- **With the swap the strategy trades exactly the top 7 tranches by P/L: 54.6% of the profit from 35% of the tranches.** 14:53, swapped out,
+  is 11th.
 - **It isn't an 80/20 book:** the profit is spread fairly evenly over the middle of the day (5-9% per tranche), and 80% of it takes the top
-  **12** of 20 tranches. The tail is the first hour (2-2.5% each), 15:13 and 14:33, and 15:33 / 15:53, which make nothing.
-- **The strategy's 7 are the top 5, the 7th and the 11th: 53% of the profit from 35% of the tranches** (and 37% of the trades), with 30%
-  of all-20's drawdown (-$3.8k against -$12.7k).
-- **13:33, 11:13 and 12:53 (ranks 6, 8 and 9) are the profitable tranches the strategy leaves out**, each about 7% of the profit; they are
-  the ones that lift Sharpe to the 2.75 plateau when added back, at the cost of a deeper drawdown. 14:53 (rank 11) earns less but trades
-  on fewer days and adds least to the drawdown, which is why forward selection keeps it.""")
+  **12** of 20.
+- **Ranking by P/L and ranking by contribution to the book disagree:** 13:33 earns $3.4k more than 14:53, but adds $2.7k of drawdown;
+  Sections 8 and 11 show the book is steadier with 14:53.""")
 
 md(r"""**Do the cuts hold out of sample?** The same rules re-run for each year on the earlier years only:""")
 
@@ -1013,12 +1001,13 @@ for crit, w in tdd.walk_forward.items():
     display(w.round(2))
 """)
 
-md(r"""- **By Sharpe, the rule cuts nothing in 2024-26**; only in 2023, with a single year of history, does it cut (11:33 and 11:53), and that
-  year it loses (0.58 against 2.48).
-- **By drawdown, the cuts lose out of sample** (1.11 against 2.53, $46.0k against $91.0k).
+md(r"""- **By Sharpe, the rule cuts nothing in 2025-26;** in 2023 and 2024, with one or two years of history, it cuts (11:33 and 11:53, then
+  13:53) and loses those years (0.86 against 2.51, 1.65 against 2.18): out of sample 1.79 against 2.40.
+- **By drawdown, the cuts lose out of sample** (1.40 against 2.40, $53.1k against $94.0k).
 
-**What this says about cutting the selection:** nothing. Every one of the 7 made money every year, each one's removal lowers Sharpe, and the
-drawdowns are shallow market episodes that a smaller book would only make smaller in proportion.""")
+**What this says about the selection:** the drawdowns are market episodes, and the one tranche that stands out on risk is **13:33**: the
+biggest share of the deepest drawdown, the lowest P/L per $ of drawdown, the first cut by both rules. On this data the swap from 14:53 to
+13:33 makes the book a little richer and noticeably less steady.""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 12. Feature ranking and correlation
@@ -1027,14 +1016,14 @@ Every feature on one Sharpe scale, against the finished strategy:
 
 - **the strategy's settings (blue, bold, "ON:"):** the Sharpe **lost** when the setting is removed from the finished strategy;
 - **every other feature (orange):** the Sharpe **gained** by its best single cut as a further filter (a min or max at a decile, keeping
-  at least 30% of condors). Dark orange means the gain holds in both halves;
+  at least 30% of condors). Dark orange means the gain holds in both halves. **A day on which a feature doesn't exist is kept** (VIX1D, for
+  example, only starts on 2023-04-24): a filter can't act on missing data;
 - **a noise feature (grey):** a random number per session put through the same search: **whatever it scores is what luck alone finds.**
 
-The red line is the noise bar, corrected for testing many candidates: 200 random features go through the same search, and the
-bar is the 95th percentile of the **best** of 33 of them (as many as there are candidates). Picking the best of 33 features is
-itself a search, so a candidate has to beat what the luckiest of 33 random features would score. The candidates are price,
-volatility, curve and calendar features, including the 20-day SMA (now a candidate, not a setting) and the vol-regime feature library's
-findings (VIX9D gap, month end, rule W, ATR20, low VRP).""")
+The red line is the noise bar, corrected for testing many candidates: 200 random features go through the same search, and the bar is the
+95th percentile of the **best** of 33 of them (as many as there are candidates). The candidates are price, volatility, curve and calendar
+features, including the 20-day SMA (now a candidate, not a setting) and the vol-regime feature library's findings (VIX9D gap, month end,
+rule W, ATR20, low VRP).""")
 
 code(r"""
 fv.fig_ranking(study.ranking); plt.show()
@@ -1046,26 +1035,36 @@ display(study.leave_one_out.round(2))
 display(study.ranking.round(2))
 """)
 
-md(r"""**How to read the noise.** The noise feature scores **-0.11**: one random draw, close to the middle of what random features score
-(median -0.16 over 200 draws; most random cuts lower Sharpe, because with 187 trading days every idle day pays the 4% hurdle). One random
-feature beats +0.01 only 5% of the time, but **the best of 33 random features beats +0.17 5% of the time**, and typically scores +0.06.
-That is the bar a candidate has to clear: **+0.17**.
+md(r"""**How to read the noise.** The noise feature scores **-0.16**: one random draw, close to the middle of what random features score
+(median -0.14 over 200 draws; most random cuts lower Sharpe, because every idle day pays the 4% hurdle). One random feature beats +0.05 only
+5% of the time, but **the best of 33 random features beats +0.28 5% of the time**, and typically scores +0.09. That is the bar a candidate has
+to clear: **+0.28**.
 
 | removed from the finished strategy | trades | Sharpe | change | total P/L change |
 |---|---|---|---|---|
-| above the 10-day SMA | 2,864 | 1.32 | **-1.28** | -$11.2k |
-| max move up 0% | 3,946 | 1.42 | **-1.18** | +$10.4k |
-| the VIX9D/VIX band | 2,324 | 1.89 | **-0.71** | +$4.2k |
-| no Thursdays | 1,862 | 2.03 | **-0.56** | -$4.5k |
-| the 7 tranches (trade all 20) | 3,940 | 2.40 | -0.20 | +$99.3k |
-| short/long ratio <= 4 | 1,582 | 2.48 | -0.12 | +$1.3k |
-| *added: a 400% call stop* | 1,450 | 2.46 | *-0.14* | *-$6.2k* |
+| above the 10-day SMA | 2,970 | 1.16 | **-1.33** | -$18.5k |
+| max move up 0% | 4,164 | 1.39 | **-1.10** | +$14.0k |
+| the VIX9D/VIX band | 2,450 | 1.85 | **-0.64** | +$6.2k |
+| no Thursdays | 1,958 | 1.86 | **-0.63** | -$8.1k |
+| short/long ratio <= 4 | 1,588 | 2.35 | -0.14 | -$0.5k |
+| the 7 tranches (trade all 20) | 3,940 | 2.40 | -0.09 | +$95.9k |
+| *added: a 400% call stop* | 1,528 | 2.41 | *-0.08* | *-$5.5k* |
 
-- **Every setting pays, in both halves.** The 10-day SMA is now the most important: without it Sharpe falls to 1.32, the book loses $11.2k
-  and the drawdown triples (-$3.8k to -$11.8k).
-- **No candidate clears the noise bar, and none adds in both halves.** The best, SPX's 5-day return (+0.10), is what the luckiest of 33
-  random features would typically score, and it only works from 2025 (-0.03 in 2022-24).
-  SMA5 > SMA9 loses (-0.04).""")
+- **The four entry filters pay in both halves.** The 10-day SMA is the most important: without it Sharpe falls to 1.16, the book makes $18.5k
+  less and the drawdown nearly doubles (-$6.5k to -$11.9k).
+- **The ratio cap and the 7 tranches now pay in 2022-24 only** (+0.19 and +0.18), not in 2025-26 (-0.01 and -0.10): with 13:33 in, the set's
+  edge over trading all 20 is gone in the recent half.
+- **No candidate clears the noise bar, and none adds in both halves.** The best, SPX's 5-day return (+0.16), is what the luckiest of 33
+  random features would typically score, and it only works from 2025 (-0.05 in 2022-24).
+
+**Why the VIX1D features looked so bad, and what they really score.** In an earlier version of this ranking, VIX1D at the open (-0.69) and
+VIX1D/VIX30 (-0.76) were the two worst candidates, far below the random-noise control (-0.11); VIX1D/VIX9D was weak and redundant and is left
+out of the ranking (`DROPPED_FEATURES` in `final_version.py`). **That was missing data, not a signal:** VIX1D only exists from 2023-04-24, and
+20% of the strategy's condors (+$30.8k) come before it. The search treated a blank as failing the rule, so every VIX1D cut threw out all of
+2022 to April 2023 and lost ~$31k. **With those days kept (a filter can't act on a day its feature doesn't exist), VIX1D at the open scores
++0.05 and VIX1D/VIX30 -0.04**: mid-table, above the noise control, below the bar, and neither works in both halves. On the days it exists,
+VIX1D at the open is only weakly related to the condor's P/L (rank correlation -0.15; P/L per condor $99-160 across its quintiles, lowest
+at the highest VIX1D): it measures today's priced risk, which the band and the move filter already capture.""")
 
 code(r"""
 fv.fig_feature_corr(study.feature_corr); plt.show()
@@ -1075,23 +1074,23 @@ display(study.addon_test.round(2))
 """)
 
 md(r"""**The features fall into a few clusters that say the same thing twice:** vol level (VIX and VIX9D: 0.96), premium (credit and the
-condor's ratio: 0.89), trend (SPX vs SMA10 with SPX vs SMA5 and the 5-day return: 0.74-0.77), intraday path (range so far, below the
-intraday high, move since the open: 0.75-0.80). **VIX9D/VIX at entry stands on its own**: it measures the curve's shape, not its level.
-Correlation with P/L is small everywhere (credit +0.30, the ratio +0.26, SPX vs SMA20 +0.17, the rest within ±0.16).
+condor's ratio: 0.89), trend (SPX vs SMA10 with SPX vs SMA5 and the 5-day return: 0.75-0.77), intraday path (range so far, below the
+intraday high, move since the open: 0.75-0.79), and VIX1D with VIX1D/VIX30 (0.77). **VIX9D/VIX at entry stands on its own**: it measures the
+curve's shape, not its level. Correlation with P/L is small everywhere (credit +0.31, the ratio +0.26, the rest within ±0.19).
 
 | on top of the strategy | sessions | Sharpe | change | total P/L change | both halves |
 |---|---|---|---|---|---|
-| SMA5 > SMA9 | 164 | 2.55 | -0.04 | -$5.6k | no (-0.12 in 2022-24, +0.14 in 2025-26) |
-| condor credit <= $450 | 186 | 2.59 | -0.01 | -$2.8k | no |
-| VVIX rank <= 35 | 166 | 2.53 | -0.07 | -$5.8k | no |
-| SPX gap >= 0% | 111 | 1.78 | -0.81 | -$36.5k | no |
+| SMA5 > SMA9 | 159 | 2.47 | -0.02 | -$5.2k | no (-0.16 in 2022-24, +0.31 in 2025-26) |
+| condor credit <= $450 | 181 | 2.49 | 0.00 | -$1.9k | no |
+| VVIX rank <= 35 | 162 | 2.43 | -0.06 | -$5.8k | no |
+| SPX gap >= 0% | 110 | 1.65 | -0.84 | -$38.8k | no |
 
 **Nothing tested improves the finished strategy.**""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 13. A/B with everything on: above the 10-day SMA vs the 20-day
 
-No cascade here: **every other setting is on** (no Thursdays, max move 0%, VIX9D/VIX 0.87-1.02, the 7 tranches, ratio <= 4, held to
+No cascade here: **every other setting is on** (no Thursdays, max move 0%, VIX9D/VIX 0.87-1.02, the ratio cap, the 7 tranches, held to
 expiry), and only the trend rule changes: SPX at entry above its 10-day SMA (A, the strategy) against above its 20-day SMA (B), and above
 both. Both SMAs are measured the backtester's way (the prior N - 1 closes and the entry price). The Sharpe difference gets a paired session
 bootstrap, and two t-tests say how significant each difference is (below).""")
@@ -1113,22 +1112,22 @@ display(tests.round(3))
 
 md(r"""| everything on, trend rule | trades | total P/L | Sharpe | 2022-24 / 2025-26 | max drawdown | win per trade |
 |---|---|---|---|---|---|---|
-| **A: above the 10-day SMA (strategy)** | 1,450 | **$112.0k** | **2.60** | **2.44 / 2.92** | **-$3.8k** | **87.4%** |
-| B: above the 20-day SMA | 1,778 | $105.7k | 1.97 | 1.66 / 2.70 | -$9.1k | 85.4% |
-| above both | 1,320 | $102.4k | 2.38 | 2.16 / 2.83 | -$3.8k | 87.1% |
+| **A: above the 10-day SMA (strategy)** | 1,528 | **$115.5k** | **2.49** | **2.48 / 2.51** | **-$6.5k** | **87.3%** |
+| B: above the 20-day SMA | 1,886 | $108.4k | 1.84 | 1.70 / 2.23 | -$12.1k | 85.2% |
+| above both | 1,406 | $107.3k | 2.33 | 2.26 / 2.48 | -$6.5k | 87.1% |
 
 | year | Sharpe A (SMA10) / B (SMA20) | P/L A / B |
 |---|---|---|
-| 2022 (part) | **2.91** / 1.81 | **$21.1k** / $15.2k |
-| 2023 | **2.48** / 2.36 | $26.7k / $26.9k |
-| 2024 | **2.08** / 1.18 | **$24.6k** / $22.4k |
-| 2025 | **2.69** / 2.46 | $27.9k / **$29.5k** |
-| 2026 (part) | 3.59 / 3.57 | $11.7k / $11.7k |
+| 2022 (part) | **2.92** / 1.92 | **$21.5k** / $16.1k |
+| 2023 | **2.51** / 2.28 | $29.2k / $29.0k |
+| 2024 | **2.18** / 1.29 | **$27.7k** / $25.9k |
+| 2025 | **2.19** / 1.90 | $25.6k / $26.0k |
+| 2026 (part) | 3.62 / 3.58 | $11.5k / $11.5k |
 
-- **On the 7 tranches the 10-day wins on every measure:** higher Sharpe (2.60 against 1.97) in every year, $6.4k more P/L, and well under half
-  the drawdown (-$3.8k against -$9.1k).
-- **The 20-day's extra trades don't pay:** the 458 trades only the 20-day takes earn $3.3k; the 130 only the 10-day takes earn $9.7k.
-- **The 10-day is better in 96% of resamples** (interval -1.33 to +0.07 for SMA20 minus SMA10), just short of a 95% bar.
+- **The 10-day wins on every measure:** higher Sharpe (2.49 against 1.84) in every year, $7.1k more P/L, and about half the drawdown (-$6.5k
+  against -$12.1k).
+- **The 20-day's extra trades don't pay:** the 480 trades only the 20-day takes earn $1.1k; the 122 only the 10-day takes earn $8.2k.
+- **The 10-day is better in 96% of resamples** (interval -1.34 to +0.07 for SMA20 minus SMA10), just short of a 95% bar.
 
 **Statistical significance.** Two tests, each against the strategy's 10-day SMA on the same 998 sessions (a negative t means worse than the
 10-day):
@@ -1140,17 +1139,16 @@ md(r"""| everything on, trend rule | trades | total P/L | Sharpe | 2022-24 / 202
 
 | against the 10-day SMA | Sharpe difference | t (Sharpe) | p (Sharpe) | t (daily P/L) | p (daily P/L) |
 |---|---|---|---|---|---|
-| B: above the 20-day SMA | -0.63 | **-1.73** | 0.08 | -0.54 | 0.59 |
-| above both | -0.21 | -1.65 | 0.10 | **-2.16** | **0.03** |
+| B: above the 20-day SMA | -0.65 | **-1.77** | 0.077 | -0.55 | 0.58 |
+| above both | -0.16 | -1.31 | 0.19 | -1.82 | 0.070 |
 
-- **SMA10 against SMA20: t = 1.73 on the Sharpe difference (p = 0.08 two-sided, about 0.04 one-sided).** Significant at 10% but not at
-  the usual 5% two-sided bar; it says the same as the bootstrap's 96%.
-- **The daily P/L barely differs** (t = 0.54, p = 0.59): the two rules make about the same money ($112.0k against $105.7k). **The 10-day's
-  edge is risk, not return:** the same money with fewer bad days, hence half the drawdown and the higher Sharpe.
-- **Adding the 20-day on top of the 10-day ("above both") makes significantly less money** (t = -2.16, p = 0.03): it drops the 130 trades
-  only the 10-day takes, which earn $9.7k, and adds nothing.
+- **SMA10 against SMA20: t = 1.77 on the Sharpe difference (p = 0.08 two-sided, about 0.04 one-sided).** Significant at 10% but not at
+  the usual 5% two-sided bar.
+- **The daily P/L barely differs** (t = 0.55, p = 0.58): **the 10-day's edge is risk, not return.**
+- **Adding the 20-day on top of the 10-day ("above both")** makes less money (t = -1.82, p = 0.07): it drops the 122 trades only the 10-day
+  takes, which earn $8.2k.
 
-**The same A/B on the tranches forward selection by drawdown picks** (Section 7: 10:53, 11:13, 11:33, 12:13, 13:53, 14:13, 14:53, 15:53),
+**The same A/B on the tranches forward selection by drawdown picks** (Section 8: 10:53, 11:13, 11:33, 12:13, 13:53, 14:13, 14:53, 15:53),
 every other setting on, to check the result doesn't depend on the strategy's own tranche set.""")
 
 code(r"""
@@ -1170,20 +1168,21 @@ md(r"""| drawdown-picked tranches, everything else on | trades | total P/L | Sha
 | B: above the 20-day SMA | 1,800 | $103.1k | 1.97 | 1.92 / 2.06 | -$7.4k | -0.89 | 0.38 | +0.02 | 0.98 |
 | above both | 1,350 | $95.8k | 2.18 | 2.20 / 2.15 | -$2.6k | -0.65 | 0.52 | -1.40 | 0.16 |
 
-- **The 10-day still leads**, on Sharpe (2.29 against 1.97, ahead in four of five years) and above all on drawdown (-$2.6k against -$7.4k),
-  for exactly the same money ($102.8k against $103.1k).
-- **But on this tranche set the gap isn't significant** (t = 0.89, p = 0.38; the 10-day is better in 82% of resamples, against 96% on the
-  strategy's 7). The 10-day's edge is real in direction and in drawdown, but how big it looks depends on which tranches it's paired with.""")
+- **The 10-day still leads**, on Sharpe (2.29 against 1.97) and above all on drawdown (-$2.6k against -$7.4k), for the same money.
+- **But on this tranche set the gap isn't significant** (t = 0.89, p = 0.38): the 10-day's edge is real in direction and in drawdown, but how
+  big it looks depends on which tranches it's paired with.""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 14. The 2026 drawdown, in the backtester's own log
 
-Everything above is rebuilt from the 20-tranche export, which ends 2026-05-07. **The backtester's log of the live strategy** (the 7
-tranches, no Thursdays, held to expiry) runs to 2026-09-28, and it shows a drawdown the rest of this notebook can't see: from a peak on
+Everything above is rebuilt from the 20-tranche export, which ends 2026-05-07. **The backtester's log of the strategy** runs to
+2026-09-28. **It was run before the tranche change, with 14:53 instead of 13:33** (11:33, 11:53, 12:13, 13:13, 13:53, 14:13, 14:53; no
+Thursdays, held to expiry), so this section is about that set. It shows a drawdown the rest of this notebook can't see: from a peak on
 2026-05-11, **-$13.4k by 2026-06-17**, three and a half times anything in the four years before, and **not recovered** by the end of the
-log.
+log. How the new set (with 13:33) would have fared in 2026 needs a new backtest.
 
-First, a check that the log and this notebook describe the same strategy, on the sessions both cover:""")
+First, a check that the log and this notebook describe the same strategy (the rebuild run on the log's own tranches), on the sessions both
+cover:""")
 
 code(r"""
 log = lg.load_log()
@@ -1198,8 +1197,8 @@ md(r"""| 2022-05-31 to 2026-05-07 | trades | total P/L | Sharpe | max drawdown |
 | the backtester's log | 1,446 | $111.3k | 2.51 | -$3.8k |
 | this notebook's rebuild | 1,450 | $112.0k | 2.53 | -$3.8k |
 
-**The rebuild matches the backtester's log almost exactly** (4 trades and $0.7k apart over four years), so the rest of the notebook is the
-live strategy. The difference is what came after 2026-05-07.""")
+**The rebuild matches the backtester's log almost exactly** (4 trades and $0.7k apart over four years), so the rules in this notebook are
+the backtester's. The difference is what came after 2026-05-07.""")
 
 code(r"""
 ldaily = lg.daily_matrix(log)
@@ -1283,8 +1282,8 @@ md(r"""| year | SPX (median) | credit per spread | short strike from spot | cond
   Thursday analysis (Section 3) found the same pattern: the strategy's worst days are days the market moves more than VIX priced, often
   macro days. This data has no economic calendar, so this is a hypothesis: **an event-day filter (no trading on FOMC decision days, and
   possibly CPI days) is the change most worth backtesting.**
-- **The tranche study (Section 11) said the drawdowns were shallow:** on the rebuild they were (-$3.8k). The log shows the tail those four
-  years didn't contain, and it is the number to size the strategy on.""")
+- **On the rebuild this set's drawdowns were shallow** (-$3.8k at most in 2022-2026). The log shows the tail those four years didn't
+  contain, and it is the number to size the strategy on.""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 15. Summary
@@ -1298,35 +1297,33 @@ md(r"""## 15. Summary
 | + max move 0% | 14,416 | $195.9k | 0.97 | enters on pullbacks, so an intraday rally doesn't run into the short call |
 | + above the 10-day SMA | 7,362 | $205.6k | 1.50 | keeps calm markets, where SPX moves less after entry |
 | + VIX9D/VIX 0.87-1.02 | 4,630 | $213.3k | 2.25 | keeps a curve that isn't bracing for a move; both tails lose on the put side |
-| + the 7 tranches | 1,582 | $113.4k | 2.48 | keeps the late morning and early afternoon; drawdown -$15.1k -> -$4.9k |
-| **+ short/long <= 4** | **1,450** | **$112.0k** | **2.60** | skips the richest condors the 7 still take |
+| + short/long <= 4 | 3,940 | $211.4k | 2.40 | skips the richest, nearest-the-money condors |
+| **+ the 7 tranches** | **1,528** | **$115.5k** | **2.49** | keeps 11:33-14:13 (with 13:33); drawdown -$12.7k -> -$6.5k |
 
-**The strategy: 1,450 trades, $112.0k, Sharpe 2.60, -$3.8k drawdown, 87.4% of trades winning**, held to expiry; +$599 on an average trading
-day (76% of days positive), an average win of $285 a condor against an average loss of $399.
+**The strategy: 1,528 trades, $115.5k, Sharpe 2.49, -$6.5k drawdown, 87.3% of trades winning**, held to expiry; +$635 on an average trading
+day (75% of days positive).
 
+- **The swap of 14:53 for 13:33 is a step back on this data:** +$3.4k, but Sharpe 2.60 -> 2.49, the drawdown 70% deeper (-$3.8k -> -$6.5k)
+  and 2025-26 much weaker (2.92 -> 2.51). 13:33 earns more on its own (the 6th tranche by P/L, against 11th) but is the biggest single
+  loser in the deepest drawdown and the first tranche both cutting rules remove (Sections 8 and 11).
 - **No Thursdays isn't a VIX regime:** nothing known at entry differs on Thursdays, but they move more than VIX prices (the realized range
-  explains two-thirds of the loss), on a few big days every year; macro releases are the likely cause, untested here.
+  explains two-thirds of the loss on the raw book), on a few big days every year; macro releases are the likely cause, untested here.
 - **The settings work together.** The band is the worst entry filter on the raw book and adds the most at step 4; with everything on, every
-  threshold is at the top of its sweep.
-- **The 10-day SMA is the most important setting:** removing it costs 1.28 Sharpe and triples the drawdown. With everything on it beats the
-  20-day in every year (t = 1.73 on the Sharpe difference, p = 0.08: significant at 10%, not at 5%); the edge is lower risk, not more
-  money. On the drawdown-picked tranches it still leads (2.29 against 1.97, a third of the drawdown) but not significantly (p = 0.38).
-- **The band's exact edges aren't significant** (no cap from 0.98 to 1.08 is significantly worse than 1.02, p 0.07-0.55); the direction
-  is (caps of 0.97 and tighter and floors of 0.90 and higher are clearly worse) (Section 6).
-- **No stop:** on this strategy every call-stop level lowers Sharpe and P/L and none reduces the drawdown, and a put stop is worse still
-  (400%: Sharpe 1.91, -$21.8k; 42% of the stopped puts would have expired winning) (Section 9). The cost is exposure to a day worse than any
-  in this sample.
-- **The 7 tranches are the smallest, steadiest set:** the smallest drawdown and the most P/L per $ of drawdown of the sets tested. Adding
-  11:13 and 13:33 (forward selection's peak) scores a higher Sharpe (2.73) for $29.8k more and a deeper drawdown; the previous 15, 2.69 for
-  $68.4k more. None of the 7 should be cut: each made money every year and each one's removal lowers Sharpe.
+  threshold is at the top of its sweep, but **the band's exact edges aren't significant** (no cap from 0.98 to 1.08 is significantly worse
+  than 1.02); the direction is (caps of 0.97 and tighter and floors of 0.90 and higher are clearly worse).
+- **The 10-day SMA is the most important setting:** removing it costs 1.33 Sharpe and nearly doubles the drawdown. With everything on it
+  beats the 20-day in every year (t = 1.77, p = 0.08: significant at 10%, not at 5%); the edge is lower risk, not more money.
+- **No stop:** every call-stop level lowers Sharpe and P/L, and a put stop is worse still (400%: Sharpe 1.88, -$21.8k; 42% of the stopped
+  puts would have expired winning) (Section 9).
+- **No candidate feature beats the noise bar** (+0.28, the best of 33 random features); the VIX1D features only looked bad because VIX1D
+  starts in April 2023 (Section 12).
+- **The backtester's log shows a 2026 drawdown the export doesn't reach** (on the previous 7, with 14:53): -$13.4k from 2026-05-11 to 06-17,
+  not recovered by 2026-09-28, from three days on which all seven tranches lost a full wing (Section 14). Size the strategy on that tail, and
+  backtest an event-day (FOMC/CPI) filter and the new tranche set.
 
-- **The backtester's log shows a 2026 drawdown the export doesn't reach:** -$13.4k from 2026-05-11 to 06-17, not recovered by 2026-09-28,
-  from three days on which all seven tranches lost a full wing (Section 14). The rebuild matches the log to 2026-05-07; size the strategy on
-  that tail, not on the -$3.8k of 2022-2026, and backtest an event-day (FOMC/CPI) filter.
-
-**What this notebook doesn't establish:** out-of-sample performance (apart from the walk-forward checks); the backtester's totals on these
-settings (the rules were matched trade by trade against a backtest on earlier settings, with the 20-day SMA; the 10-day and the 7 tranches
-haven't been checked against a backtest log); the first sessions, which need SPX closes before the export; and a put stop, which is untested.""")
+**What this notebook doesn't establish:** out-of-sample performance (apart from the walk-forward checks); the backtester's totals on the
+new tranche set (the rebuild matches the backtester trade by trade on the previous 7; the set with 13:33 hasn't been backtested); the first
+sessions, which need SPX closes before the export.""")
 
 nb["cells"] = cells
 nb["metadata"]["kernelspec"] = {"display_name": "py313-quant", "language": "python", "name": "py313-quant"}

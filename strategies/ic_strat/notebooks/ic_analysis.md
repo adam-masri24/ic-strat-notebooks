@@ -2,8 +2,8 @@
 
 **The trade.** An SPX iron condor expiring the same day: a short call spread and a short put spread, each 10 points wide, opened
 every 20 minutes (the export has 20 entries a day from 09:32) and held to the close. It makes money when SPX stays between the
-short strikes until 16:00. Inside the strategy each condor collects about **\$326** (median \$325: \$175 call side, \$145 put side), with
-short strikes a median 11.4 points (call) and 12.9 points (put) from spot.
+short strikes until 16:00. Inside the strategy each condor collects about **\$325** (median \$325: \$175 call side, \$145 put side), with
+short strikes a median 11.3 points (call) and 12.9 points (put) from spot.
 
 **The strategy: every setting used**, in the order the greedy cascade adds them (Section 2).
 
@@ -13,8 +13,8 @@ short strikes a median 11.4 points (call) and 12.9 points (put) from spot.
 | 2 | max SPX move up | **max 0%**: SPX at or below its 09:30 open at entry |
 | 3 | trend | **above the 10-day SMA**: SPX at entry against the average of the last 9 closes and the entry price |
 | 4 | term structure | **VIX9D/VIX: min 0.87, max 1.02**, read at each trade's entry minute |
-| 5 | entry times | **7 tranches: 11:33 AM, 11:53 AM, 12:13 PM, 1:13 PM, 1:53 PM, 2:13 PM, 2:53 PM** (the first seven forward selection adds) |
-| 6 | short/long ratio | **max 4** for the whole condor: the two short prices over the two long prices |
+| 5 | short/long ratio | **max 4** for the whole condor: the two short prices over the two long prices |
+| 6 | entry times | **7 tranches: 11:33 AM, 11:53 AM, 12:13 PM, 1:13 PM, 1:33 PM, 1:53 PM, 2:13 PM** (1:33 PM in place of 2:53 PM since 2026-10-30) |
 | | exit | **none: every condor held to expiry**. The 400% call stop is studied in Section 9 (why it isn't used), not as a step |
 | | always | 0DTE, exact strike offsets, 10-wide wings; 1 contract per trade; \$0.97 per contract to open and to close, \$0.05 entry slippage |
 
@@ -50,7 +50,7 @@ other features, and test the 10-day SMA against the 20-day.
   SMA) and **every condor is held to expiry**, as the strategy trades it. The call stop in Section 9 is replayed from each spread's
   worst intraday loss (never on the settlement print), filled where the SPXW option chain crossed it.
 - **2022-2024 vs 2025-2026**: each version is also scored on the two halves, as a stability check.
-- **Everything is in-sample**, apart from the walk-forward checks in Sections 7 and 11. Intervals are 95% session-bootstrap intervals.
+- **Everything is in-sample**, apart from the walk-forward checks in Sections 8 and 11. Intervals are 95% session-bootstrap intervals.
 
 ## 1. Setup and data
 
@@ -65,7 +65,7 @@ None of these are in git (`data/` is git-ignored; see "Data" in the root README)
 so the export's first 9 sessions (to 2022-05-26) can't pass the SMA step.
 
     19,847 condors over 998 sessions, 2022-05-16 to 2026-05-07
-    greedy order: thursday -> move -> sma10 -> band -> tranches -> ratio (matches the sections below: True)
+    greedy order: thursday -> move -> sma10 -> band -> ratio -> tranches (matches the sections below: True)
     
 
 ## 2. The greedy search, and the cascade it builds
@@ -74,17 +74,17 @@ so the export's first 9 sessions (to 2022-05-26) can't pass the SMA step.
 have with it. The highest (highlighted) is added, and the next row starts from that book.
 
 
-<table id="T_873a7">
+<table id="T_f717e">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_873a7_level0_col0" class="col_heading level0 col0" >picked</th>
-      <th id="T_873a7_level0_col1" class="col_heading level0 col1" >VIX9D/VIX 0.87-1.02 at entry</th>
-      <th id="T_873a7_level0_col2" class="col_heading level0 col2" >max move up 0%</th>
-      <th id="T_873a7_level0_col3" class="col_heading level0 col3" >above the 10-day SMA</th>
-      <th id="T_873a7_level0_col4" class="col_heading level0 col4" >short/long ratio <= 4</th>
-      <th id="T_873a7_level0_col5" class="col_heading level0 col5" >no Thursdays</th>
-      <th id="T_873a7_level0_col6" class="col_heading level0 col6" >7 forward-selected tranches</th>
+      <th id="T_f717e_level0_col0" class="col_heading level0 col0" >picked</th>
+      <th id="T_f717e_level0_col1" class="col_heading level0 col1" >VIX9D/VIX 0.87-1.02 at entry</th>
+      <th id="T_f717e_level0_col2" class="col_heading level0 col2" >max move up 0%</th>
+      <th id="T_f717e_level0_col3" class="col_heading level0 col3" >above the 10-day SMA</th>
+      <th id="T_f717e_level0_col4" class="col_heading level0 col4" >short/long ratio <= 4</th>
+      <th id="T_f717e_level0_col5" class="col_heading level0 col5" >no Thursdays</th>
+      <th id="T_f717e_level0_col6" class="col_heading level0 col6" >7 forward-selected tranches</th>
     </tr>
     <tr>
       <th class="index_name level0" >step</th>
@@ -99,64 +99,64 @@ have with it. The highest (highlighted) is added, and the next row starts from t
   </thead>
   <tbody>
     <tr>
-      <th id="T_873a7_level0_row0" class="row_heading level0 row0" >1</th>
-      <td id="T_873a7_row0_col0" class="data row0 col0" >no Thursdays</td>
-      <td id="T_873a7_row0_col1" class="data row0 col1" >-0.11</td>
-      <td id="T_873a7_row0_col2" class="data row0 col2" >0.37</td>
-      <td id="T_873a7_row0_col3" class="data row0 col3" >0.35</td>
-      <td id="T_873a7_row0_col4" class="data row0 col4" >-0.00</td>
-      <td id="T_873a7_row0_col5" class="data row0 col5" >0.44</td>
-      <td id="T_873a7_row0_col6" class="data row0 col6" >0.12</td>
+      <th id="T_f717e_level0_row0" class="row_heading level0 row0" >1</th>
+      <td id="T_f717e_row0_col0" class="data row0 col0" >no Thursdays</td>
+      <td id="T_f717e_row0_col1" class="data row0 col1" >-0.11</td>
+      <td id="T_f717e_row0_col2" class="data row0 col2" >0.37</td>
+      <td id="T_f717e_row0_col3" class="data row0 col3" >0.35</td>
+      <td id="T_f717e_row0_col4" class="data row0 col4" >-0.00</td>
+      <td id="T_f717e_row0_col5" class="data row0 col5" >0.44</td>
+      <td id="T_f717e_row0_col6" class="data row0 col6" >0.08</td>
     </tr>
     <tr>
-      <th id="T_873a7_level0_row1" class="row_heading level0 row1" >2</th>
-      <td id="T_873a7_row1_col0" class="data row1 col0" >max move up 0%</td>
-      <td id="T_873a7_row1_col1" class="data row1 col1" >0.66</td>
-      <td id="T_873a7_row1_col2" class="data row1 col2" >0.97</td>
-      <td id="T_873a7_row1_col3" class="data row1 col3" >0.71</td>
-      <td id="T_873a7_row1_col4" class="data row1 col4" >0.59</td>
-      <td id="T_873a7_row1_col5" class="data row1 col5" ></td>
-      <td id="T_873a7_row1_col6" class="data row1 col6" >0.56</td>
+      <th id="T_f717e_level0_row1" class="row_heading level0 row1" >2</th>
+      <td id="T_f717e_row1_col0" class="data row1 col0" >max move up 0%</td>
+      <td id="T_f717e_row1_col1" class="data row1 col1" >0.66</td>
+      <td id="T_f717e_row1_col2" class="data row1 col2" >0.97</td>
+      <td id="T_f717e_row1_col3" class="data row1 col3" >0.71</td>
+      <td id="T_f717e_row1_col4" class="data row1 col4" >0.59</td>
+      <td id="T_f717e_row1_col5" class="data row1 col5" ></td>
+      <td id="T_f717e_row1_col6" class="data row1 col6" >0.60</td>
     </tr>
     <tr>
-      <th id="T_873a7_level0_row2" class="row_heading level0 row2" >3</th>
-      <td id="T_873a7_row2_col0" class="data row2 col0" >above the 10-day SMA</td>
-      <td id="T_873a7_row2_col1" class="data row2 col1" >1.39</td>
-      <td id="T_873a7_row2_col2" class="data row2 col2" ></td>
-      <td id="T_873a7_row2_col3" class="data row2 col3" >1.50</td>
-      <td id="T_873a7_row2_col4" class="data row2 col4" >1.15</td>
-      <td id="T_873a7_row2_col5" class="data row2 col5" ></td>
-      <td id="T_873a7_row2_col6" class="data row2 col6" >1.03</td>
+      <th id="T_f717e_level0_row2" class="row_heading level0 row2" >3</th>
+      <td id="T_f717e_row2_col0" class="data row2 col0" >above the 10-day SMA</td>
+      <td id="T_f717e_row2_col1" class="data row2 col1" >1.39</td>
+      <td id="T_f717e_row2_col2" class="data row2 col2" ></td>
+      <td id="T_f717e_row2_col3" class="data row2 col3" >1.50</td>
+      <td id="T_f717e_row2_col4" class="data row2 col4" >1.15</td>
+      <td id="T_f717e_row2_col5" class="data row2 col5" ></td>
+      <td id="T_f717e_row2_col6" class="data row2 col6" >0.92</td>
     </tr>
     <tr>
-      <th id="T_873a7_level0_row3" class="row_heading level0 row3" >4</th>
-      <td id="T_873a7_row3_col0" class="data row3 col0" >VIX9D/VIX 0.87-1.02 at entry</td>
-      <td id="T_873a7_row3_col1" class="data row3 col1" >2.25</td>
-      <td id="T_873a7_row3_col2" class="data row3 col2" ></td>
-      <td id="T_873a7_row3_col3" class="data row3 col3" ></td>
-      <td id="T_873a7_row3_col4" class="data row3 col4" >1.74</td>
-      <td id="T_873a7_row3_col5" class="data row3 col5" ></td>
-      <td id="T_873a7_row3_col6" class="data row3 col6" >1.66</td>
+      <th id="T_f717e_level0_row3" class="row_heading level0 row3" >4</th>
+      <td id="T_f717e_row3_col0" class="data row3 col0" >VIX9D/VIX 0.87-1.02 at entry</td>
+      <td id="T_f717e_row3_col1" class="data row3 col1" >2.25</td>
+      <td id="T_f717e_row3_col2" class="data row3 col2" ></td>
+      <td id="T_f717e_row3_col3" class="data row3 col3" ></td>
+      <td id="T_f717e_row3_col4" class="data row3 col4" >1.74</td>
+      <td id="T_f717e_row3_col5" class="data row3 col5" ></td>
+      <td id="T_f717e_row3_col6" class="data row3 col6" >1.69</td>
     </tr>
     <tr>
-      <th id="T_873a7_level0_row4" class="row_heading level0 row4" >5</th>
-      <td id="T_873a7_row4_col0" class="data row4 col0" >7 forward-selected tranches</td>
-      <td id="T_873a7_row4_col1" class="data row4 col1" ></td>
-      <td id="T_873a7_row4_col2" class="data row4 col2" ></td>
-      <td id="T_873a7_row4_col3" class="data row4 col3" ></td>
-      <td id="T_873a7_row4_col4" class="data row4 col4" >2.40</td>
-      <td id="T_873a7_row4_col5" class="data row4 col5" ></td>
-      <td id="T_873a7_row4_col6" class="data row4 col6" >2.48</td>
+      <th id="T_f717e_level0_row4" class="row_heading level0 row4" >5</th>
+      <td id="T_f717e_row4_col0" class="data row4 col0" >short/long ratio <= 4</td>
+      <td id="T_f717e_row4_col1" class="data row4 col1" ></td>
+      <td id="T_f717e_row4_col2" class="data row4 col2" ></td>
+      <td id="T_f717e_row4_col3" class="data row4 col3" ></td>
+      <td id="T_f717e_row4_col4" class="data row4 col4" >2.40</td>
+      <td id="T_f717e_row4_col5" class="data row4 col5" ></td>
+      <td id="T_f717e_row4_col6" class="data row4 col6" >2.35</td>
     </tr>
     <tr>
-      <th id="T_873a7_level0_row5" class="row_heading level0 row5" >6</th>
-      <td id="T_873a7_row5_col0" class="data row5 col0" >short/long ratio <= 4</td>
-      <td id="T_873a7_row5_col1" class="data row5 col1" ></td>
-      <td id="T_873a7_row5_col2" class="data row5 col2" ></td>
-      <td id="T_873a7_row5_col3" class="data row5 col3" ></td>
-      <td id="T_873a7_row5_col4" class="data row5 col4" >2.60</td>
-      <td id="T_873a7_row5_col5" class="data row5 col5" ></td>
-      <td id="T_873a7_row5_col6" class="data row5 col6" ></td>
+      <th id="T_f717e_level0_row5" class="row_heading level0 row5" >6</th>
+      <td id="T_f717e_row5_col0" class="data row5 col0" >7 forward-selected tranches</td>
+      <td id="T_f717e_row5_col1" class="data row5 col1" ></td>
+      <td id="T_f717e_row5_col2" class="data row5 col2" ></td>
+      <td id="T_f717e_row5_col3" class="data row5 col3" ></td>
+      <td id="T_f717e_row5_col4" class="data row5 col4" ></td>
+      <td id="T_f717e_row5_col5" class="data row5 col5" ></td>
+      <td id="T_f717e_row5_col6" class="data row5 col6" >2.49</td>
     </tr>
   </tbody>
 </table>
@@ -165,19 +165,19 @@ have with it. The highest (highlighted) is added, and the next row starts from t
 
 | step | settings tried: Sharpe if added | added |
 |---|---|---|
-| 1 (raw book) | **no Thursdays 0.44**, max move 0.37, SMA10 0.35, tranches 0.12, ratio 0.00, band -0.11 | **no Thursdays** |
-| 2 | **max move 0.97**, SMA10 0.71, band 0.66, ratio 0.59, tranches 0.56 | **max move 0%** |
-| 3 | **SMA10 1.50**, band 1.39, ratio 1.15, tranches 1.03 | **above the 10-day SMA** |
-| 4 | **band 2.25**, ratio 1.74, tranches 1.66 | **VIX9D/VIX band** |
-| 5 | **tranches 2.48**, ratio 2.40 | **the 7 tranches** |
-| 6 | **ratio 2.60** | **short/long ratio <= 4** |
+| 1 (raw book) | **no Thursdays 0.44**, max move 0.37, SMA10 0.35, tranches 0.08, ratio 0.00, band -0.11 | **no Thursdays** |
+| 2 | **max move 0.97**, SMA10 0.71, band 0.66, tranches 0.60, ratio 0.59 | **max move 0%** |
+| 3 | **SMA10 1.50**, band 1.39, ratio 1.15, tranches 0.92 | **above the 10-day SMA** |
+| 4 | **band 2.25**, ratio 1.74, tranches 1.69 | **VIX9D/VIX band** |
+| 5 | **ratio 2.40**, tranches 2.35 | **short/long ratio <= 4** |
+| 6 | **tranches 2.49** | **the 7 tranches** |
 
 - **No Thursdays wins step 1** because Thursdays are where the raw book loses its money (Section 3); max move and the 10-day SMA are close
   behind (0.37, 0.35).
 - **The band only pays once the move and trend filters are on:** on the raw book it scores -0.11 (the worst of the entry filters); at step 4
   it adds the most of any step (+0.75).
-- **The tranche step is the fixed set of 7**; Section 7 shows they are the first seven forward selection picks at that point, and what a
-  selection by drawdown picks on its own.
+- **With 13:33 in the tranche set, the ratio cap now comes before the tranches** (2.40 against 2.35 at step 5). With 14:53 the tranches came
+  first.
 
 **The cascade it builds.** Each bar is a full version scored on all 998 sessions.
 
@@ -306,36 +306,36 @@ have with it. The highest (highlighted) is added, and the next row starts from t
       <td>0.75</td>
     </tr>
     <tr>
-      <th>5. + 7 forward-selected tranches</th>
-      <td>1582.0</td>
-      <td>188.0</td>
-      <td>113370.92</td>
-      <td>2.48</td>
-      <td>2.33</td>
-      <td>2.83</td>
-      <td>-4888.92</td>
-      <td>85.65</td>
-      <td>79.14</td>
-      <td>143.33</td>
-      <td>-3048.0</td>
-      <td>-99907.88</td>
-      <td>0.23</td>
+      <th>5. + short/long ratio &lt;= 4</th>
+      <td>3940.0</td>
+      <td>288.0</td>
+      <td>211370.40</td>
+      <td>2.40</td>
+      <td>2.30</td>
+      <td>2.61</td>
+      <td>-12700.72</td>
+      <td>86.52</td>
+      <td>76.95</td>
+      <td>107.29</td>
+      <td>-690.0</td>
+      <td>-1908.40</td>
+      <td>0.15</td>
     </tr>
     <tr>
-      <th>6. + short/long ratio &lt;= 4</th>
-      <td>1450.0</td>
-      <td>187.0</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>2.44</td>
-      <td>2.92</td>
-      <td>-3808.68</td>
-      <td>87.38</td>
-      <td>80.97</td>
-      <td>154.54</td>
-      <td>-132.0</td>
-      <td>-1326.92</td>
-      <td>0.12</td>
+      <th>6. + 7 forward-selected tranches</th>
+      <td>1528.0</td>
+      <td>182.0</td>
+      <td>115481.68</td>
+      <td>2.49</td>
+      <td>2.48</td>
+      <td>2.51</td>
+      <td>-6501.16</td>
+      <td>87.30</td>
+      <td>81.02</td>
+      <td>151.15</td>
+      <td>-2412.0</td>
+      <td>-95888.72</td>
+      <td>0.09</td>
     </tr>
   </tbody>
 </table>
@@ -348,20 +348,21 @@ have with it. The highest (highlighted) is added, and the next row starts from t
 | 1. + no Thursdays | 31,768 | \$155.6k | 0.44 | 0.58 / 0.13 | -\$67.9k | 79.9% |
 | 2. + max move up 0% | 14,416 | \$195.9k | 0.97 | 1.05 / 0.80 | -\$33.6k | 81.7% |
 | 3. + above the 10-day SMA | 7,362 | \$205.6k | 1.50 | 1.54 / 1.43 | -\$22.5k | 81.9% |
-| 4. + VIX9D/VIX 0.87-1.02 | 4,630 | **\$213.3k** | 2.25 | 2.16 / 2.48 | -\$15.1k | 83.4% |
-| 5. + 7 forward-selected tranches | 1,582 | \$113.4k | 2.48 | 2.33 / 2.83 | -\$4.9k | 85.7% |
-| **6. + short/long ratio <= 4** | **1,450** | **\$112.0k** | **2.60** | **2.44 / 2.92** | **-\$3.8k** | **87.4%** |
+| 4. + VIX9D/VIX 0.87-1.02 | 4,630 | \$213.3k | 2.25 | 2.16 / 2.48 | -\$15.1k | 83.4% |
+| 5. + short/long ratio <= 4 | 3,940 | \$211.4k | 2.40 | 2.30 / 2.61 | -\$12.7k | 86.5% |
+| **6. + the 7 tranches** | **1,528** | **\$115.5k** | **2.49** | **2.48 / 2.51** | **-\$6.5k** | **87.3%** |
 
 **The raw book is a coin flip that loses slowly:** a condor wins 66% of the time, but an average win (+\$254) is half an average loss
 (-\$497), so the book drifts to -\$7.5k with a -\$113k drawdown.
 
 - **The first four steps build the money:** no Thursdays alone turns -\$7.5k into +\$155.6k; max move, the 10-day SMA and the band each add
   +0.5 to +0.75 Sharpe, and P/L peaks at \$213.3k with the band.
-- **The 7 tranches and the ratio cap trade money for steadiness:** they cost \$101.2k between them but take Sharpe from 2.25 to 2.60 and the
-  drawdown from -\$15.1k to -\$3.8k.
+- **The ratio cap and the 7 tranches trade money for steadiness:** they cost \$97.8k between them but take Sharpe from 2.25 to 2.49 and the
+  drawdown from -\$15.1k to -\$6.5k.
 
-**The strategy: 1,450 trades, \$112.0k, Sharpe 2.60, -\$3.8k drawdown, 87.4% of trades winning**, held to expiry; +\$599 on an average trading
-day (76% of days positive), an average win of \$285 a condor against an average loss of \$399.
+**The strategy: 1,528 trades, \$115.5k, Sharpe 2.49, -\$6.5k drawdown, 87.3% of trades winning**, held to expiry; +\$635 on an average trading
+day (75% of days positive), an average win of \$284 a condor against an average loss of \$415. **With 14:53 instead of 13:33 it was 1,450
+trades, \$112.0k, Sharpe 2.60, -\$3.8k** (Section 8).
 
 ## 3. Step 1: no Thursdays, on the raw book
 
@@ -1100,67 +1101,67 @@ under 15: 0.81 against 0.66).
   <tbody>
     <tr>
       <th>sessions</th>
+      <td>45.00</td>
+      <td>52.00</td>
       <td>47.00</td>
-      <td>53.00</td>
-      <td>48.00</td>
       <td>50.00</td>
-      <td>39.00</td>
+      <td>38.00</td>
     </tr>
     <tr>
       <th>trades</th>
-      <td>352.00</td>
-      <td>436.00</td>
       <td>374.00</td>
-      <td>412.00</td>
-      <td>288.00</td>
+      <td>466.00</td>
+      <td>386.00</td>
+      <td>430.00</td>
+      <td>302.00</td>
     </tr>
     <tr>
       <th>avg_pl</th>
-      <td>173.93</td>
-      <td>121.85</td>
-      <td>143.22</td>
-      <td>-21.91</td>
-      <td>195.04</td>
+      <td>172.58</td>
+      <td>129.45</td>
+      <td>127.32</td>
+      <td>-37.50</td>
+      <td>188.56</td>
     </tr>
     <tr>
       <th>avg_pl_call</th>
-      <td>100.06</td>
-      <td>61.18</td>
-      <td>85.31</td>
-      <td>-1.09</td>
-      <td>110.52</td>
+      <td>99.91</td>
+      <td>64.54</td>
+      <td>69.08</td>
+      <td>-15.67</td>
+      <td>120.25</td>
     </tr>
     <tr>
       <th>avg_pl_put</th>
-      <td>73.87</td>
-      <td>60.67</td>
-      <td>57.90</td>
-      <td>-20.82</td>
-      <td>84.53</td>
+      <td>72.67</td>
+      <td>64.92</td>
+      <td>58.25</td>
+      <td>-21.82</td>
+      <td>68.31</td>
     </tr>
     <tr>
       <th>call_breached_pct</th>
-      <td>19.32</td>
-      <td>22.48</td>
-      <td>15.51</td>
-      <td>27.18</td>
-      <td>15.28</td>
+      <td>18.72</td>
+      <td>21.03</td>
+      <td>16.06</td>
+      <td>28.37</td>
+      <td>14.57</td>
     </tr>
     <tr>
       <th>put_breached_pct</th>
-      <td>14.20</td>
-      <td>15.60</td>
       <td>13.37</td>
-      <td>22.33</td>
-      <td>14.58</td>
+      <td>15.45</td>
+      <td>12.44</td>
+      <td>21.40</td>
+      <td>15.89</td>
     </tr>
     <tr>
       <th>vix_open</th>
-      <td>17.35</td>
-      <td>17.45</td>
-      <td>17.79</td>
+      <td>17.48</td>
+      <td>17.07</td>
+      <td>17.83</td>
       <td>16.47</td>
-      <td>16.72</td>
+      <td>16.67</td>
     </tr>
     <tr>
       <th>ts_9d_30_entry</th>
@@ -1180,16 +1181,16 @@ under 15: 0.81 against 0.66).
     </tr>
     <tr>
       <th>move_since_open</th>
-      <td>-0.23</td>
-      <td>-0.33</td>
-      <td>-0.29</td>
+      <td>-0.22</td>
+      <td>-0.32</td>
+      <td>-0.28</td>
       <td>-0.38</td>
       <td>-0.33</td>
     </tr>
     <tr>
       <th>abs_gap</th>
       <td>0.24</td>
-      <td>0.28</td>
+      <td>0.27</td>
       <td>0.25</td>
       <td>0.31</td>
       <td>0.28</td>
@@ -1197,42 +1198,42 @@ under 15: 0.81 against 0.66).
     <tr>
       <th>day_range_pct</th>
       <td>0.59</td>
-      <td>0.67</td>
+      <td>0.64</td>
+      <td>0.80</td>
       <td>0.81</td>
-      <td>0.81</td>
-      <td>0.76</td>
+      <td>0.75</td>
     </tr>
     <tr>
       <th>big_range_days_pct</th>
-      <td>4.26</td>
-      <td>11.32</td>
-      <td>22.92</td>
+      <td>4.44</td>
+      <td>9.62</td>
+      <td>21.28</td>
       <td>32.00</td>
-      <td>25.64</td>
+      <td>23.68</td>
     </tr>
     <tr>
       <th>abs_move_after_entry</th>
       <td>0.17</td>
       <td>0.19</td>
       <td>0.25</td>
-      <td>0.30</td>
-      <td>0.18</td>
+      <td>0.31</td>
+      <td>0.19</td>
     </tr>
     <tr>
       <th>range_vs_implied</th>
-      <td>0.54</td>
-      <td>0.58</td>
-      <td>0.72</td>
+      <td>0.53</td>
+      <td>0.57</td>
+      <td>0.69</td>
       <td>0.80</td>
-      <td>0.72</td>
+      <td>0.71</td>
     </tr>
     <tr>
       <th>total_pl</th>
-      <td>30612.12</td>
-      <td>26564.16</td>
-      <td>26781.44</td>
-      <td>-4513.28</td>
-      <td>28086.28</td>
+      <td>32272.44</td>
+      <td>30162.96</td>
+      <td>24573.16</td>
+      <td>-8062.20</td>
+      <td>28473.12</td>
     </tr>
   </tbody>
 </table>
@@ -1274,95 +1275,95 @@ under 15: 0.81 against 0.66).
     <tr>
       <th rowspan="4" valign="top">VIX at the open</th>
       <th>&lt;= 15</th>
-      <td>148</td>
-      <td>-150.24</td>
-      <td>132.92</td>
-      <td>-283.17</td>
-      <td>0.91</td>
-      <td>0.66</td>
+      <td>160</td>
+      <td>-181.38</td>
+      <td>127.69</td>
+      <td>-309.07</td>
+      <td>0.89</td>
+      <td>0.64</td>
     </tr>
     <tr>
       <th>15 to 18</th>
-      <td>162</td>
-      <td>-64.35</td>
-      <td>188.63</td>
-      <td>-252.98</td>
+      <td>164</td>
+      <td>-60.70</td>
+      <td>181.60</td>
+      <td>-242.30</td>
       <td>0.78</td>
       <td>0.56</td>
     </tr>
     <tr>
       <th>18 to 22</th>
-      <td>72</td>
-      <td>212.51</td>
-      <td>95.54</td>
-      <td>116.97</td>
+      <td>76</td>
+      <td>201.28</td>
+      <td>106.52</td>
+      <td>94.76</td>
       <td>0.72</td>
-      <td>0.63</td>
+      <td>0.61</td>
     </tr>
     <tr>
       <th>&gt; 22</th>
       <td>30</td>
-      <td>277.79</td>
-      <td>188.43</td>
-      <td>89.35</td>
+      <td>251.79</td>
+      <td>189.11</td>
+      <td>62.68</td>
       <td>0.56</td>
-      <td>0.72</td>
+      <td>0.73</td>
     </tr>
     <tr>
       <th rowspan="4" valign="top">VIX9D/VIX at entry</th>
       <th>&lt;= 0.9</th>
-      <td>92</td>
-      <td>-86.86</td>
-      <td>175.13</td>
-      <td>-261.99</td>
-      <td>0.79</td>
+      <td>96</td>
+      <td>-106.86</td>
+      <td>158.74</td>
+      <td>-265.60</td>
+      <td>0.76</td>
       <td>0.60</td>
     </tr>
     <tr>
       <th>0.9 to 0.95</th>
       <td>204</td>
-      <td>-7.13</td>
-      <td>154.37</td>
-      <td>-161.50</td>
+      <td>-10.50</td>
+      <td>154.55</td>
+      <td>-165.05</td>
       <td>0.84</td>
-      <td>0.58</td>
+      <td>0.57</td>
     </tr>
     <tr>
       <th>0.95 to 1</th>
-      <td>106</td>
-      <td>24.35</td>
-      <td>139.80</td>
-      <td>-115.45</td>
+      <td>120</td>
+      <td>-13.03</td>
+      <td>142.30</td>
+      <td>-155.33</td>
       <td>0.84</td>
-      <td>0.70</td>
+      <td>0.68</td>
     </tr>
     <tr>
       <th>&gt; 1</th>
       <td>10</td>
       <td>-216.08</td>
-      <td>169.18</td>
-      <td>-385.26</td>
+      <td>157.42</td>
+      <td>-373.50</td>
       <td>0.97</td>
-      <td>0.82</td>
+      <td>0.84</td>
     </tr>
     <tr>
       <th rowspan="2" valign="top">SPX vs its SMA10, %</th>
       <th>0 to 1</th>
-      <td>220</td>
-      <td>-111.16</td>
-      <td>138.60</td>
-      <td>-249.76</td>
-      <td>0.89</td>
-      <td>0.63</td>
+      <td>236</td>
+      <td>-111.26</td>
+      <td>128.64</td>
+      <td>-239.90</td>
+      <td>0.88</td>
+      <td>0.62</td>
     </tr>
     <tr>
       <th>&gt; 1</th>
-      <td>192</td>
-      <td>80.36</td>
-      <td>177.01</td>
-      <td>-96.65</td>
-      <td>0.71</td>
-      <td>0.64</td>
+      <td>194</td>
+      <td>52.23</td>
+      <td>181.73</td>
+      <td>-129.50</td>
+      <td>0.72</td>
+      <td>0.62</td>
     </tr>
   </tbody>
 </table>
@@ -1393,27 +1394,27 @@ under 15: 0.81 against 0.66).
   <tbody>
     <tr>
       <th>Thursday alone</th>
-      <td>931</td>
-      <td>-176.453</td>
-      <td>53.185</td>
-      <td>-3.318</td>
+      <td>979</td>
+      <td>-188.653</td>
+      <td>55.621</td>
+      <td>-3.392</td>
       <td>0.001</td>
     </tr>
     <tr>
       <th>+ every entry feature</th>
-      <td>931</td>
-      <td>-181.069</td>
-      <td>51.125</td>
-      <td>-3.542</td>
+      <td>979</td>
+      <td>-192.376</td>
+      <td>53.702</td>
+      <td>-3.582</td>
       <td>0.000</td>
     </tr>
     <tr>
       <th>+ the session's range vs implied (an outcome)</th>
-      <td>931</td>
-      <td>-122.292</td>
-      <td>44.091</td>
-      <td>-2.774</td>
-      <td>0.006</td>
+      <td>979</td>
+      <td>-133.746</td>
+      <td>46.456</td>
+      <td>-2.879</td>
+      <td>0.004</td>
     </tr>
   </tbody>
 </table>
@@ -1440,15 +1441,15 @@ under 15: 0.81 against 0.66).
   <tbody>
     <tr>
       <th>Thursday</th>
-      <td>201.7</td>
-      <td>-90.3</td>
+      <td>159.0</td>
+      <td>-161.2</td>
       <td>56.0</td>
     </tr>
     <tr>
       <th>other days</th>
-      <td>587.2</td>
-      <td>599.2</td>
-      <td>76.5</td>
+      <td>637.8</td>
+      <td>634.5</td>
+      <td>75.3</td>
     </tr>
   </tbody>
 </table>
@@ -1475,21 +1476,21 @@ under 15: 0.81 against 0.66).
   <tbody>
     <tr>
       <th>5</th>
-      <td>-14918.0</td>
-      <td>-4513.0</td>
-      <td>10404.0</td>
+      <td>-17434.0</td>
+      <td>-8062.0</td>
+      <td>9372.0</td>
     </tr>
     <tr>
       <th>10</th>
-      <td>-24387.0</td>
-      <td>-4513.0</td>
-      <td>19874.0</td>
+      <td>-27491.0</td>
+      <td>-8062.0</td>
+      <td>19428.0</td>
     </tr>
     <tr>
       <th>20</th>
-      <td>-31196.0</td>
-      <td>-4513.0</td>
-      <td>26683.0</td>
+      <td>-35165.0</td>
+      <td>-8062.0</td>
+      <td>27103.0</td>
     </tr>
   </tbody>
 </table>
@@ -1516,32 +1517,32 @@ under 15: 0.81 against 0.66).
   <tbody>
     <tr>
       <th>2022</th>
-      <td>1707.0</td>
-      <td>843.0</td>
+      <td>1501.0</td>
+      <td>895.0</td>
       <td>4</td>
     </tr>
     <tr>
       <th>2023</th>
-      <td>-772.0</td>
-      <td>594.0</td>
-      <td>13</td>
+      <td>-1078.0</td>
+      <td>695.0</td>
+      <td>12</td>
     </tr>
     <tr>
       <th>2024</th>
-      <td>157.0</td>
-      <td>464.0</td>
-      <td>15</td>
+      <td>140.0</td>
+      <td>522.0</td>
+      <td>16</td>
     </tr>
     <tr>
       <th>2025</th>
-      <td>-197.0</td>
-      <td>517.0</td>
+      <td>-117.0</td>
+      <td>484.0</td>
       <td>14</td>
     </tr>
     <tr>
       <th>2026</th>
-      <td>-229.0</td>
-      <td>1173.0</td>
+      <td>-434.0</td>
+      <td>1152.0</td>
       <td>4</td>
     </tr>
   </tbody>
@@ -1551,27 +1552,27 @@ under 15: 0.81 against 0.66).
 
 | strategy with Thursdays, per weekday | Mon | Tue | Wed | **Thu** | Fri |
 |---|---|---|---|---|---|
-| avg P/L per condor | +\$174 | +\$122 | +\$143 | **-\$22** | +\$195 |
-| call / put side | +\$100 / +\$74 | +\$61 / +\$61 | +\$85 / +\$58 | **-\$1 / -\$21** | +\$111 / +\$85 |
-| short call / short put breached | 19% / 14% | 22% / 16% | 16% / 13% | **27% / 22%** | 15% / 15% |
-| VIX at the open | 17.4 | 17.5 | 17.8 | **16.5** | 16.7 |
-| sessions with a range above 1% | 4% | 11% | 23% | **32%** | 26% |
-| range / VIX-implied move | 0.54 | 0.58 | 0.72 | **0.80** | 0.72 |
+| avg P/L per condor | +\$173 | +\$129 | +\$127 | **-\$38** | +\$189 |
+| call / put side | +\$100 / +\$73 | +\$65 / +\$65 | +\$69 / +\$58 | **-\$16 / -\$22** | +\$120 / +\$68 |
+| short call / short put breached | 19% / 13% | 21% / 15% | 16% / 12% | **28% / 21%** | 15% / 16% |
+| VIX at the open | 17.5 | 17.1 | 17.8 | **16.5** | 16.7 |
+| sessions with a range above 1% | 4% | 10% | 21% | **32%** | 24% |
+| range / VIX-implied move | 0.53 | 0.57 | 0.69 | **0.80** | 0.71 |
 
 | condor P/L on a Thursday dummy (strategy with Thursdays) | Thursday effect, \$ per condor | t | p |
 |---|---|---|---|
-| Thursday alone | **-\$176** | -3.32 | 0.001 |
-| + every feature known at entry | **-\$181** | -3.54 | <0.001 |
-| + the session's range vs implied (an outcome) | -\$122 | -2.77 | 0.006 |
+| Thursday alone | **-\$189** | -3.39 | 0.001 |
+| + every feature known at entry | **-\$192** | -3.58 | <0.001 |
+| + the session's range vs implied (an outcome) | -\$134 | -2.88 | 0.004 |
 
 - **The same story inside the strategy:** entry conditions are ordinary (VIX is in fact the lowest, 16.5), but Thursdays move more than VIX
-  priced (0.80 against 0.54-0.72), both short strikes break more often, and the entry features explain none of the gap.
-- **The realized move explains about a third of it here** (-\$181 -> -\$122, still significant): even for the same range, Thursday condors do
+  priced (0.80 against 0.53-0.71), both short strikes break more often, and the entry features explain none of the gap.
+- **The realized move explains about a third of it here** (-\$192 -> -\$134, still significant): even for the same range, Thursday condors do
   worse, which fits an intraday shock (a release or a reversal) more than a steady trend.
-- **It is a low-VIX problem:** Thursdays lose with VIX under 18 (-\$150 and -\$64 a condor, against +\$133 and +\$189 on other days), where VIX
-  most underprices them (range / implied 0.91 and 0.78 against 0.66 and 0.56); above 18 the few Thursday trades (102) earn.
-- **Five bad Thursdays sink the rest:** the worst five lose \$14.9k, more than all Thursdays together (-\$4.5k); the other Thursdays make
-  +\$10.4k. The median Thursday session still wins (+\$202), but only 56% of them do, against 77% of other days.
+- **It is a low-VIX problem:** Thursdays lose with VIX under 18 (-\$181 and -\$61 a condor, against +\$128 and +\$182 on other days), where VIX
+  most underprices them (range / implied 0.89 and 0.78 against 0.64 and 0.56); above 18 the few Thursday trades (106) earn.
+- **Five bad Thursdays sink the rest:** the worst five lose \$17.4k, more than all Thursdays together (-\$8.1k); the other Thursdays make
+  +\$9.4k. The median Thursday session still wins (+\$159), but only 56% of them do, against 75% of other days.
 
 **Why no Thursdays, in one line:** not a VIX regime and nothing visible at entry, but Thursdays realise more movement than VIX prices at the
 open, mostly on a few big days each year (macro releases are the likely cause, untested here), and a short-volatility condor has no defence
@@ -3588,12 +3589,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
   <tbody>
     <tr>
       <th>0.96</th>
-      <td>908.0</td>
-      <td>73606.48</td>
-      <td>1.67</td>
-      <td>1.37</td>
-      <td>2.23</td>
-      <td>-3893.00</td>
+      <td>966.0</td>
+      <td>75815.96</td>
+      <td>1.62</td>
+      <td>1.55</td>
+      <td>1.75</td>
+      <td>-6644.64</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3603,12 +3604,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>0.97</th>
-      <td>1066.0</td>
-      <td>85845.96</td>
-      <td>2.03</td>
-      <td>1.68</td>
-      <td>2.69</td>
-      <td>-3808.68</td>
+      <td>1128.0</td>
+      <td>87440.68</td>
+      <td>1.94</td>
+      <td>1.80</td>
+      <td>2.21</td>
+      <td>-6152.40</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3618,12 +3619,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>0.98</th>
-      <td>1150.0</td>
-      <td>94025.00</td>
-      <td>2.25</td>
-      <td>1.95</td>
-      <td>2.82</td>
-      <td>-3808.68</td>
+      <td>1216.0</td>
+      <td>98192.96</td>
+      <td>2.24</td>
+      <td>2.14</td>
+      <td>2.42</td>
+      <td>-6152.40</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3633,12 +3634,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>0.99</th>
-      <td>1226.0</td>
-      <td>98007.56</td>
-      <td>2.32</td>
-      <td>2.03</td>
-      <td>2.89</td>
-      <td>-3808.68</td>
+      <td>1292.0</td>
+      <td>103027.52</td>
+      <td>2.33</td>
+      <td>2.24</td>
+      <td>2.51</td>
+      <td>-6152.40</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3648,12 +3649,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>1.00</th>
-      <td>1314.0</td>
-      <td>100539.84</td>
-      <td>2.35</td>
-      <td>2.13</td>
-      <td>2.78</td>
-      <td>-3808.68</td>
+      <td>1390.0</td>
+      <td>104619.40</td>
+      <td>2.30</td>
+      <td>2.22</td>
+      <td>2.45</td>
+      <td>-6152.40</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3663,12 +3664,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>1.01</th>
-      <td>1372.0</td>
-      <td>105164.32</td>
-      <td>2.45</td>
-      <td>2.26</td>
-      <td>2.83</td>
-      <td>-3808.68</td>
+      <td>1448.0</td>
+      <td>108113.88</td>
+      <td>2.34</td>
+      <td>2.27</td>
+      <td>2.49</td>
+      <td>-6152.40</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3678,12 +3679,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>1.02</th>
-      <td>1450.0</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>2.44</td>
-      <td>2.92</td>
-      <td>-3808.68</td>
+      <td>1528.0</td>
+      <td>115481.68</td>
+      <td>2.49</td>
+      <td>2.48</td>
+      <td>2.51</td>
+      <td>-6501.16</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3693,12 +3694,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>1.03</th>
-      <td>1504.0</td>
-      <td>107428.24</td>
-      <td>2.38</td>
-      <td>2.18</td>
-      <td>2.85</td>
-      <td>-3808.68</td>
+      <td>1588.0</td>
+      <td>112267.28</td>
+      <td>2.32</td>
+      <td>2.22</td>
+      <td>2.54</td>
+      <td>-5962.80</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3708,12 +3709,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>1.04</th>
-      <td>1560.0</td>
-      <td>112068.60</td>
-      <td>2.49</td>
-      <td>2.30</td>
-      <td>2.92</td>
-      <td>-3808.68</td>
+      <td>1648.0</td>
+      <td>117089.88</td>
+      <td>2.41</td>
+      <td>2.32</td>
+      <td>2.64</td>
+      <td>-5801.68</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3723,12 +3724,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>1.05</th>
-      <td>1596.0</td>
-      <td>113233.76</td>
-      <td>2.47</td>
-      <td>2.30</td>
-      <td>2.86</td>
-      <td>-4386.84</td>
+      <td>1688.0</td>
+      <td>118429.28</td>
+      <td>2.41</td>
+      <td>2.34</td>
+      <td>2.60</td>
+      <td>-5650.56</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3738,12 +3739,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>1.06</th>
-      <td>1622.0</td>
-      <td>113435.32</td>
-      <td>2.44</td>
+      <td>1712.0</td>
+      <td>118607.72</td>
+      <td>2.37</td>
       <td>2.32</td>
-      <td>2.74</td>
-      <td>-5095.72</td>
+      <td>2.54</td>
+      <td>-5650.56</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3753,12 +3754,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>1.07</th>
-      <td>1658.0</td>
-      <td>111200.48</td>
-      <td>2.33</td>
-      <td>2.31</td>
-      <td>2.38</td>
-      <td>-5095.72</td>
+      <td>1750.0</td>
+      <td>116921.00</td>
+      <td>2.29</td>
+      <td>2.30</td>
+      <td>2.29</td>
+      <td>-5650.56</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3768,12 +3769,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
     </tr>
     <tr>
       <th>1.08</th>
-      <td>1712.0</td>
-      <td>110525.72</td>
-      <td>2.21</td>
-      <td>2.26</td>
-      <td>2.09</td>
-      <td>-5095.72</td>
+      <td>1810.0</td>
+      <td>115964.60</td>
+      <td>2.17</td>
+      <td>2.24</td>
+      <td>2.03</td>
+      <td>-6755.68</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
@@ -3789,12 +3790,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1844.0</td>
-      <td>110504.64</td>
-      <td>2.07</td>
-      <td>1.85</td>
-      <td>2.51</td>
-      <td>-4041.20</td>
+      <td>1946.0</td>
+      <td>114774.76</td>
+      <td>2.00</td>
+      <td>1.86</td>
+      <td>2.29</td>
+      <td>-5602.80</td>
     </tr>
     <tr>
       <th>0.81</th>
@@ -3804,12 +3805,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1814.0</td>
-      <td>111380.84</td>
-      <td>2.11</td>
+      <td>1910.0</td>
+      <td>114751.60</td>
+      <td>2.02</td>
       <td>1.91</td>
-      <td>2.49</td>
-      <td>-3865.32</td>
+      <td>2.23</td>
+      <td>-5943.92</td>
     </tr>
     <tr>
       <th>0.82</th>
@@ -3819,12 +3820,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1760.0</td>
-      <td>109182.60</td>
-      <td>2.08</td>
+      <td>1854.0</td>
+      <td>112176.24</td>
+      <td>1.98</td>
       <td>1.84</td>
-      <td>2.56</td>
-      <td>-3865.32</td>
+      <td>2.29</td>
+      <td>-6501.16</td>
     </tr>
     <tr>
       <th>0.83</th>
@@ -3834,12 +3835,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1718.0</td>
-      <td>108434.08</td>
-      <td>2.08</td>
-      <td>1.77</td>
-      <td>2.70</td>
-      <td>-3865.32</td>
+      <td>1808.0</td>
+      <td>111771.48</td>
+      <td>1.98</td>
+      <td>1.76</td>
+      <td>2.44</td>
+      <td>-6501.16</td>
     </tr>
     <tr>
       <th>0.84</th>
@@ -3849,12 +3850,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1656.0</td>
-      <td>108511.36</td>
-      <td>2.17</td>
-      <td>1.92</td>
-      <td>2.67</td>
-      <td>-3818.28</td>
+      <td>1756.0</td>
+      <td>110718.36</td>
+      <td>2.02</td>
+      <td>1.90</td>
+      <td>2.25</td>
+      <td>-6501.16</td>
     </tr>
     <tr>
       <th>0.85</th>
@@ -3864,12 +3865,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1588.0</td>
-      <td>108503.28</td>
-      <td>2.27</td>
-      <td>2.05</td>
-      <td>2.71</td>
-      <td>-3808.68</td>
+      <td>1676.0</td>
+      <td>111328.56</td>
+      <td>2.13</td>
+      <td>2.07</td>
+      <td>2.26</td>
+      <td>-6501.16</td>
     </tr>
     <tr>
       <th>0.86</th>
@@ -3879,12 +3880,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1508.0</td>
-      <td>109621.48</td>
-      <td>2.43</td>
-      <td>2.20</td>
-      <td>2.91</td>
-      <td>-3808.68</td>
+      <td>1592.0</td>
+      <td>112907.52</td>
+      <td>2.31</td>
+      <td>2.24</td>
+      <td>2.47</td>
+      <td>-6501.16</td>
     </tr>
     <tr>
       <th>0.87</th>
@@ -3894,12 +3895,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1450.0</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>2.44</td>
-      <td>2.92</td>
-      <td>-3808.68</td>
+      <td>1528.0</td>
+      <td>115481.68</td>
+      <td>2.49</td>
+      <td>2.48</td>
+      <td>2.51</td>
+      <td>-6501.16</td>
     </tr>
     <tr>
       <th>0.88</th>
@@ -3909,12 +3910,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1356.0</td>
-      <td>105314.36</td>
-      <td>2.47</td>
-      <td>2.29</td>
-      <td>2.84</td>
-      <td>-3825.52</td>
+      <td>1428.0</td>
+      <td>109445.68</td>
+      <td>2.38</td>
+      <td>2.34</td>
+      <td>2.48</td>
+      <td>-6947.28</td>
     </tr>
     <tr>
       <th>0.89</th>
@@ -3924,12 +3925,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1242.0</td>
-      <td>96646.52</td>
-      <td>2.31</td>
-      <td>2.11</td>
-      <td>2.79</td>
-      <td>-3808.68</td>
+      <td>1310.0</td>
+      <td>100789.60</td>
+      <td>2.23</td>
+      <td>2.14</td>
+      <td>2.44</td>
+      <td>-6824.24</td>
     </tr>
     <tr>
       <th>0.90</th>
@@ -3939,12 +3940,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1160.0</td>
-      <td>86650.60</td>
-      <td>2.02</td>
-      <td>1.85</td>
-      <td>2.45</td>
-      <td>-3808.68</td>
+      <td>1218.0</td>
+      <td>90877.08</td>
+      <td>1.98</td>
+      <td>1.89</td>
+      <td>2.22</td>
+      <td>-5737.72</td>
     </tr>
     <tr>
       <th>0.91</th>
@@ -3954,12 +3955,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>1052.0</td>
-      <td>81428.12</td>
-      <td>1.90</td>
-      <td>1.77</td>
-      <td>2.24</td>
-      <td>-3392.16</td>
+      <td>1106.0</td>
+      <td>85003.36</td>
+      <td>1.86</td>
+      <td>1.80</td>
+      <td>2.04</td>
+      <td>-4716.32</td>
     </tr>
     <tr>
       <th>0.92</th>
@@ -3969,12 +3970,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>970.0</td>
-      <td>72625.20</td>
-      <td>1.64</td>
-      <td>1.66</td>
-      <td>1.61</td>
-      <td>-3456.00</td>
+      <td>1018.0</td>
+      <td>76186.08</td>
+      <td>1.63</td>
+      <td>1.73</td>
+      <td>1.43</td>
+      <td>-4387.16</td>
     </tr>
     <tr>
       <th>0.93</th>
@@ -3984,12 +3985,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>878.0</td>
-      <td>68667.68</td>
-      <td>1.58</td>
-      <td>1.66</td>
-      <td>1.42</td>
-      <td>-3373.72</td>
+      <td>916.0</td>
+      <td>70703.96</td>
+      <td>1.53</td>
+      <td>1.68</td>
+      <td>1.18</td>
+      <td>-4387.16</td>
     </tr>
     <tr>
       <th>0.94</th>
@@ -3999,12 +4000,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>774.0</td>
-      <td>59767.44</td>
-      <td>1.27</td>
-      <td>1.40</td>
-      <td>0.97</td>
-      <td>-3680.60</td>
+      <td>806.0</td>
+      <td>61535.36</td>
+      <td>1.24</td>
+      <td>1.39</td>
+      <td>0.89</td>
+      <td>-4694.04</td>
     </tr>
     <tr>
       <th>0.95</th>
@@ -4014,12 +4015,12 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
       <td>NaN</td>
       <td>NaN</td>
       <td>NaN</td>
-      <td>670.0</td>
-      <td>48830.20</td>
-      <td>0.86</td>
-      <td>0.93</td>
-      <td>0.70</td>
-      <td>-3680.60</td>
+      <td>700.0</td>
+      <td>50848.00</td>
+      <td>0.88</td>
+      <td>0.97</td>
+      <td>0.66</td>
+      <td>-4694.04</td>
     </tr>
   </tbody>
 </table>
@@ -4028,20 +4029,20 @@ contango; near or above 1 it is flat or inverted, which is what it does in a sel
 
 | cap (VIX9D/VIX <=) | 0.99 | 1.00 | 1.01 | **1.02** | 1.03 | 1.04 | 1.05 |
 |---|---|---|---|---|---|---|---|
-| Sharpe | 2.32 | 2.35 | 2.45 | **2.60** | 2.38 | 2.49 | 2.47 |
+| Sharpe | 2.33 | 2.30 | 2.34 | **2.49** | 2.32 | 2.41 | 2.41 |
 
 | floor (VIX9D/VIX >=) | 0.84 | 0.85 | 0.86 | **0.87** | 0.88 | 0.89 | 0.90 |
 |---|---|---|---|---|---|---|---|
-| Sharpe | 2.17 | 2.27 | 2.43 | **2.60** | 2.47 | 2.31 | 2.02 |
+| Sharpe | 2.02 | 2.13 | 2.31 | **2.49** | 2.38 | 2.23 | 1.98 |
 
 **The economic reading:** 1.00 is where the curve inverts (VIX9D = VIX: the next week priced as more stressed than the next month). A cap
 of 1.02 says **flat or barely inverted is fine, clearly inverted is not**. A 2% tolerance on a one-minute reading of two noisy indices is
-reasonable on its own. The 0.87 floor shows the same pattern (2.60 against 2.27 at 0.85 and 2.31 at 0.89): below it the curve is so
+reasonable on its own. The 0.87 floor shows the same pattern (2.49 against 2.13 at 0.85 and 2.23 at 0.89): below it the curve is so
 calm that a move breaks it (Section 6's profile: the short put breached on 42% of condors under 0.80).
 
-- **Both edges are single-point peaks:** one step either way costs 0.13-0.22 Sharpe. Part of that height is the noise of fitting a threshold
+- **Both edges are single-point peaks:** one step either way costs 0.11-0.18 Sharpe. Part of that height is the noise of fitting a threshold
   on the same data; the robust reading is the zone around each edge, not the exact number.
-- **The zone holds up:** every cap from 1.01 to 1.05 scores 2.38-2.60, and every floor from 0.86 to 0.88 scores 2.43-2.60. Past 1.06 on
+- **The zone holds up:** every cap from 1.01 to 1.05 scores 2.32-2.49, and every floor from 0.86 to 0.88 scores 2.31-2.49. Past 1.06 on
   the cap (clearly inverted) and past 0.90 on the floor, Sharpe falls away, in both halves.
 
 **Is the peak statistically significant?** Two checks, both on the same resampled sessions for every value (2,000 session-bootstrap
@@ -4085,75 +4086,75 @@ sharper one, because the versions trade mostly the same days.
   <tbody>
     <tr>
       <th>0.96</th>
-      <td>1.673</td>
-      <td>0.785</td>
-      <td>2.543</td>
-      <td>0.923</td>
-      <td>0.263</td>
-      <td>3.514</td>
-      <td>0.000</td>
-      <td>99.95</td>
+      <td>1.620</td>
+      <td>0.687</td>
+      <td>2.506</td>
+      <td>0.871</td>
+      <td>0.279</td>
+      <td>3.123</td>
+      <td>0.002</td>
+      <td>99.90</td>
     </tr>
     <tr>
       <th>0.97</th>
-      <td>2.030</td>
-      <td>1.190</td>
-      <td>2.873</td>
-      <td>0.565</td>
-      <td>0.220</td>
-      <td>2.569</td>
-      <td>0.010</td>
-      <td>99.35</td>
+      <td>1.941</td>
+      <td>1.069</td>
+      <td>2.785</td>
+      <td>0.549</td>
+      <td>0.242</td>
+      <td>2.267</td>
+      <td>0.023</td>
+      <td>98.75</td>
     </tr>
     <tr>
       <th>0.98</th>
-      <td>2.247</td>
-      <td>1.406</td>
-      <td>3.061</td>
-      <td>0.349</td>
-      <td>0.208</td>
-      <td>1.677</td>
-      <td>0.094</td>
-      <td>95.80</td>
+      <td>2.236</td>
+      <td>1.388</td>
+      <td>3.057</td>
+      <td>0.254</td>
+      <td>0.228</td>
+      <td>1.114</td>
+      <td>0.265</td>
+      <td>89.10</td>
     </tr>
     <tr>
       <th>0.99</th>
-      <td>2.322</td>
-      <td>1.477</td>
-      <td>3.134</td>
-      <td>0.274</td>
-      <td>0.184</td>
-      <td>1.489</td>
-      <td>0.137</td>
-      <td>94.15</td>
+      <td>2.330</td>
+      <td>1.456</td>
+      <td>3.171</td>
+      <td>0.160</td>
+      <td>0.197</td>
+      <td>0.812</td>
+      <td>0.417</td>
+      <td>81.40</td>
     </tr>
     <tr>
       <th>1.00</th>
-      <td>2.353</td>
-      <td>1.482</td>
-      <td>3.196</td>
-      <td>0.243</td>
-      <td>0.136</td>
-      <td>1.785</td>
-      <td>0.074</td>
-      <td>96.70</td>
+      <td>2.299</td>
+      <td>1.398</td>
+      <td>3.174</td>
+      <td>0.192</td>
+      <td>0.140</td>
+      <td>1.364</td>
+      <td>0.172</td>
+      <td>91.65</td>
     </tr>
     <tr>
       <th>1.01</th>
-      <td>2.446</td>
-      <td>1.615</td>
-      <td>3.309</td>
+      <td>2.341</td>
+      <td>1.446</td>
+      <td>3.226</td>
       <td>0.150</td>
-      <td>0.095</td>
-      <td>1.572</td>
-      <td>0.116</td>
-      <td>94.65</td>
+      <td>0.093</td>
+      <td>1.613</td>
+      <td>0.107</td>
+      <td>95.20</td>
     </tr>
     <tr>
       <th>1.02</th>
-      <td>2.596</td>
-      <td>1.752</td>
-      <td>3.451</td>
+      <td>2.491</td>
+      <td>1.639</td>
+      <td>3.396</td>
       <td>0.000</td>
       <td>0.000</td>
       <td>NaN</td>
@@ -4162,69 +4163,69 @@ sharper one, because the versions trade mostly the same days.
     </tr>
     <tr>
       <th>1.03</th>
-      <td>2.384</td>
-      <td>1.516</td>
-      <td>3.275</td>
-      <td>0.212</td>
-      <td>0.137</td>
-      <td>1.547</td>
-      <td>0.122</td>
-      <td>95.40</td>
+      <td>2.316</td>
+      <td>1.417</td>
+      <td>3.229</td>
+      <td>0.175</td>
+      <td>0.154</td>
+      <td>1.136</td>
+      <td>0.256</td>
+      <td>87.35</td>
     </tr>
     <tr>
       <th>1.04</th>
-      <td>2.486</td>
-      <td>1.601</td>
-      <td>3.396</td>
-      <td>0.110</td>
-      <td>0.171</td>
-      <td>0.643</td>
-      <td>0.520</td>
-      <td>75.50</td>
+      <td>2.408</td>
+      <td>1.518</td>
+      <td>3.330</td>
+      <td>0.082</td>
+      <td>0.182</td>
+      <td>0.453</td>
+      <td>0.650</td>
+      <td>67.05</td>
     </tr>
     <tr>
       <th>1.05</th>
-      <td>2.466</td>
-      <td>1.581</td>
-      <td>3.401</td>
-      <td>0.130</td>
-      <td>0.217</td>
-      <td>0.598</td>
-      <td>0.550</td>
-      <td>72.10</td>
+      <td>2.409</td>
+      <td>1.514</td>
+      <td>3.350</td>
+      <td>0.082</td>
+      <td>0.206</td>
+      <td>0.397</td>
+      <td>0.692</td>
+      <td>65.30</td>
     </tr>
     <tr>
       <th>1.06</th>
-      <td>2.440</td>
-      <td>1.540</td>
-      <td>3.391</td>
-      <td>0.156</td>
-      <td>0.248</td>
-      <td>0.631</td>
-      <td>0.528</td>
-      <td>72.50</td>
+      <td>2.372</td>
+      <td>1.466</td>
+      <td>3.356</td>
+      <td>0.118</td>
+      <td>0.246</td>
+      <td>0.482</td>
+      <td>0.630</td>
+      <td>68.10</td>
     </tr>
     <tr>
       <th>1.07</th>
-      <td>2.326</td>
-      <td>1.401</td>
-      <td>3.316</td>
-      <td>0.269</td>
-      <td>0.268</td>
-      <td>1.004</td>
-      <td>0.315</td>
-      <td>83.85</td>
+      <td>2.289</td>
+      <td>1.379</td>
+      <td>3.295</td>
+      <td>0.202</td>
+      <td>0.260</td>
+      <td>0.776</td>
+      <td>0.438</td>
+      <td>77.55</td>
     </tr>
     <tr>
       <th>1.08</th>
-      <td>2.206</td>
-      <td>1.275</td>
-      <td>3.216</td>
-      <td>0.390</td>
-      <td>0.312</td>
-      <td>1.252</td>
-      <td>0.211</td>
-      <td>88.95</td>
+      <td>2.174</td>
+      <td>1.210</td>
+      <td>3.199</td>
+      <td>0.317</td>
+      <td>0.297</td>
+      <td>1.066</td>
+      <td>0.287</td>
+      <td>85.40</td>
     </tr>
   </tbody>
 </table>
@@ -4261,86 +4262,86 @@ sharper one, because the versions trade mostly the same days.
   <tbody>
     <tr>
       <th>0.80</th>
-      <td>2.074</td>
-      <td>1.132</td>
-      <td>3.093</td>
-      <td>0.522</td>
-      <td>0.337</td>
-      <td>1.549</td>
-      <td>0.121</td>
-      <td>93.75</td>
+      <td>2.004</td>
+      <td>1.042</td>
+      <td>3.056</td>
+      <td>0.487</td>
+      <td>0.343</td>
+      <td>1.419</td>
+      <td>0.156</td>
+      <td>92.05</td>
     </tr>
     <tr>
       <th>0.81</th>
-      <td>2.108</td>
-      <td>1.162</td>
-      <td>3.099</td>
-      <td>0.488</td>
-      <td>0.335</td>
-      <td>1.456</td>
-      <td>0.145</td>
-      <td>92.20</td>
+      <td>2.017</td>
+      <td>1.036</td>
+      <td>3.047</td>
+      <td>0.474</td>
+      <td>0.340</td>
+      <td>1.393</td>
+      <td>0.164</td>
+      <td>91.35</td>
     </tr>
     <tr>
       <th>0.82</th>
-      <td>2.080</td>
-      <td>1.115</td>
-      <td>3.063</td>
-      <td>0.515</td>
-      <td>0.327</td>
-      <td>1.576</td>
-      <td>0.115</td>
-      <td>94.40</td>
+      <td>1.984</td>
+      <td>1.014</td>
+      <td>3.019</td>
+      <td>0.507</td>
+      <td>0.332</td>
+      <td>1.525</td>
+      <td>0.127</td>
+      <td>93.60</td>
     </tr>
     <tr>
       <th>0.83</th>
-      <td>2.081</td>
-      <td>1.112</td>
-      <td>3.072</td>
-      <td>0.515</td>
-      <td>0.323</td>
-      <td>1.593</td>
-      <td>0.111</td>
-      <td>94.75</td>
+      <td>1.984</td>
+      <td>1.016</td>
+      <td>3.017</td>
+      <td>0.506</td>
+      <td>0.330</td>
+      <td>1.534</td>
+      <td>0.125</td>
+      <td>94.10</td>
     </tr>
     <tr>
       <th>0.84</th>
-      <td>2.167</td>
-      <td>1.212</td>
-      <td>3.130</td>
-      <td>0.429</td>
-      <td>0.294</td>
-      <td>1.459</td>
-      <td>0.145</td>
-      <td>93.80</td>
+      <td>2.016</td>
+      <td>1.030</td>
+      <td>3.022</td>
+      <td>0.475</td>
+      <td>0.310</td>
+      <td>1.531</td>
+      <td>0.126</td>
+      <td>94.90</td>
     </tr>
     <tr>
       <th>0.85</th>
-      <td>2.267</td>
-      <td>1.348</td>
-      <td>3.218</td>
-      <td>0.329</td>
-      <td>0.230</td>
-      <td>1.433</td>
-      <td>0.152</td>
-      <td>94.05</td>
+      <td>2.133</td>
+      <td>1.158</td>
+      <td>3.140</td>
+      <td>0.358</td>
+      <td>0.245</td>
+      <td>1.462</td>
+      <td>0.144</td>
+      <td>94.40</td>
     </tr>
     <tr>
       <th>0.86</th>
-      <td>2.430</td>
-      <td>1.561</td>
-      <td>3.342</td>
-      <td>0.166</td>
-      <td>0.130</td>
-      <td>1.275</td>
-      <td>0.202</td>
-      <td>90.70</td>
+      <td>2.313</td>
+      <td>1.391</td>
+      <td>3.223</td>
+      <td>0.178</td>
+      <td>0.137</td>
+      <td>1.296</td>
+      <td>0.195</td>
+      <td>91.70</td>
     </tr>
     <tr>
       <th>0.87</th>
-      <td>2.596</td>
-      <td>1.752</td>
-      <td>3.451</td>
+      <td>2.491</td>
+      <td>1.639</td>
+      <td>3.396</td>
       <td>0.000</td>
       <td>0.000</td>
       <td>NaN</td>
@@ -4349,89 +4350,89 @@ sharper one, because the versions trade mostly the same days.
     </tr>
     <tr>
       <th>0.88</th>
-      <td>2.466</td>
-      <td>1.619</td>
-      <td>3.340</td>
-      <td>0.130</td>
-      <td>0.079</td>
-      <td>1.640</td>
-      <td>0.101</td>
-      <td>95.50</td>
+      <td>2.379</td>
+      <td>1.535</td>
+      <td>3.283</td>
+      <td>0.112</td>
+      <td>0.083</td>
+      <td>1.357</td>
+      <td>0.175</td>
+      <td>91.90</td>
     </tr>
     <tr>
       <th>0.89</th>
-      <td>2.311</td>
-      <td>1.454</td>
-      <td>3.176</td>
-      <td>0.285</td>
-      <td>0.156</td>
-      <td>1.829</td>
-      <td>0.067</td>
-      <td>96.60</td>
+      <td>2.226</td>
+      <td>1.353</td>
+      <td>3.104</td>
+      <td>0.265</td>
+      <td>0.151</td>
+      <td>1.754</td>
+      <td>0.079</td>
+      <td>96.25</td>
     </tr>
     <tr>
       <th>0.90</th>
-      <td>2.023</td>
-      <td>1.159</td>
-      <td>2.882</td>
-      <td>0.572</td>
-      <td>0.196</td>
-      <td>2.928</td>
-      <td>0.003</td>
-      <td>99.75</td>
+      <td>1.978</td>
+      <td>1.108</td>
+      <td>2.849</td>
+      <td>0.513</td>
+      <td>0.195</td>
+      <td>2.631</td>
+      <td>0.009</td>
+      <td>99.50</td>
     </tr>
     <tr>
       <th>0.91</th>
-      <td>1.897</td>
-      <td>1.028</td>
-      <td>2.742</td>
-      <td>0.698</td>
-      <td>0.232</td>
-      <td>3.009</td>
-      <td>0.003</td>
-      <td>99.90</td>
+      <td>1.855</td>
+      <td>0.974</td>
+      <td>2.733</td>
+      <td>0.636</td>
+      <td>0.229</td>
+      <td>2.779</td>
+      <td>0.005</td>
+      <td>99.65</td>
     </tr>
     <tr>
       <th>0.92</th>
-      <td>1.639</td>
-      <td>0.762</td>
-      <td>2.501</td>
-      <td>0.957</td>
-      <td>0.262</td>
-      <td>3.659</td>
-      <td>0.000</td>
+      <td>1.631</td>
+      <td>0.725</td>
+      <td>2.522</td>
+      <td>0.860</td>
+      <td>0.263</td>
+      <td>3.265</td>
+      <td>0.001</td>
       <td>99.95</td>
     </tr>
     <tr>
       <th>0.93</th>
-      <td>1.584</td>
-      <td>0.737</td>
-      <td>2.403</td>
-      <td>1.011</td>
-      <td>0.298</td>
-      <td>3.391</td>
+      <td>1.532</td>
+      <td>0.654</td>
+      <td>2.406</td>
+      <td>0.959</td>
+      <td>0.297</td>
+      <td>3.224</td>
       <td>0.001</td>
-      <td>100.00</td>
+      <td>99.95</td>
     </tr>
     <tr>
       <th>0.94</th>
-      <td>1.267</td>
-      <td>0.377</td>
-      <td>2.114</td>
-      <td>1.329</td>
-      <td>0.347</td>
-      <td>3.825</td>
+      <td>1.242</td>
+      <td>0.318</td>
+      <td>2.143</td>
+      <td>1.249</td>
+      <td>0.343</td>
+      <td>3.640</td>
       <td>0.000</td>
       <td>100.00</td>
     </tr>
     <tr>
       <th>0.95</th>
-      <td>0.861</td>
-      <td>-0.045</td>
-      <td>1.746</td>
-      <td>1.735</td>
-      <td>0.371</td>
-      <td>4.679</td>
+      <td>0.877</td>
+      <td>-0.054</td>
+      <td>1.770</td>
+      <td>1.614</td>
+      <td>0.369</td>
+      <td>4.372</td>
       <td>0.000</td>
       <td>100.00</td>
     </tr>
@@ -4442,53 +4443,479 @@ sharper one, because the versions trade mostly the same days.
 
 | cap vs the strategy's 1.02 | 0.97 | 0.98 | 0.99 | 1.00 | 1.01 | 1.03 | 1.04 | 1.05 | 1.06 |
 |---|---|---|---|---|---|---|---|---|---|
-| Sharpe | 2.03 | 2.25 | 2.32 | 2.35 | 2.45 | 2.38 | 2.49 | 2.47 | 2.44 |
-| t (1.02 minus this) | **2.57** | 1.68 | 1.49 | 1.79 | 1.57 | 1.55 | 0.64 | 0.60 | 0.63 |
-| p | **0.010** | 0.094 | 0.137 | 0.074 | 0.116 | 0.122 | 0.520 | 0.550 | 0.528 |
+| Sharpe | 1.94 | 2.24 | 2.33 | 2.30 | 2.34 | 2.32 | 2.41 | 2.41 | 2.37 |
+| t (1.02 minus this) | **2.27** | 1.11 | 0.81 | 1.36 | 1.61 | 1.14 | 0.45 | 0.40 | 0.48 |
+| p | **0.023** | 0.265 | 0.417 | 0.172 | 0.107 | 0.256 | 0.650 | 0.692 | 0.630 |
 
 | floor vs the strategy's 0.87 | 0.84 | 0.85 | 0.86 | 0.88 | 0.89 | 0.90 | 0.91 | 0.92 |
 |---|---|---|---|---|---|---|---|---|
-| Sharpe | 2.17 | 2.27 | 2.43 | 2.47 | 2.31 | 2.02 | 1.90 | 1.64 |
-| t (0.87 minus this) | 1.46 | 1.43 | 1.28 | 1.64 | 1.83 | **2.93** | **3.01** | **3.66** |
-| p | 0.145 | 0.152 | 0.202 | 0.101 | 0.067 | **0.003** | **0.003** | **<0.001** |
+| Sharpe | 2.02 | 2.13 | 2.31 | 2.38 | 2.23 | 1.98 | 1.86 | 1.63 |
+| t (0.87 minus this) | 1.53 | 1.46 | 1.30 | 1.36 | 1.75 | **2.63** | **2.78** | **3.27** |
+| p | 0.126 | 0.144 | 0.195 | 0.175 | 0.079 | **0.009** | **0.005** | **0.001** |
 
-- **The intervals all overlap:** the strategy's Sharpe of 2.60 has a 95% interval of 1.75 to 3.45, and every cap and floor value's interval
+- **The intervals all overlap:** the strategy's Sharpe of 2.49 has a 95% interval of 1.64 to 3.40, and every cap and floor value's interval
   overlaps it. By the conservative check nothing is distinguishable.
-- **By the paired test, the exact peak isn't significant either.** No cap from 0.98 to 1.08 is significantly worse than 1.02 (p 0.07-0.55);
-  1.04-1.06 are statistically level with it (p ~0.5). **What is significant is the direction:** caps of 0.97 and tighter are clearly worse
-  (p 0.010 and below). Cutting off before the curve flattens costs real money; where exactly past 1.00 the cap sits does not, within
-  this data.
-- **The floor is the same picture:** 0.86-0.89 are level with 0.87 (p 0.07-0.20), and lowering it towards 0.80 isn't significantly worse
-  (p 0.11-0.15), but **raising it to 0.90 or above is clearly worse** (p 0.003 and below).
+- **By the paired test, the exact peak isn't significant either.** No cap from 0.98 to 1.08 is significantly worse than 1.02 (p 0.11-0.69);
+  1.04-1.06 are statistically level with it (p 0.6-0.7). **What is significant is the direction:** caps of 0.97 and tighter are clearly worse
+  (p 0.023 and below). Cutting off before the curve flattens costs real money; where exactly past 1.00 the cap sits does not, within this
+  data.
+- **The floor is the same picture:** 0.86-0.89 are level with 0.87 (p 0.08-0.20), and lowering it towards 0.80 isn't significantly worse
+  (p 0.13-0.16), but **raising it to 0.90 or above is clearly worse** (p 0.009 and below).
 - **So the band's message is robust, its exact numbers are not:** keep the curve between "not too calm" (a floor in the mid-0.80s) and
   "not clearly inverted" (a cap a little above 1.00). 0.87 and 1.02 are the best points of this sample, not significantly better than their
   neighbours.
 
-## 7. Step 5: the tranches, on the book after steps 1-4
+## 7. Step 5: the short/long ratio <= 4, on the book after steps 1-4
 
-The book so far trades all 20 entry times. This step keeps the strategy's **7 tranches: 11:33, 11:53, 12:13, 13:13, 13:53, 14:13 and
-14:53**. They are the first seven tranches forward selection adds on this book (below). First, each tranche on this book and how
-correlated they are.
+The backtester caps one short/long ratio for the whole condor: the two short strikes' prices over the two long strikes'. Here the book still
+trades all 20 entry times (the tranches come next).
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>spearman_condor</th>
+      <th>ci_low</th>
+      <th>ci_high</th>
+      <th>spearman_session</th>
+      <th>pearson_condor</th>
+      <th>p60_ratio</th>
+      <th>spearman_below_p60</th>
+      <th>spearman_above_p60</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>whole condor</th>
+      <td>0.098</td>
+      <td>0.03</td>
+      <td>0.172</td>
+      <td>0.337</td>
+      <td>-0.09</td>
+      <td>2.542</td>
+      <td>0.435</td>
+      <td>-0.188</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+    partial rank correlation with P/L, controlling for what the ratio moves with:
+    
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>whole condor</th>
+    </tr>
+    <tr>
+      <th>controlling for</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>none</th>
+      <td>0.098</td>
+    </tr>
+    <tr>
+      <th>credit</th>
+      <td>-0.073</td>
+    </tr>
+    <tr>
+      <th>strike distance (both sides)</th>
+      <td>0.024</td>
+    </tr>
+    <tr>
+      <th>entry time</th>
+      <td>0.083</td>
+    </tr>
+    <tr>
+      <th>VIX9D</th>
+      <td>0.106</td>
+    </tr>
+    <tr>
+      <th>credit, VIX9D, entry time</th>
+      <td>-0.046</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+    what the ratio moves with (rank correlation):
+    
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>whole condor</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>credit</th>
+      <td>0.92</td>
+    </tr>
+    <tr>
+      <th>otm_points_call</th>
+      <td>-0.96</td>
+    </tr>
+    <tr>
+      <th>otm_points_put</th>
+      <td>-0.98</td>
+    </tr>
+    <tr>
+      <th>mins_from_open</th>
+      <td>0.70</td>
+    </tr>
+    <tr>
+      <th>vix9d_open</th>
+      <td>-0.35</td>
+    </tr>
+    <tr>
+      <th>vvix_prev</th>
+      <td>-0.36</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+    rank correlation with P/L by year:
+    
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>whole condor</th>
+    </tr>
+    <tr>
+      <th>date</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2022</th>
+      <td>0.372</td>
+    </tr>
+    <tr>
+      <th>2023</th>
+      <td>0.004</td>
+    </tr>
+    <tr>
+      <th>2024</th>
+      <td>-0.002</td>
+    </tr>
+    <tr>
+      <th>2025</th>
+      <td>0.131</td>
+    </tr>
+    <tr>
+      <th>2026</th>
+      <td>0.450</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
 
 
     
-![png](ic_analysis_files/output_46_0.png)
+![png](ic_analysis_files/output_46_7.png)
     
 
 
 
-<table id="T_dfc12">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>side</th>
+      <th>quintile</th>
+      <th>range</th>
+      <th>condors</th>
+      <th>trades</th>
+      <th>sessions</th>
+      <th>win_rate</th>
+      <th>avg_pl</th>
+      <th>total_pl</th>
+      <th>avg_pl_to_2024</th>
+      <th>avg_pl_from_2025</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>whole condor</td>
+      <td>1</td>
+      <td>1.25 to 1.80</td>
+      <td>465</td>
+      <td>930</td>
+      <td>135</td>
+      <td>86.7</td>
+      <td>99.3</td>
+      <td>46176.8</td>
+      <td>102.5</td>
+      <td>97.6</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>whole condor</td>
+      <td>2</td>
+      <td>1.80 to 2.12</td>
+      <td>462</td>
+      <td>924</td>
+      <td>172</td>
+      <td>81.0</td>
+      <td>121.7</td>
+      <td>56244.4</td>
+      <td>117.0</td>
+      <td>130.7</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>whole condor</td>
+      <td>3</td>
+      <td>2.12 to 2.54</td>
+      <td>462</td>
+      <td>924</td>
+      <td>167</td>
+      <td>73.2</td>
+      <td>100.6</td>
+      <td>46464.4</td>
+      <td>101.9</td>
+      <td>96.9</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>whole condor</td>
+      <td>4</td>
+      <td>2.54 to 3.42</td>
+      <td>465</td>
+      <td>930</td>
+      <td>141</td>
+      <td>69.9</td>
+      <td>111.1</td>
+      <td>51640.8</td>
+      <td>120.8</td>
+      <td>79.1</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>whole condor</td>
+      <td>5</td>
+      <td>3.42 to 57.50</td>
+      <td>461</td>
+      <td>922</td>
+      <td>139</td>
+      <td>59.0</td>
+      <td>27.7</td>
+      <td>12752.3</td>
+      <td>36.6</td>
+      <td>-6.3</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>kept_pct</th>
+      <th>trades</th>
+      <th>total_pl</th>
+      <th>sharpe</th>
+      <th>max_drawdown</th>
+      <th>sharpe_to_2024</th>
+      <th>sharpe_from_2025</th>
+    </tr>
+    <tr>
+      <th>side</th>
+      <th>max_ratio</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="10" valign="top">whole condor</th>
+      <th>2.5</th>
+      <td>58.75</td>
+      <td>2720</td>
+      <td>147206.20</td>
+      <td>2.12</td>
+      <td>-8172.00</td>
+      <td>1.90</td>
+      <td>2.52</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>72.96</td>
+      <td>3378</td>
+      <td>180796.68</td>
+      <td>2.26</td>
+      <td>-9696.40</td>
+      <td>2.10</td>
+      <td>2.59</td>
+    </tr>
+    <tr>
+      <th>3.5</th>
+      <td>81.17</td>
+      <td>3758</td>
+      <td>202448.48</td>
+      <td>2.36</td>
+      <td>-11236.20</td>
+      <td>2.27</td>
+      <td>2.56</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>85.10</td>
+      <td>3940</td>
+      <td>211370.40</td>
+      <td>2.40</td>
+      <td>-12700.72</td>
+      <td>2.30</td>
+      <td>2.61</td>
+    </tr>
+    <tr>
+      <th>4.5</th>
+      <td>87.65</td>
+      <td>4058</td>
+      <td>214669.48</td>
+      <td>2.38</td>
+      <td>-14966.24</td>
+      <td>2.30</td>
+      <td>2.57</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>90.02</td>
+      <td>4168</td>
+      <td>217972.08</td>
+      <td>2.38</td>
+      <td>-14902.00</td>
+      <td>2.30</td>
+      <td>2.59</td>
+    </tr>
+    <tr>
+      <th>5.5</th>
+      <td>91.36</td>
+      <td>4230</td>
+      <td>218386.80</td>
+      <td>2.36</td>
+      <td>-15458.64</td>
+      <td>2.27</td>
+      <td>2.58</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>92.70</td>
+      <td>4292</td>
+      <td>218946.52</td>
+      <td>2.35</td>
+      <td>-15315.40</td>
+      <td>2.25</td>
+      <td>2.59</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>94.04</td>
+      <td>4354</td>
+      <td>218526.24</td>
+      <td>2.33</td>
+      <td>-15315.40</td>
+      <td>2.23</td>
+      <td>2.58</td>
+    </tr>
+    <tr>
+      <th>off</th>
+      <td>100.00</td>
+      <td>4630</td>
+      <td>213278.80</td>
+      <td>2.25</td>
+      <td>-15130.04</td>
+      <td>2.16</td>
+      <td>2.48</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+**A small positive correlation with a clear drop at the top.** Rank correlation with condor P/L +0.10 (interval +0.03 to +0.17); below its
+60th percentile (2.54) +0.44, above it -0.19. The ratio is strike distance in another form (-0.96 to -0.98 with how far the shorts sit from
+spot, +0.92 with the credit).
+
+| condor short/long ratio | trades | avg P/L | win rate | 2022-24 / 2025-26 |
+|---|---|---|---|---|
+| 1.25-1.80 | 930 | +\$99 | 87% | +\$103 / +\$98 |
+| 1.80-2.12 | 924 | **+\$122** | 81% | +\$117 / +\$131 |
+| 2.12-2.54 | 924 | +\$101 | 73% | +\$102 / +\$97 |
+| 2.54-3.42 | 930 | +\$111 | 70% | +\$121 / +\$79 |
+| **above 3.42** | 922 | **+\$28** | **59%** | +\$37 / **-\$6** |
+
+| maximum ratio | trades | total P/L | Sharpe | max drawdown |
+|---|---|---|---|---|
+| 3.5 | 3,758 | \$202.4k | 2.36 | -\$11.2k |
+| **4 (strategy)** | **3,940** | **\$211.4k** | **2.40** | -\$12.7k |
+| 4.5 | 4,058 | \$214.7k | 2.38 | -\$15.0k |
+| 5 | 4,168 | \$218.0k | 2.38 | -\$14.9k |
+| no cap | 4,630 | \$213.3k | 2.25 | -\$15.1k |
+
+- **The richest fifth is where the ratio bites:** above about 3.4 condors earn \$28 (and lose \$6 in 2025-26) and win only 59%.
+- **A cap of 4 is the peak** (2.40): it removes 690 trades for \$1.9k and takes the drawdown from -\$15.1k to -\$12.7k.
+
+## 8. Step 6: the tranches, on the book after steps 1-5
+
+The book so far trades all 20 entry times with the ratio cap on. This step keeps the strategy's **7 tranches: 11:33, 11:53, 12:13, 13:13,
+13:33, 13:53 and 14:13**. **13:33 replaced 14:53 in the live strategy** (green and red in the tables and charts below). First, each
+tranche on this book and how correlated they are.
+
+
+    
+![png](ic_analysis_files/output_49_0.png)
+    
+
+
+
+<table id="T_43612">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_dfc12_level0_col0" class="col_heading level0 col0" >condors</th>
-      <th id="T_dfc12_level0_col1" class="col_heading level0 col1" >trades</th>
-      <th id="T_dfc12_level0_col2" class="col_heading level0 col2" >avg_pl</th>
-      <th id="T_dfc12_level0_col3" class="col_heading level0 col3" >ci_low</th>
-      <th id="T_dfc12_level0_col4" class="col_heading level0 col4" >ci_high</th>
-      <th id="T_dfc12_level0_col5" class="col_heading level0 col5" >total_pl</th>
-      <th id="T_dfc12_level0_col6" class="col_heading level0 col6" >sharpe_if_dropped</th>
-      <th id="T_dfc12_level0_col7" class="col_heading level0 col7" >status</th>
+      <th id="T_43612_level0_col0" class="col_heading level0 col0" >condors</th>
+      <th id="T_43612_level0_col1" class="col_heading level0 col1" >trades</th>
+      <th id="T_43612_level0_col2" class="col_heading level0 col2" >avg_pl</th>
+      <th id="T_43612_level0_col3" class="col_heading level0 col3" >ci_low</th>
+      <th id="T_43612_level0_col4" class="col_heading level0 col4" >ci_high</th>
+      <th id="T_43612_level0_col5" class="col_heading level0 col5" >total_pl</th>
+      <th id="T_43612_level0_col6" class="col_heading level0 col6" >sharpe_if_dropped</th>
+      <th id="T_43612_level0_col7" class="col_heading level0 col7" >status</th>
     </tr>
     <tr>
       <th class="index_name level0" >entry_time</th>
@@ -4504,242 +4931,243 @@ correlated they are.
   </thead>
   <tbody>
     <tr>
-      <th id="T_dfc12_level0_row0" class="row_heading level0 row0" >09:32</th>
-      <td id="T_dfc12_row0_col0" class="data row0 col0" >139</td>
-      <td id="T_dfc12_row0_col1" class="data row0 col1" >278</td>
-      <td id="T_dfc12_row0_col2" class="data row0 col2" >31.85</td>
-      <td id="T_dfc12_row0_col3" class="data row0 col3" >-31.26</td>
-      <td id="T_dfc12_row0_col4" class="data row0 col4" >96.27</td>
-      <td id="T_dfc12_row0_col5" class="data row0 col5" >4427.68</td>
-      <td id="T_dfc12_row0_col6" class="data row0 col6" >0.04</td>
-      <td id="T_dfc12_row0_col7" class="data row0 col7" >dropped</td>
+      <th id="T_43612_level0_row0" class="row_heading level0 row0" >09:32</th>
+      <td id="T_43612_row0_col0" class="data row0 col0" >139</td>
+      <td id="T_43612_row0_col1" class="data row0 col1" >278</td>
+      <td id="T_43612_row0_col2" class="data row0 col2" >31.85</td>
+      <td id="T_43612_row0_col3" class="data row0 col3" >-31.26</td>
+      <td id="T_43612_row0_col4" class="data row0 col4" >96.27</td>
+      <td id="T_43612_row0_col5" class="data row0 col5" >4427.68</td>
+      <td id="T_43612_row0_col6" class="data row0 col6" >0.06</td>
+      <td id="T_43612_row0_col7" class="data row0 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row1" class="row_heading level0 row1" >09:52</th>
-      <td id="T_dfc12_row1_col0" class="data row1 col0" >131</td>
-      <td id="T_dfc12_row1_col1" class="data row1 col1" >262</td>
-      <td id="T_dfc12_row1_col2" class="data row1 col2" >34.85</td>
-      <td id="T_dfc12_row1_col3" class="data row1 col3" >-31.65</td>
-      <td id="T_dfc12_row1_col4" class="data row1 col4" >95.74</td>
-      <td id="T_dfc12_row1_col5" class="data row1 col5" >4565.72</td>
-      <td id="T_dfc12_row1_col6" class="data row1 col6" >0.04</td>
-      <td id="T_dfc12_row1_col7" class="data row1 col7" >dropped</td>
+      <th id="T_43612_level0_row1" class="row_heading level0 row1" >09:52</th>
+      <td id="T_43612_row1_col0" class="data row1 col0" >131</td>
+      <td id="T_43612_row1_col1" class="data row1 col1" >262</td>
+      <td id="T_43612_row1_col2" class="data row1 col2" >34.85</td>
+      <td id="T_43612_row1_col3" class="data row1 col3" >-31.65</td>
+      <td id="T_43612_row1_col4" class="data row1 col4" >95.74</td>
+      <td id="T_43612_row1_col5" class="data row1 col5" >4565.72</td>
+      <td id="T_43612_row1_col6" class="data row1 col6" >0.06</td>
+      <td id="T_43612_row1_col7" class="data row1 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row2" class="row_heading level0 row2" >10:13</th>
-      <td id="T_dfc12_row2_col0" class="data row2 col0" >112</td>
-      <td id="T_dfc12_row2_col1" class="data row2 col1" >224</td>
-      <td id="T_dfc12_row2_col2" class="data row2 col2" >43.86</td>
-      <td id="T_dfc12_row2_col3" class="data row2 col3" >-26.94</td>
-      <td id="T_dfc12_row2_col4" class="data row2 col4" >108.33</td>
-      <td id="T_dfc12_row2_col5" class="data row2 col5" >4912.44</td>
-      <td id="T_dfc12_row2_col6" class="data row2 col6" >0.05</td>
-      <td id="T_dfc12_row2_col7" class="data row2 col7" >dropped</td>
+      <th id="T_43612_level0_row2" class="row_heading level0 row2" >10:13</th>
+      <td id="T_43612_row2_col0" class="data row2 col0" >112</td>
+      <td id="T_43612_row2_col1" class="data row2 col1" >224</td>
+      <td id="T_43612_row2_col2" class="data row2 col2" >43.86</td>
+      <td id="T_43612_row2_col3" class="data row2 col3" >-26.94</td>
+      <td id="T_43612_row2_col4" class="data row2 col4" >108.33</td>
+      <td id="T_43612_row2_col5" class="data row2 col5" >4912.44</td>
+      <td id="T_43612_row2_col6" class="data row2 col6" >0.07</td>
+      <td id="T_43612_row2_col7" class="data row2 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row3" class="row_heading level0 row3" >10:33</th>
-      <td id="T_dfc12_row3_col0" class="data row3 col0" >122</td>
-      <td id="T_dfc12_row3_col1" class="data row3 col1" >244</td>
-      <td id="T_dfc12_row3_col2" class="data row3 col2" >43.01</td>
-      <td id="T_dfc12_row3_col3" class="data row3 col3" >-29.20</td>
-      <td id="T_dfc12_row3_col4" class="data row3 col4" >109.34</td>
-      <td id="T_dfc12_row3_col5" class="data row3 col5" >5246.64</td>
-      <td id="T_dfc12_row3_col6" class="data row3 col6" >0.07</td>
-      <td id="T_dfc12_row3_col7" class="data row3 col7" >dropped</td>
+      <th id="T_43612_level0_row3" class="row_heading level0 row3" >10:33</th>
+      <td id="T_43612_row3_col0" class="data row3 col0" >121</td>
+      <td id="T_43612_row3_col1" class="data row3 col1" >242</td>
+      <td id="T_43612_row3_col2" class="data row3 col2" >43.96</td>
+      <td id="T_43612_row3_col3" class="data row3 col3" >-26.08</td>
+      <td id="T_43612_row3_col4" class="data row3 col4" >109.89</td>
+      <td id="T_43612_row3_col5" class="data row3 col5" >5319.52</td>
+      <td id="T_43612_row3_col6" class="data row3 col6" >0.09</td>
+      <td id="T_43612_row3_col7" class="data row3 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row4" class="row_heading level0 row4" >10:53</th>
-      <td id="T_dfc12_row4_col0" class="data row4 col0" >131</td>
-      <td id="T_dfc12_row4_col1" class="data row4 col1" >262</td>
-      <td id="T_dfc12_row4_col2" class="data row4 col2" >78.01</td>
-      <td id="T_dfc12_row4_col3" class="data row4 col3" >16.48</td>
-      <td id="T_dfc12_row4_col4" class="data row4 col4" >136.45</td>
-      <td id="T_dfc12_row4_col5" class="data row4 col5" >10218.72</td>
-      <td id="T_dfc12_row4_col6" class="data row4 col6" >0.00</td>
-      <td id="T_dfc12_row4_col7" class="data row4 col7" >dropped</td>
+      <th id="T_43612_level0_row4" class="row_heading level0 row4" >10:53</th>
+      <td id="T_43612_row4_col0" class="data row4 col0" >130</td>
+      <td id="T_43612_row4_col1" class="data row4 col1" >260</td>
+      <td id="T_43612_row4_col2" class="data row4 col2" >79.51</td>
+      <td id="T_43612_row4_col3" class="data row4 col3" >17.81</td>
+      <td id="T_43612_row4_col4" class="data row4 col4" >138.57</td>
+      <td id="T_43612_row4_col5" class="data row4 col5" >10336.60</td>
+      <td id="T_43612_row4_col6" class="data row4 col6" >0.02</td>
+      <td id="T_43612_row4_col7" class="data row4 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row5" class="row_heading level0 row5" >11:13</th>
-      <td id="T_dfc12_row5_col0" class="data row5 col0" >115</td>
-      <td id="T_dfc12_row5_col1" class="data row5 col1" >230</td>
-      <td id="T_dfc12_row5_col2" class="data row5 col2" >128.06</td>
-      <td id="T_dfc12_row5_col3" class="data row5 col3" >65.88</td>
-      <td id="T_dfc12_row5_col4" class="data row5 col4" >183.16</td>
-      <td id="T_dfc12_row5_col5" class="data row5 col5" >14726.80</td>
-      <td id="T_dfc12_row5_col6" class="data row5 col6" >-0.06</td>
-      <td id="T_dfc12_row5_col7" class="data row5 col7" >dropped</td>
+      <th id="T_43612_level0_row5" class="row_heading level0 row5" >11:13</th>
+      <td id="T_43612_row5_col0" class="data row5 col0" >115</td>
+      <td id="T_43612_row5_col1" class="data row5 col1" >230</td>
+      <td id="T_43612_row5_col2" class="data row5 col2" >128.06</td>
+      <td id="T_43612_row5_col3" class="data row5 col3" >65.88</td>
+      <td id="T_43612_row5_col4" class="data row5 col4" >183.16</td>
+      <td id="T_43612_row5_col5" class="data row5 col5" >14726.80</td>
+      <td id="T_43612_row5_col6" class="data row5 col6" >-0.05</td>
+      <td id="T_43612_row5_col7" class="data row5 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row6" class="row_heading level0 row6" >11:33</th>
-      <td id="T_dfc12_row6_col0" class="data row6 col0" >122</td>
-      <td id="T_dfc12_row6_col1" class="data row6 col1" >244</td>
-      <td id="T_dfc12_row6_col2" class="data row6 col2" >133.44</td>
-      <td id="T_dfc12_row6_col3" class="data row6 col3" >77.09</td>
-      <td id="T_dfc12_row6_col4" class="data row6 col4" >188.55</td>
-      <td id="T_dfc12_row6_col5" class="data row6 col5" >16279.64</td>
-      <td id="T_dfc12_row6_col6" class="data row6 col6" >-0.09</td>
-      <td id="T_dfc12_row6_col7" class="data row6 col7" >traded</td>
+      <th id="T_43612_level0_row6" class="row_heading level0 row6" >11:33</th>
+      <td id="T_43612_row6_col0" class="data row6 col0" >122</td>
+      <td id="T_43612_row6_col1" class="data row6 col1" >244</td>
+      <td id="T_43612_row6_col2" class="data row6 col2" >133.44</td>
+      <td id="T_43612_row6_col3" class="data row6 col3" >77.09</td>
+      <td id="T_43612_row6_col4" class="data row6 col4" >188.55</td>
+      <td id="T_43612_row6_col5" class="data row6 col5" >16279.64</td>
+      <td id="T_43612_row6_col6" class="data row6 col6" >-0.08</td>
+      <td id="T_43612_row6_col7" class="data row6 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row7" class="row_heading level0 row7" >11:53</th>
-      <td id="T_dfc12_row7_col0" class="data row7 col0" >119</td>
-      <td id="T_dfc12_row7_col1" class="data row7 col1" >238</td>
-      <td id="T_dfc12_row7_col2" class="data row7 col2" >151.93</td>
-      <td id="T_dfc12_row7_col3" class="data row7 col3" >99.79</td>
-      <td id="T_dfc12_row7_col4" class="data row7 col4" >202.39</td>
-      <td id="T_dfc12_row7_col5" class="data row7 col5" >18079.28</td>
-      <td id="T_dfc12_row7_col6" class="data row7 col6" >-0.10</td>
-      <td id="T_dfc12_row7_col7" class="data row7 col7" >traded</td>
+      <th id="T_43612_level0_row7" class="row_heading level0 row7" >11:53</th>
+      <td id="T_43612_row7_col0" class="data row7 col0" >119</td>
+      <td id="T_43612_row7_col1" class="data row7 col1" >238</td>
+      <td id="T_43612_row7_col2" class="data row7 col2" >151.93</td>
+      <td id="T_43612_row7_col3" class="data row7 col3" >99.79</td>
+      <td id="T_43612_row7_col4" class="data row7 col4" >202.39</td>
+      <td id="T_43612_row7_col5" class="data row7 col5" >18079.28</td>
+      <td id="T_43612_row7_col6" class="data row7 col6" >-0.10</td>
+      <td id="T_43612_row7_col7" class="data row7 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row8" class="row_heading level0 row8" >12:13</th>
-      <td id="T_dfc12_row8_col0" class="data row8 col0" >110</td>
-      <td id="T_dfc12_row8_col1" class="data row8 col1" >220</td>
-      <td id="T_dfc12_row8_col2" class="data row8 col2" >156.40</td>
-      <td id="T_dfc12_row8_col3" class="data row8 col3" >103.37</td>
-      <td id="T_dfc12_row8_col4" class="data row8 col4" >203.10</td>
-      <td id="T_dfc12_row8_col5" class="data row8 col5" >17204.20</td>
-      <td id="T_dfc12_row8_col6" class="data row8 col6" >-0.09</td>
-      <td id="T_dfc12_row8_col7" class="data row8 col7" >traded</td>
+      <th id="T_43612_level0_row8" class="row_heading level0 row8" >12:13</th>
+      <td id="T_43612_row8_col0" class="data row8 col0" >110</td>
+      <td id="T_43612_row8_col1" class="data row8 col1" >220</td>
+      <td id="T_43612_row8_col2" class="data row8 col2" >156.40</td>
+      <td id="T_43612_row8_col3" class="data row8 col3" >103.37</td>
+      <td id="T_43612_row8_col4" class="data row8 col4" >203.10</td>
+      <td id="T_43612_row8_col5" class="data row8 col5" >17204.20</td>
+      <td id="T_43612_row8_col6" class="data row8 col6" >-0.09</td>
+      <td id="T_43612_row8_col7" class="data row8 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row9" class="row_heading level0 row9" >12:33</th>
-      <td id="T_dfc12_row9_col0" class="data row9 col0" >115</td>
-      <td id="T_dfc12_row9_col1" class="data row9 col1" >230</td>
-      <td id="T_dfc12_row9_col2" class="data row9 col2" >101.97</td>
-      <td id="T_dfc12_row9_col3" class="data row9 col3" >37.67</td>
-      <td id="T_dfc12_row9_col4" class="data row9 col4" >161.83</td>
-      <td id="T_dfc12_row9_col5" class="data row9 col5" >11726.80</td>
-      <td id="T_dfc12_row9_col6" class="data row9 col6" >-0.01</td>
-      <td id="T_dfc12_row9_col7" class="data row9 col7" >dropped</td>
+      <th id="T_43612_level0_row9" class="row_heading level0 row9" >12:33</th>
+      <td id="T_43612_row9_col0" class="data row9 col0" >115</td>
+      <td id="T_43612_row9_col1" class="data row9 col1" >230</td>
+      <td id="T_43612_row9_col2" class="data row9 col2" >101.97</td>
+      <td id="T_43612_row9_col3" class="data row9 col3" >37.67</td>
+      <td id="T_43612_row9_col4" class="data row9 col4" >161.83</td>
+      <td id="T_43612_row9_col5" class="data row9 col5" >11726.80</td>
+      <td id="T_43612_row9_col6" class="data row9 col6" >-0.00</td>
+      <td id="T_43612_row9_col7" class="data row9 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row10" class="row_heading level0 row10" >12:53</th>
-      <td id="T_dfc12_row10_col0" class="data row10 col0" >119</td>
-      <td id="T_dfc12_row10_col1" class="data row10 col1" >238</td>
-      <td id="T_dfc12_row10_col2" class="data row10 col2" >122.09</td>
-      <td id="T_dfc12_row10_col3" class="data row10 col3" >59.76</td>
-      <td id="T_dfc12_row10_col4" class="data row10 col4" >180.05</td>
-      <td id="T_dfc12_row10_col5" class="data row10 col5" >14529.28</td>
-      <td id="T_dfc12_row10_col6" class="data row10 col6" >-0.03</td>
-      <td id="T_dfc12_row10_col7" class="data row10 col7" >dropped</td>
+      <th id="T_43612_level0_row10" class="row_heading level0 row10" >12:53</th>
+      <td id="T_43612_row10_col0" class="data row10 col0" >118</td>
+      <td id="T_43612_row10_col1" class="data row10 col1" >236</td>
+      <td id="T_43612_row10_col2" class="data row10 col2" >119.56</td>
+      <td id="T_43612_row10_col3" class="data row10 col3" >55.27</td>
+      <td id="T_43612_row10_col4" class="data row10 col4" >174.81</td>
+      <td id="T_43612_row10_col5" class="data row10 col5" >14108.16</td>
+      <td id="T_43612_row10_col6" class="data row10 col6" >-0.02</td>
+      <td id="T_43612_row10_col7" class="data row10 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row11" class="row_heading level0 row11" >13:13</th>
-      <td id="T_dfc12_row11_col0" class="data row11 col0" >115</td>
-      <td id="T_dfc12_row11_col1" class="data row11 col1" >230</td>
-      <td id="T_dfc12_row11_col2" class="data row11 col2" >142.34</td>
-      <td id="T_dfc12_row11_col3" class="data row11 col3" >84.21</td>
-      <td id="T_dfc12_row11_col4" class="data row11 col4" >199.19</td>
-      <td id="T_dfc12_row11_col5" class="data row11 col5" >16368.80</td>
-      <td id="T_dfc12_row11_col6" class="data row11 col6" >-0.08</td>
-      <td id="T_dfc12_row11_col7" class="data row11 col7" >traded</td>
+      <th id="T_43612_level0_row11" class="row_heading level0 row11" >13:13</th>
+      <td id="T_43612_row11_col0" class="data row11 col0" >115</td>
+      <td id="T_43612_row11_col1" class="data row11 col1" >230</td>
+      <td id="T_43612_row11_col2" class="data row11 col2" >142.34</td>
+      <td id="T_43612_row11_col3" class="data row11 col3" >84.21</td>
+      <td id="T_43612_row11_col4" class="data row11 col4" >199.19</td>
+      <td id="T_43612_row11_col5" class="data row11 col5" >16368.80</td>
+      <td id="T_43612_row11_col6" class="data row11 col6" >-0.08</td>
+      <td id="T_43612_row11_col7" class="data row11 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row12" class="row_heading level0 row12" >13:33</th>
-      <td id="T_dfc12_row12_col0" class="data row12 col0" >110</td>
-      <td id="T_dfc12_row12_col1" class="data row12 col1" >220</td>
-      <td id="T_dfc12_row12_col2" class="data row12 col2" >125.69</td>
-      <td id="T_dfc12_row12_col3" class="data row12 col3" >56.78</td>
-      <td id="T_dfc12_row12_col4" class="data row12 col4" >188.97</td>
-      <td id="T_dfc12_row12_col5" class="data row12 col5" >13826.20</td>
-      <td id="T_dfc12_row12_col6" class="data row12 col6" >-0.05</td>
-      <td id="T_dfc12_row12_col7" class="data row12 col7" >dropped</td>
+      <th id="T_43612_level0_row12" class="row_heading level0 row12" >13:33</th>
+      <td id="T_43612_row12_col0" class="data row12 col0" >106</td>
+      <td id="T_43612_row12_col1" class="data row12 col1" >212</td>
+      <td id="T_43612_row12_col2" class="data row12 col2" >142.39</td>
+      <td id="T_43612_row12_col3" class="data row12 col3" >72.35</td>
+      <td id="T_43612_row12_col4" class="data row12 col4" >200.45</td>
+      <td id="T_43612_row12_col5" class="data row12 col5" >15093.72</td>
+      <td id="T_43612_row12_col6" class="data row12 col6" >-0.08</td>
+      <td id="T_43612_row12_col7" class="data row12 col7" >traded (swapped in)</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row13" class="row_heading level0 row13" >13:53</th>
-      <td id="T_dfc12_row13_col0" class="data row13 col0" >107</td>
-      <td id="T_dfc12_row13_col1" class="data row13 col1" >214</td>
-      <td id="T_dfc12_row13_col2" class="data row13 col2" >165.76</td>
-      <td id="T_dfc12_row13_col3" class="data row13 col3" >108.62</td>
-      <td id="T_dfc12_row13_col4" class="data row13 col4" >224.09</td>
-      <td id="T_dfc12_row13_col5" class="data row13 col5" >17735.84</td>
-      <td id="T_dfc12_row13_col6" class="data row13 col6" >-0.12</td>
-      <td id="T_dfc12_row13_col7" class="data row13 col7" >traded</td>
+      <th id="T_43612_level0_row13" class="row_heading level0 row13" >13:53</th>
+      <td id="T_43612_row13_col0" class="data row13 col0" >101</td>
+      <td id="T_43612_row13_col1" class="data row13 col1" >202</td>
+      <td id="T_43612_row13_col2" class="data row13 col2" >174.99</td>
+      <td id="T_43612_row13_col3" class="data row13 col3" >116.49</td>
+      <td id="T_43612_row13_col4" class="data row13 col4" >229.49</td>
+      <td id="T_43612_row13_col5" class="data row13 col5" >17674.12</td>
+      <td id="T_43612_row13_col6" class="data row13 col6" >-0.14</td>
+      <td id="T_43612_row13_col7" class="data row13 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row14" class="row_heading level0 row14" >14:13</th>
-      <td id="T_dfc12_row14_col0" class="data row14 col0" >111</td>
-      <td id="T_dfc12_row14_col1" class="data row14 col1" >222</td>
-      <td id="T_dfc12_row14_col2" class="data row14 col2" >139.41</td>
-      <td id="T_dfc12_row14_col3" class="data row14 col3" >78.27</td>
-      <td id="T_dfc12_row14_col4" class="data row14 col4" >193.31</td>
-      <td id="T_dfc12_row14_col5" class="data row14 col5" >15474.32</td>
-      <td id="T_dfc12_row14_col6" class="data row14 col6" >-0.10</td>
-      <td id="T_dfc12_row14_col7" class="data row14 col7" >traded</td>
+      <th id="T_43612_level0_row14" class="row_heading level0 row14" >14:13</th>
+      <td id="T_43612_row14_col0" class="data row14 col0" >91</td>
+      <td id="T_43612_row14_col1" class="data row14 col1" >182</td>
+      <td id="T_43612_row14_col2" class="data row14 col2" >162.44</td>
+      <td id="T_43612_row14_col3" class="data row14 col3" >99.33</td>
+      <td id="T_43612_row14_col4" class="data row14 col4" >220.98</td>
+      <td id="T_43612_row14_col5" class="data row14 col5" >14781.92</td>
+      <td id="T_43612_row14_col6" class="data row14 col6" >-0.12</td>
+      <td id="T_43612_row14_col7" class="data row14 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row15" class="row_heading level0 row15" >14:33</th>
-      <td id="T_dfc12_row15_col0" class="data row15 col0" >111</td>
-      <td id="T_dfc12_row15_col1" class="data row15 col1" >222</td>
-      <td id="T_dfc12_row15_col2" class="data row15 col2" >74.84</td>
-      <td id="T_dfc12_row15_col3" class="data row15 col3" >9.37</td>
-      <td id="T_dfc12_row15_col4" class="data row15 col4" >140.85</td>
-      <td id="T_dfc12_row15_col5" class="data row15 col5" >8307.32</td>
-      <td id="T_dfc12_row15_col6" class="data row15 col6" >-0.01</td>
-      <td id="T_dfc12_row15_col7" class="data row15 col7" >dropped</td>
+      <th id="T_43612_level0_row15" class="row_heading level0 row15" >14:33</th>
+      <td id="T_43612_row15_col0" class="data row15 col0" >80</td>
+      <td id="T_43612_row15_col1" class="data row15 col1" >160</td>
+      <td id="T_43612_row15_col2" class="data row15 col2" >107.79</td>
+      <td id="T_43612_row15_col3" class="data row15 col3" >36.68</td>
+      <td id="T_43612_row15_col4" class="data row15 col4" >179.11</td>
+      <td id="T_43612_row15_col5" class="data row15 col5" >8623.60</td>
+      <td id="T_43612_row15_col6" class="data row15 col6" >-0.05</td>
+      <td id="T_43612_row15_col7" class="data row15 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row16" class="row_heading level0 row16" >14:53</th>
-      <td id="T_dfc12_row16_col0" class="data row16 col0" >107</td>
-      <td id="T_dfc12_row16_col1" class="data row16 col1" >214</td>
-      <td id="T_dfc12_row16_col2" class="data row16 col2" >114.29</td>
-      <td id="T_dfc12_row16_col3" class="data row16 col3" >52.78</td>
-      <td id="T_dfc12_row16_col4" class="data row16 col4" >169.79</td>
-      <td id="T_dfc12_row16_col5" class="data row16 col5" >12228.84</td>
-      <td id="T_dfc12_row16_col6" class="data row16 col6" >-0.07</td>
-      <td id="T_dfc12_row16_col7" class="data row16 col7" >traded</td>
+      <th id="T_43612_level0_row16" class="row_heading level0 row16" >14:53</th>
+      <td id="T_43612_row16_col0" class="data row16 col0" >67</td>
+      <td id="T_43612_row16_col1" class="data row16 col1" >134</td>
+      <td id="T_43612_row16_col2" class="data row16 col2" >173.97</td>
+      <td id="T_43612_row16_col3" class="data row16 col3" >101.92</td>
+      <td id="T_43612_row16_col4" class="data row16 col4" >242.65</td>
+      <td id="T_43612_row16_col5" class="data row16 col5" >11656.04</td>
+      <td id="T_43612_row16_col6" class="data row16 col6" >-0.09</td>
+      <td id="T_43612_row16_col7" class="data row16 col7" >dropped (swapped out)</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row17" class="row_heading level0 row17" >15:13</th>
-      <td id="T_dfc12_row17_col0" class="data row17 col0" >105</td>
-      <td id="T_dfc12_row17_col1" class="data row17 col1" >210</td>
-      <td id="T_dfc12_row17_col2" class="data row17 col2" >70.82</td>
-      <td id="T_dfc12_row17_col3" class="data row17 col3" >7.06</td>
-      <td id="T_dfc12_row17_col4" class="data row17 col4" >137.75</td>
-      <td id="T_dfc12_row17_col5" class="data row17 col5" >7436.60</td>
-      <td id="T_dfc12_row17_col6" class="data row17 col6" >-0.01</td>
-      <td id="T_dfc12_row17_col7" class="data row17 col7" >dropped</td>
+      <th id="T_43612_level0_row17" class="row_heading level0 row17" >15:13</th>
+      <td id="T_43612_row17_col0" class="data row17 col0" >50</td>
+      <td id="T_43612_row17_col1" class="data row17 col1" >100</td>
+      <td id="T_43612_row17_col2" class="data row17 col2" >105.38</td>
+      <td id="T_43612_row17_col3" class="data row17 col3" >-1.99</td>
+      <td id="T_43612_row17_col4" class="data row17 col4" >202.37</td>
+      <td id="T_43612_row17_col5" class="data row17 col5" >5269.00</td>
+      <td id="T_43612_row17_col6" class="data row17 col6" >-0.02</td>
+      <td id="T_43612_row17_col7" class="data row17 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row18" class="row_heading level0 row18" >15:33</th>
-      <td id="T_dfc12_row18_col0" class="data row18 col0" >101</td>
-      <td id="T_dfc12_row18_col1" class="data row18 col1" >202</td>
-      <td id="T_dfc12_row18_col2" class="data row18 col2" >23.16</td>
-      <td id="T_dfc12_row18_col3" class="data row18 col3" >-42.84</td>
-      <td id="T_dfc12_row18_col4" class="data row18 col4" >84.47</td>
-      <td id="T_dfc12_row18_col5" class="data row18 col5" >2339.12</td>
-      <td id="T_dfc12_row18_col6" class="data row18 col6" >0.02</td>
-      <td id="T_dfc12_row18_col7" class="data row18 col7" >dropped</td>
+      <th id="T_43612_level0_row18" class="row_heading level0 row18" >15:33</th>
+      <td id="T_43612_row18_col0" class="data row18 col0" >27</td>
+      <td id="T_43612_row18_col1" class="data row18 col1" >54</td>
+      <td id="T_43612_row18_col2" class="data row18 col2" >1.82</td>
+      <td id="T_43612_row18_col3" class="data row18 col3" >-140.47</td>
+      <td id="T_43612_row18_col4" class="data row18 col4" >131.99</td>
+      <td id="T_43612_row18_col5" class="data row18 col5" >49.24</td>
+      <td id="T_43612_row18_col6" class="data row18 col6" >0.02</td>
+      <td id="T_43612_row18_col7" class="data row18 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_dfc12_level0_row19" class="row_heading level0 row19" >15:53</th>
-      <td id="T_dfc12_row19_col0" class="data row19 col0" >113</td>
-      <td id="T_dfc12_row19_col1" class="data row19 col1" >226</td>
-      <td id="T_dfc12_row19_col2" class="data row19 col2" >-20.84</td>
-      <td id="T_dfc12_row19_col3" class="data row19 col3" >-71.71</td>
-      <td id="T_dfc12_row19_col4" class="data row19 col4" >28.55</td>
-      <td id="T_dfc12_row19_col5" class="data row19 col5" >-2355.44</td>
-      <td id="T_dfc12_row19_col6" class="data row19 col6" >0.05</td>
-      <td id="T_dfc12_row19_col7" class="data row19 col7" >dropped</td>
+      <th id="T_43612_level0_row19" class="row_heading level0 row19" >15:53</th>
+      <td id="T_43612_row19_col0" class="data row19 col0" >1</td>
+      <td id="T_43612_row19_col1" class="data row19 col1" >2</td>
+      <td id="T_43612_row19_col2" class="data row19 col2" >167.12</td>
+      <td id="T_43612_row19_col3" class="data row19 col3" >167.12</td>
+      <td id="T_43612_row19_col4" class="data row19 col4" >167.12</td>
+      <td id="T_43612_row19_col5" class="data row19 col5" >167.12</td>
+      <td id="T_43612_row19_col6" class="data row19 col6" >-0.00</td>
+      <td id="T_43612_row19_col7" class="data row19 col7" >dropped</td>
     </tr>
   </tbody>
 </table>
 
 
 
-- **The strategy keeps six of the seven best earners:** 13:53 (+\$166 a condor), 12:13 (+\$156), 11:53 (+\$152), 13:13 (+\$142), 14:13 (+\$139)
-  and 11:33 (+\$133), plus 14:53 (+\$114). 11:13, 13:33 and 12:53 earn a little more than 14:53 (+\$122-128), but forward selection adds 14:53
-  first: it adds more to the book's Sharpe.
-- **The first hour earns the least:** 09:32-10:33 make \$32-44 a condor. The last two are weak (15:33 +\$23, 15:53 -\$21).
+- **With the ratio cap on, the afternoon earns the most per condor:** 13:53 (+\$175), **14:53 (+\$174)**, 14:13 (+\$162), then 12:13 (+\$156)
+  and 11:53 (+\$152). **13:33 earns +\$142**, level with 13:13 and above 11:33 (+\$133).
+- **14:53 earns more per condor than 13:33 but trades on fewer days** (67 condors against 106): the ratio cap removes many of its late,
+  rich condors.
+- **The first hour earns the least** (09:32-10:33: \$32-44 a condor); 15:33 and 15:53 earn nothing.
 
 
     
-![png](ic_analysis_files/output_48_0.png)
+![png](ic_analysis_files/output_51_0.png)
     
 
 
-    20 tranches, average pairwise correlation 0.33 -> about 2.8 independent bets a day; 24 pairs above 0.7
+    20 tranches, average pairwise correlation 0.36 -> about 2.5 independent bets a day; 22 pairs above 0.7
     
 
 
@@ -4770,7 +5198,7 @@ correlated they are.
       <td>10:33</td>
       <td>4</td>
       <td>09:32, 09:52, 10:13, 10:33</td>
-      <td>0.80</td>
+      <td>0.81</td>
     </tr>
     <tr>
       <th>2</th>
@@ -4778,34 +5206,42 @@ correlated they are.
       <td>12:53</td>
       <td>7</td>
       <td>10:53, 11:13, 11:33, 11:53, 12:13, 12:33, 12:53</td>
-      <td>0.70</td>
+      <td>0.69</td>
     </tr>
     <tr>
       <th>3</th>
       <td>13:13</td>
-      <td>13:33</td>
-      <td>2</td>
-      <td>13:13, 13:33</td>
-      <td>0.70</td>
+      <td>13:13</td>
+      <td>1</td>
+      <td>13:13</td>
+      <td>NaN</td>
     </tr>
     <tr>
       <th>4</th>
+      <td>13:33</td>
       <td>13:53</td>
-      <td>14:13</td>
       <td>2</td>
-      <td>13:53, 14:13</td>
-      <td>0.73</td>
+      <td>13:33, 13:53</td>
+      <td>0.69</td>
     </tr>
     <tr>
       <th>5</th>
+      <td>14:13</td>
+      <td>14:13</td>
+      <td>1</td>
+      <td>14:13</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>6</th>
       <td>14:33</td>
       <td>15:13</td>
       <td>3</td>
       <td>14:33, 14:53, 15:13</td>
-      <td>0.70</td>
+      <td>0.76</td>
     </tr>
     <tr>
-      <th>6</th>
+      <th>7</th>
       <td>15:33</td>
       <td>15:33</td>
       <td>1</td>
@@ -4813,7 +5249,7 @@ correlated they are.
       <td>NaN</td>
     </tr>
     <tr>
-      <th>7</th>
+      <th>8</th>
       <td>15:53</td>
       <td>15:53</td>
       <td>1</td>
@@ -4849,154 +5285,130 @@ correlated they are.
   <tbody>
     <tr>
       <th>20</th>
-      <td>0.74</td>
-      <td>0.74</td>
-      <td>0.44</td>
+      <td>0.78</td>
+      <td>0.80</td>
+      <td>0.65</td>
       <td>0.89</td>
-      <td>19</td>
+      <td>17</td>
     </tr>
     <tr>
       <th>40</th>
-      <td>0.61</td>
-      <td>0.64</td>
-      <td>0.29</td>
+      <td>0.63</td>
+      <td>0.68</td>
+      <td>0.32</td>
       <td>0.87</td>
-      <td>18</td>
+      <td>16</td>
     </tr>
     <tr>
       <th>60</th>
       <td>0.51</td>
-      <td>0.55</td>
-      <td>0.18</td>
+      <td>0.59</td>
+      <td>0.14</td>
       <td>0.74</td>
-      <td>17</td>
-    </tr>
-    <tr>
-      <th>80</th>
-      <td>0.47</td>
-      <td>0.44</td>
-      <td>0.22</td>
-      <td>0.73</td>
-      <td>16</td>
-    </tr>
-    <tr>
-      <th>100</th>
-      <td>0.38</td>
-      <td>0.32</td>
-      <td>0.17</td>
-      <td>0.70</td>
       <td>15</td>
     </tr>
     <tr>
-      <th>120</th>
-      <td>0.29</td>
-      <td>0.31</td>
-      <td>-0.07</td>
-      <td>0.61</td>
+      <th>80</th>
+      <td>0.45</td>
+      <td>0.40</td>
+      <td>0.16</td>
+      <td>0.73</td>
       <td>14</td>
     </tr>
     <tr>
-      <th>140</th>
-      <td>0.27</td>
-      <td>0.27</td>
-      <td>0.06</td>
-      <td>0.51</td>
+      <th>100</th>
+      <td>0.36</td>
+      <td>0.30</td>
+      <td>0.08</td>
+      <td>0.70</td>
       <td>13</td>
     </tr>
     <tr>
-      <th>160</th>
-      <td>0.21</td>
-      <td>0.26</td>
-      <td>-0.12</td>
-      <td>0.53</td>
+      <th>120</th>
+      <td>0.33</td>
+      <td>0.36</td>
+      <td>-0.02</td>
+      <td>0.61</td>
       <td>12</td>
     </tr>
     <tr>
-      <th>180</th>
-      <td>0.17</td>
-      <td>0.12</td>
-      <td>-0.05</td>
-      <td>0.52</td>
+      <th>140</th>
+      <td>0.24</td>
+      <td>0.25</td>
+      <td>-0.07</td>
+      <td>0.51</td>
       <td>11</td>
     </tr>
     <tr>
-      <th>200</th>
-      <td>0.12</td>
-      <td>0.03</td>
-      <td>-0.06</td>
-      <td>0.56</td>
+      <th>160</th>
+      <td>0.20</td>
+      <td>0.19</td>
+      <td>-0.15</td>
+      <td>0.53</td>
       <td>10</td>
     </tr>
     <tr>
-      <th>220</th>
-      <td>0.11</td>
+      <th>180</th>
+      <td>0.15</td>
       <td>0.04</td>
-      <td>-0.05</td>
-      <td>0.59</td>
+      <td>-0.08</td>
+      <td>0.52</td>
       <td>9</td>
     </tr>
     <tr>
-      <th>240</th>
-      <td>0.07</td>
-      <td>0.07</td>
-      <td>-0.10</td>
-      <td>0.38</td>
+      <th>200</th>
+      <td>0.11</td>
+      <td>0.02</td>
+      <td>-0.12</td>
+      <td>0.56</td>
       <td>8</td>
     </tr>
     <tr>
-      <th>260</th>
-      <td>0.03</td>
-      <td>0.01</td>
-      <td>-0.07</td>
-      <td>0.21</td>
+      <th>220</th>
+      <td>0.08</td>
+      <td>0.05</td>
+      <td>-0.18</td>
+      <td>0.59</td>
       <td>7</td>
     </tr>
     <tr>
-      <th>280</th>
+      <th>240</th>
       <td>-0.00</td>
-      <td>-0.02</td>
-      <td>-0.09</td>
-      <td>0.16</td>
+      <td>0.00</td>
+      <td>-0.30</td>
+      <td>0.33</td>
       <td>6</td>
     </tr>
     <tr>
-      <th>300</th>
-      <td>-0.02</td>
-      <td>-0.03</td>
-      <td>-0.11</td>
-      <td>0.08</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>320</th>
-      <td>-0.00</td>
-      <td>0.02</td>
-      <td>-0.15</td>
-      <td>0.08</td>
+      <th>260</th>
+      <td>-0.09</td>
+      <td>-0.07</td>
+      <td>-0.28</td>
+      <td>0.05</td>
       <td>4</td>
     </tr>
     <tr>
-      <th>340</th>
-      <td>0.01</td>
-      <td>-0.06</td>
-      <td>-0.12</td>
-      <td>0.22</td>
-      <td>3</td>
-    </tr>
-    <tr>
-      <th>360</th>
-      <td>0.07</td>
-      <td>0.07</td>
-      <td>-0.03</td>
-      <td>0.17</td>
+      <th>280</th>
+      <td>0.05</td>
+      <td>0.05</td>
+      <td>-0.02</td>
+      <td>0.12</td>
       <td>2</td>
     </tr>
     <tr>
-      <th>380</th>
-      <td>0.04</td>
-      <td>0.04</td>
-      <td>0.04</td>
-      <td>0.04</td>
+      <th>300</th>
+      <td>-0.15</td>
+      <td>-0.15</td>
+      <td>-0.15</td>
+      <td>-0.15</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>320</th>
+      <td>0.32</td>
+      <td>0.32</td>
+      <td>0.32</td>
+      <td>0.32</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -5004,47 +5416,47 @@ correlated they are.
 </div>
 
 
-**Neighbouring tranches are close to the same trade.** Entries 20 minutes apart correlate 0.74 on average; 1 hour apart 0.51, 2 hours
-0.29, 3 hours 0.17, 4 hours 0.07. The 20 tranches are about **2.8 independent bets a day** (average pairwise correlation 0.33). The 7 are
-spread from 11:33 to 14:53, never more than an hour apart, so they share most of each day's risk: what they give up against all 20 is
-mostly the first and the last hour, the weakest tranches.
+**Neighbouring tranches are close to the same trade.** Entries 20 minutes apart correlate 0.78 on average; 1 hour apart 0.51, 2 hours
+0.33, 3 hours 0.15, 4 hours 0.00. The 20 tranches are about **2.5 independent bets a day** (average pairwise correlation 0.36). The new 7
+run from 11:33 to 14:13, a tighter window than the previous set (to 14:53): 13:33 sits 20 minutes from both 13:13 and 13:53, the
+distance at which tranches move most alike.
 
 
     
-![png](ic_analysis_files/output_50_0.png)
+![png](ic_analysis_files/output_53_0.png)
     
 
 
-    forward selection on this book peaks at: 11:13, 11:33, 11:53, 12:13, 13:13, 13:33, 13:53, 14:13, 14:53
+    forward selection on this book peaks at: 11:13, 11:33, 11:53, 12:13, 13:13, 13:33, 13:53, 14:13, 14:33, 14:53, 15:53
     every step: the book's Sharpe if each remaining tranche were added (the one picked is highlighted)
     
 
 
-<table id="T_36442">
+<table id="T_cdf60">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_36442_level0_col0" class="col_heading level0 col0" >picked</th>
-      <th id="T_36442_level0_col1" class="col_heading level0 col1" >09:32</th>
-      <th id="T_36442_level0_col2" class="col_heading level0 col2" >09:52</th>
-      <th id="T_36442_level0_col3" class="col_heading level0 col3" >10:13</th>
-      <th id="T_36442_level0_col4" class="col_heading level0 col4" >10:33</th>
-      <th id="T_36442_level0_col5" class="col_heading level0 col5" >10:53</th>
-      <th id="T_36442_level0_col6" class="col_heading level0 col6" >11:13</th>
-      <th id="T_36442_level0_col7" class="col_heading level0 col7" >11:33</th>
-      <th id="T_36442_level0_col8" class="col_heading level0 col8" >11:53</th>
-      <th id="T_36442_level0_col9" class="col_heading level0 col9" >12:13</th>
-      <th id="T_36442_level0_col10" class="col_heading level0 col10" >12:33</th>
-      <th id="T_36442_level0_col11" class="col_heading level0 col11" >12:53</th>
-      <th id="T_36442_level0_col12" class="col_heading level0 col12" >13:13</th>
-      <th id="T_36442_level0_col13" class="col_heading level0 col13" >13:33</th>
-      <th id="T_36442_level0_col14" class="col_heading level0 col14" >13:53</th>
-      <th id="T_36442_level0_col15" class="col_heading level0 col15" >14:13</th>
-      <th id="T_36442_level0_col16" class="col_heading level0 col16" >14:33</th>
-      <th id="T_36442_level0_col17" class="col_heading level0 col17" >14:53</th>
-      <th id="T_36442_level0_col18" class="col_heading level0 col18" >15:13</th>
-      <th id="T_36442_level0_col19" class="col_heading level0 col19" >15:33</th>
-      <th id="T_36442_level0_col20" class="col_heading level0 col20" >15:53</th>
+      <th id="T_cdf60_level0_col0" class="col_heading level0 col0" >picked</th>
+      <th id="T_cdf60_level0_col1" class="col_heading level0 col1" >09:32</th>
+      <th id="T_cdf60_level0_col2" class="col_heading level0 col2" >09:52</th>
+      <th id="T_cdf60_level0_col3" class="col_heading level0 col3" >10:13</th>
+      <th id="T_cdf60_level0_col4" class="col_heading level0 col4" >10:33</th>
+      <th id="T_cdf60_level0_col5" class="col_heading level0 col5" >10:53</th>
+      <th id="T_cdf60_level0_col6" class="col_heading level0 col6" >11:13</th>
+      <th id="T_cdf60_level0_col7" class="col_heading level0 col7" >11:33</th>
+      <th id="T_cdf60_level0_col8" class="col_heading level0 col8" >11:53</th>
+      <th id="T_cdf60_level0_col9" class="col_heading level0 col9" >12:13</th>
+      <th id="T_cdf60_level0_col10" class="col_heading level0 col10" >12:33</th>
+      <th id="T_cdf60_level0_col11" class="col_heading level0 col11" >12:53</th>
+      <th id="T_cdf60_level0_col12" class="col_heading level0 col12" >13:13</th>
+      <th id="T_cdf60_level0_col13" class="col_heading level0 col13" >13:33</th>
+      <th id="T_cdf60_level0_col14" class="col_heading level0 col14" >13:53</th>
+      <th id="T_cdf60_level0_col15" class="col_heading level0 col15" >14:13</th>
+      <th id="T_cdf60_level0_col16" class="col_heading level0 col16" >14:33</th>
+      <th id="T_cdf60_level0_col17" class="col_heading level0 col17" >14:53</th>
+      <th id="T_cdf60_level0_col18" class="col_heading level0 col18" >15:13</th>
+      <th id="T_cdf60_level0_col19" class="col_heading level0 col19" >15:33</th>
+      <th id="T_cdf60_level0_col20" class="col_heading level0 col20" >15:53</th>
     </tr>
     <tr>
       <th class="index_name level0" >step</th>
@@ -5073,484 +5485,484 @@ mostly the first and the last hour, the weakest tranches.
   </thead>
   <tbody>
     <tr>
-      <th id="T_36442_level0_row0" class="row_heading level0 row0" >1</th>
-      <td id="T_36442_row0_col0" class="data row0 col0" >11:53</td>
-      <td id="T_36442_row0_col1" class="data row0 col1" >-2.98</td>
-      <td id="T_36442_row0_col2" class="data row0 col2" >-3.15</td>
-      <td id="T_36442_row0_col3" class="data row0 col3" >-3.44</td>
-      <td id="T_36442_row0_col4" class="data row0 col4" >-3.15</td>
-      <td id="T_36442_row0_col5" class="data row0 col5" >-2.60</td>
-      <td id="T_36442_row0_col6" class="data row0 col6" >-2.32</td>
-      <td id="T_36442_row0_col7" class="data row0 col7" >-2.03</td>
-      <td id="T_36442_row0_col8" class="data row0 col8" >-1.93</td>
-      <td id="T_36442_row0_col9" class="data row0 col9" >-2.24</td>
-      <td id="T_36442_row0_col10" class="data row0 col10" >-2.71</td>
-      <td id="T_36442_row0_col11" class="data row0 col11" >-2.19</td>
-      <td id="T_36442_row0_col12" class="data row0 col12" >-2.10</td>
-      <td id="T_36442_row0_col13" class="data row0 col13" >-2.30</td>
-      <td id="T_36442_row0_col14" class="data row0 col14" >-2.02</td>
-      <td id="T_36442_row0_col15" class="data row0 col15" >-2.27</td>
-      <td id="T_36442_row0_col16" class="data row0 col16" >-3.05</td>
-      <td id="T_36442_row0_col17" class="data row0 col17" >-2.82</td>
-      <td id="T_36442_row0_col18" class="data row0 col18" >-3.35</td>
-      <td id="T_36442_row0_col19" class="data row0 col19" >-4.39</td>
-      <td id="T_36442_row0_col20" class="data row0 col20" >-5.91</td>
+      <th id="T_cdf60_level0_row0" class="row_heading level0 row0" >1</th>
+      <td id="T_cdf60_row0_col0" class="data row0 col0" >11:53</td>
+      <td id="T_cdf60_row0_col1" class="data row0 col1" >-2.98</td>
+      <td id="T_cdf60_row0_col2" class="data row0 col2" >-3.15</td>
+      <td id="T_cdf60_row0_col3" class="data row0 col3" >-3.44</td>
+      <td id="T_cdf60_row0_col4" class="data row0 col4" >-3.14</td>
+      <td id="T_cdf60_row0_col5" class="data row0 col5" >-2.59</td>
+      <td id="T_cdf60_row0_col6" class="data row0 col6" >-2.32</td>
+      <td id="T_cdf60_row0_col7" class="data row0 col7" >-2.03</td>
+      <td id="T_cdf60_row0_col8" class="data row0 col8" >-1.93</td>
+      <td id="T_cdf60_row0_col9" class="data row0 col9" >-2.24</td>
+      <td id="T_cdf60_row0_col10" class="data row0 col10" >-2.71</td>
+      <td id="T_cdf60_row0_col11" class="data row0 col11" >-2.25</td>
+      <td id="T_cdf60_row0_col12" class="data row0 col12" >-2.10</td>
+      <td id="T_cdf60_row0_col13" class="data row0 col13" >-2.22</td>
+      <td id="T_cdf60_row0_col14" class="data row0 col14" >-2.14</td>
+      <td id="T_cdf60_row0_col15" class="data row0 col15" >-2.62</td>
+      <td id="T_cdf60_row0_col16" class="data row0 col16" >-3.54</td>
+      <td id="T_cdf60_row0_col17" class="data row0 col17" >-3.58</td>
+      <td id="T_cdf60_row0_col18" class="data row0 col18" >-4.84</td>
+      <td id="T_cdf60_row0_col19" class="data row0 col19" >-8.19</td>
+      <td id="T_cdf60_row0_col20" class="data row0 col20" >-94.76</td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row1" class="row_heading level0 row1" >2</th>
-      <td id="T_36442_row1_col0" class="data row1 col0" >13:53</td>
-      <td id="T_36442_row1_col1" class="data row1 col1" >-0.73</td>
-      <td id="T_36442_row1_col2" class="data row1 col2" >-0.74</td>
-      <td id="T_36442_row1_col3" class="data row1 col3" >-0.72</td>
-      <td id="T_36442_row1_col4" class="data row1 col4" >-0.64</td>
-      <td id="T_36442_row1_col5" class="data row1 col5" >-0.26</td>
-      <td id="T_36442_row1_col6" class="data row1 col6" >0.09</td>
-      <td id="T_36442_row1_col7" class="data row1 col7" >0.20</td>
-      <td id="T_36442_row1_col8" class="data row1 col8" ></td>
-      <td id="T_36442_row1_col9" class="data row1 col9" >0.29</td>
-      <td id="T_36442_row1_col10" class="data row1 col10" >-0.15</td>
-      <td id="T_36442_row1_col11" class="data row1 col11" >0.07</td>
-      <td id="T_36442_row1_col12" class="data row1 col12" >0.23</td>
-      <td id="T_36442_row1_col13" class="data row1 col13" >0.02</td>
-      <td id="T_36442_row1_col14" class="data row1 col14" >0.37</td>
-      <td id="T_36442_row1_col15" class="data row1 col15" >0.17</td>
-      <td id="T_36442_row1_col16" class="data row1 col16" >-0.48</td>
-      <td id="T_36442_row1_col17" class="data row1 col17" >-0.13</td>
-      <td id="T_36442_row1_col18" class="data row1 col18" >-0.58</td>
-      <td id="T_36442_row1_col19" class="data row1 col19" >-1.13</td>
-      <td id="T_36442_row1_col20" class="data row1 col20" >-1.76</td>
+      <th id="T_cdf60_level0_row1" class="row_heading level0 row1" >2</th>
+      <td id="T_cdf60_row1_col0" class="data row1 col0" >13:53</td>
+      <td id="T_cdf60_row1_col1" class="data row1 col1" >-0.73</td>
+      <td id="T_cdf60_row1_col2" class="data row1 col2" >-0.74</td>
+      <td id="T_cdf60_row1_col3" class="data row1 col3" >-0.72</td>
+      <td id="T_cdf60_row1_col4" class="data row1 col4" >-0.63</td>
+      <td id="T_cdf60_row1_col5" class="data row1 col5" >-0.25</td>
+      <td id="T_cdf60_row1_col6" class="data row1 col6" >0.09</td>
+      <td id="T_cdf60_row1_col7" class="data row1 col7" >0.20</td>
+      <td id="T_cdf60_row1_col8" class="data row1 col8" ></td>
+      <td id="T_cdf60_row1_col9" class="data row1 col9" >0.29</td>
+      <td id="T_cdf60_row1_col10" class="data row1 col10" >-0.15</td>
+      <td id="T_cdf60_row1_col11" class="data row1 col11" >0.04</td>
+      <td id="T_cdf60_row1_col12" class="data row1 col12" >0.23</td>
+      <td id="T_cdf60_row1_col13" class="data row1 col13" >0.13</td>
+      <td id="T_cdf60_row1_col14" class="data row1 col14" >0.38</td>
+      <td id="T_cdf60_row1_col15" class="data row1 col15" >0.11</td>
+      <td id="T_cdf60_row1_col16" class="data row1 col16" >-0.50</td>
+      <td id="T_cdf60_row1_col17" class="data row1 col17" >-0.20</td>
+      <td id="T_cdf60_row1_col18" class="data row1 col18" >-0.91</td>
+      <td id="T_cdf60_row1_col19" class="data row1 col19" >-1.69</td>
+      <td id="T_cdf60_row1_col20" class="data row1 col20" >-1.90</td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row2" class="row_heading level0 row2" >3</th>
-      <td id="T_36442_row2_col0" class="data row2 col0" >12:13</td>
-      <td id="T_36442_row2_col1" class="data row2 col1" >0.54</td>
-      <td id="T_36442_row2_col2" class="data row2 col2" >0.56</td>
-      <td id="T_36442_row2_col3" class="data row2 col3" >0.59</td>
-      <td id="T_36442_row2_col4" class="data row2 col4" >0.58</td>
-      <td id="T_36442_row2_col5" class="data row2 col5" >0.88</td>
-      <td id="T_36442_row2_col6" class="data row2 col6" >1.15</td>
-      <td id="T_36442_row2_col7" class="data row2 col7" >1.24</td>
-      <td id="T_36442_row2_col8" class="data row2 col8" ></td>
-      <td id="T_36442_row2_col9" class="data row2 col9" >1.32</td>
-      <td id="T_36442_row2_col10" class="data row2 col10" >0.97</td>
-      <td id="T_36442_row2_col11" class="data row2 col11" >1.09</td>
-      <td id="T_36442_row2_col12" class="data row2 col12" >1.25</td>
-      <td id="T_36442_row2_col13" class="data row2 col13" >1.05</td>
-      <td id="T_36442_row2_col14" class="data row2 col14" ></td>
-      <td id="T_36442_row2_col15" class="data row2 col15" >1.20</td>
-      <td id="T_36442_row2_col16" class="data row2 col16" >0.81</td>
-      <td id="T_36442_row2_col17" class="data row2 col17" >1.12</td>
-      <td id="T_36442_row2_col18" class="data row2 col18" >0.79</td>
-      <td id="T_36442_row2_col19" class="data row2 col19" >0.47</td>
-      <td id="T_36442_row2_col20" class="data row2 col20" >0.14</td>
+      <th id="T_cdf60_level0_row2" class="row_heading level0 row2" >3</th>
+      <td id="T_cdf60_row2_col0" class="data row2 col0" >12:13</td>
+      <td id="T_cdf60_row2_col1" class="data row2 col1" >0.55</td>
+      <td id="T_cdf60_row2_col2" class="data row2 col2" >0.58</td>
+      <td id="T_cdf60_row2_col3" class="data row2 col3" >0.61</td>
+      <td id="T_cdf60_row2_col4" class="data row2 col4" >0.60</td>
+      <td id="T_cdf60_row2_col5" class="data row2 col5" >0.91</td>
+      <td id="T_cdf60_row2_col6" class="data row2 col6" >1.17</td>
+      <td id="T_cdf60_row2_col7" class="data row2 col7" >1.26</td>
+      <td id="T_cdf60_row2_col8" class="data row2 col8" ></td>
+      <td id="T_cdf60_row2_col9" class="data row2 col9" >1.35</td>
+      <td id="T_cdf60_row2_col10" class="data row2 col10" >0.99</td>
+      <td id="T_cdf60_row2_col11" class="data row2 col11" >1.10</td>
+      <td id="T_cdf60_row2_col12" class="data row2 col12" >1.28</td>
+      <td id="T_cdf60_row2_col13" class="data row2 col13" >1.18</td>
+      <td id="T_cdf60_row2_col14" class="data row2 col14" ></td>
+      <td id="T_cdf60_row2_col15" class="data row2 col15" >1.25</td>
+      <td id="T_cdf60_row2_col16" class="data row2 col16" >0.91</td>
+      <td id="T_cdf60_row2_col17" class="data row2 col17" >1.18</td>
+      <td id="T_cdf60_row2_col18" class="data row2 col18" >0.73</td>
+      <td id="T_cdf60_row2_col19" class="data row2 col19" >0.35</td>
+      <td id="T_cdf60_row2_col20" class="data row2 col20" >0.39</td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row3" class="row_heading level0 row3" >4</th>
-      <td id="T_36442_row3_col0" class="data row3 col0" >14:13</td>
-      <td id="T_36442_row3_col1" class="data row3 col1" >1.28</td>
-      <td id="T_36442_row3_col2" class="data row3 col2" >1.30</td>
-      <td id="T_36442_row3_col3" class="data row3 col3" >1.31</td>
-      <td id="T_36442_row3_col4" class="data row3 col4" >1.26</td>
-      <td id="T_36442_row3_col5" class="data row3 col5" >1.50</td>
-      <td id="T_36442_row3_col6" class="data row3 col6" >1.70</td>
-      <td id="T_36442_row3_col7" class="data row3 col7" >1.76</td>
-      <td id="T_36442_row3_col8" class="data row3 col8" ></td>
-      <td id="T_36442_row3_col9" class="data row3 col9" ></td>
-      <td id="T_36442_row3_col10" class="data row3 col10" >1.53</td>
-      <td id="T_36442_row3_col11" class="data row3 col11" >1.62</td>
-      <td id="T_36442_row3_col12" class="data row3 col12" >1.78</td>
-      <td id="T_36442_row3_col13" class="data row3 col13" >1.61</td>
-      <td id="T_36442_row3_col14" class="data row3 col14" ></td>
-      <td id="T_36442_row3_col15" class="data row3 col15" >1.78</td>
-      <td id="T_36442_row3_col16" class="data row3 col16" >1.49</td>
-      <td id="T_36442_row3_col17" class="data row3 col17" >1.74</td>
-      <td id="T_36442_row3_col18" class="data row3 col18" >1.51</td>
-      <td id="T_36442_row3_col19" class="data row3 col19" >1.30</td>
-      <td id="T_36442_row3_col20" class="data row3 col20" >1.10</td>
+      <th id="T_cdf60_level0_row3" class="row_heading level0 row3" >4</th>
+      <td id="T_cdf60_row3_col0" class="data row3 col0" >14:13</td>
+      <td id="T_cdf60_row3_col1" class="data row3 col1" >1.30</td>
+      <td id="T_cdf60_row3_col2" class="data row3 col2" >1.33</td>
+      <td id="T_cdf60_row3_col3" class="data row3 col3" >1.34</td>
+      <td id="T_cdf60_row3_col4" class="data row3 col4" >1.30</td>
+      <td id="T_cdf60_row3_col5" class="data row3 col5" >1.54</td>
+      <td id="T_cdf60_row3_col6" class="data row3 col6" >1.72</td>
+      <td id="T_cdf60_row3_col7" class="data row3 col7" >1.79</td>
+      <td id="T_cdf60_row3_col8" class="data row3 col8" ></td>
+      <td id="T_cdf60_row3_col9" class="data row3 col9" ></td>
+      <td id="T_cdf60_row3_col10" class="data row3 col10" >1.55</td>
+      <td id="T_cdf60_row3_col11" class="data row3 col11" >1.63</td>
+      <td id="T_cdf60_row3_col12" class="data row3 col12" >1.82</td>
+      <td id="T_cdf60_row3_col13" class="data row3 col13" >1.74</td>
+      <td id="T_cdf60_row3_col14" class="data row3 col14" ></td>
+      <td id="T_cdf60_row3_col15" class="data row3 col15" >1.86</td>
+      <td id="T_cdf60_row3_col16" class="data row3 col16" >1.63</td>
+      <td id="T_cdf60_row3_col17" class="data row3 col17" >1.83</td>
+      <td id="T_cdf60_row3_col18" class="data row3 col18" >1.53</td>
+      <td id="T_cdf60_row3_col19" class="data row3 col19" >1.29</td>
+      <td id="T_cdf60_row3_col20" class="data row3 col20" >1.36</td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row4" class="row_heading level0 row4" >5</th>
-      <td id="T_36442_row4_col0" class="data row4 col0" >11:33</td>
-      <td id="T_36442_row4_col1" class="data row4 col1" >1.72</td>
-      <td id="T_36442_row4_col2" class="data row4 col2" >1.73</td>
-      <td id="T_36442_row4_col3" class="data row4 col3" >1.75</td>
-      <td id="T_36442_row4_col4" class="data row4 col4" >1.70</td>
-      <td id="T_36442_row4_col5" class="data row4 col5" >1.90</td>
-      <td id="T_36442_row4_col6" class="data row4 col6" >2.05</td>
-      <td id="T_36442_row4_col7" class="data row4 col7" >2.11</td>
-      <td id="T_36442_row4_col8" class="data row4 col8" ></td>
-      <td id="T_36442_row4_col9" class="data row4 col9" ></td>
-      <td id="T_36442_row4_col10" class="data row4 col10" >1.89</td>
-      <td id="T_36442_row4_col11" class="data row4 col11" >1.95</td>
-      <td id="T_36442_row4_col12" class="data row4 col12" >2.08</td>
-      <td id="T_36442_row4_col13" class="data row4 col13" >1.93</td>
-      <td id="T_36442_row4_col14" class="data row4 col14" ></td>
-      <td id="T_36442_row4_col15" class="data row4 col15" ></td>
-      <td id="T_36442_row4_col16" class="data row4 col16" >1.81</td>
-      <td id="T_36442_row4_col17" class="data row4 col17" >2.03</td>
-      <td id="T_36442_row4_col18" class="data row4 col18" >1.86</td>
-      <td id="T_36442_row4_col19" class="data row4 col19" >1.71</td>
-      <td id="T_36442_row4_col20" class="data row4 col20" >1.59</td>
+      <th id="T_cdf60_level0_row4" class="row_heading level0 row4" >5</th>
+      <td id="T_cdf60_row4_col0" class="data row4 col0" >14:53</td>
+      <td id="T_cdf60_row4_col1" class="data row4 col1" >1.76</td>
+      <td id="T_cdf60_row4_col2" class="data row4 col2" >1.79</td>
+      <td id="T_cdf60_row4_col3" class="data row4 col3" >1.82</td>
+      <td id="T_cdf60_row4_col4" class="data row4 col4" >1.76</td>
+      <td id="T_cdf60_row4_col5" class="data row4 col5" >1.96</td>
+      <td id="T_cdf60_row4_col6" class="data row4 col6" >2.11</td>
+      <td id="T_cdf60_row4_col7" class="data row4 col7" >2.18</td>
+      <td id="T_cdf60_row4_col8" class="data row4 col8" ></td>
+      <td id="T_cdf60_row4_col9" class="data row4 col9" ></td>
+      <td id="T_cdf60_row4_col10" class="data row4 col10" >1.96</td>
+      <td id="T_cdf60_row4_col11" class="data row4 col11" >2.00</td>
+      <td id="T_cdf60_row4_col12" class="data row4 col12" >2.16</td>
+      <td id="T_cdf60_row4_col13" class="data row4 col13" >2.09</td>
+      <td id="T_cdf60_row4_col14" class="data row4 col14" ></td>
+      <td id="T_cdf60_row4_col15" class="data row4 col15" ></td>
+      <td id="T_cdf60_row4_col16" class="data row4 col16" >1.97</td>
+      <td id="T_cdf60_row4_col17" class="data row4 col17" >2.18</td>
+      <td id="T_cdf60_row4_col18" class="data row4 col18" >1.96</td>
+      <td id="T_cdf60_row4_col19" class="data row4 col19" >1.79</td>
+      <td id="T_cdf60_row4_col20" class="data row4 col20" >1.86</td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row5" class="row_heading level0 row5" >6</th>
-      <td id="T_36442_row5_col0" class="data row5 col0" >13:13</td>
-      <td id="T_36442_row5_col1" class="data row5 col1" >2.03</td>
-      <td id="T_36442_row5_col2" class="data row5 col2" >2.03</td>
-      <td id="T_36442_row5_col3" class="data row5 col3" >2.04</td>
-      <td id="T_36442_row5_col4" class="data row5 col4" >1.97</td>
-      <td id="T_36442_row5_col5" class="data row5 col5" >2.13</td>
-      <td id="T_36442_row5_col6" class="data row5 col6" >2.25</td>
-      <td id="T_36442_row5_col7" class="data row5 col7" ></td>
-      <td id="T_36442_row5_col8" class="data row5 col8" ></td>
-      <td id="T_36442_row5_col9" class="data row5 col9" ></td>
-      <td id="T_36442_row5_col10" class="data row5 col10" >2.15</td>
-      <td id="T_36442_row5_col11" class="data row5 col11" >2.19</td>
-      <td id="T_36442_row5_col12" class="data row5 col12" >2.33</td>
-      <td id="T_36442_row5_col13" class="data row5 col13" >2.20</td>
-      <td id="T_36442_row5_col14" class="data row5 col14" ></td>
-      <td id="T_36442_row5_col15" class="data row5 col15" ></td>
-      <td id="T_36442_row5_col16" class="data row5 col16" >2.12</td>
-      <td id="T_36442_row5_col17" class="data row5 col17" >2.31</td>
-      <td id="T_36442_row5_col18" class="data row5 col18" >2.17</td>
-      <td id="T_36442_row5_col19" class="data row5 col19" >2.05</td>
-      <td id="T_36442_row5_col20" class="data row5 col20" >1.95</td>
+      <th id="T_cdf60_level0_row5" class="row_heading level0 row5" >6</th>
+      <td id="T_cdf60_row5_col0" class="data row5 col0" >11:33</td>
+      <td id="T_cdf60_row5_col1" class="data row5 col1" >2.06</td>
+      <td id="T_cdf60_row5_col2" class="data row5 col2" >2.09</td>
+      <td id="T_cdf60_row5_col3" class="data row5 col3" >2.11</td>
+      <td id="T_cdf60_row5_col4" class="data row5 col4" >2.07</td>
+      <td id="T_cdf60_row5_col5" class="data row5 col5" >2.24</td>
+      <td id="T_cdf60_row5_col6" class="data row5 col6" >2.37</td>
+      <td id="T_cdf60_row5_col7" class="data row5 col7" >2.43</td>
+      <td id="T_cdf60_row5_col8" class="data row5 col8" ></td>
+      <td id="T_cdf60_row5_col9" class="data row5 col9" ></td>
+      <td id="T_cdf60_row5_col10" class="data row5 col10" >2.22</td>
+      <td id="T_cdf60_row5_col11" class="data row5 col11" >2.27</td>
+      <td id="T_cdf60_row5_col12" class="data row5 col12" >2.40</td>
+      <td id="T_cdf60_row5_col13" class="data row5 col13" >2.34</td>
+      <td id="T_cdf60_row5_col14" class="data row5 col14" ></td>
+      <td id="T_cdf60_row5_col15" class="data row5 col15" ></td>
+      <td id="T_cdf60_row5_col16" class="data row5 col16" >2.19</td>
+      <td id="T_cdf60_row5_col17" class="data row5 col17" ></td>
+      <td id="T_cdf60_row5_col18" class="data row5 col18" >2.19</td>
+      <td id="T_cdf60_row5_col19" class="data row5 col19" >2.11</td>
+      <td id="T_cdf60_row5_col20" class="data row5 col20" >2.19</td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row6" class="row_heading level0 row6" >7</th>
-      <td id="T_36442_row6_col0" class="data row6 col0" >14:53</td>
-      <td id="T_36442_row6_col1" class="data row6 col1" >2.24</td>
-      <td id="T_36442_row6_col2" class="data row6 col2" >2.25</td>
-      <td id="T_36442_row6_col3" class="data row6 col3" >2.25</td>
-      <td id="T_36442_row6_col4" class="data row6 col4" >2.19</td>
-      <td id="T_36442_row6_col5" class="data row6 col5" >2.34</td>
-      <td id="T_36442_row6_col6" class="data row6 col6" >2.43</td>
-      <td id="T_36442_row6_col7" class="data row6 col7" ></td>
-      <td id="T_36442_row6_col8" class="data row6 col8" ></td>
-      <td id="T_36442_row6_col9" class="data row6 col9" ></td>
-      <td id="T_36442_row6_col10" class="data row6 col10" >2.32</td>
-      <td id="T_36442_row6_col11" class="data row6 col11" >2.35</td>
-      <td id="T_36442_row6_col12" class="data row6 col12" ></td>
-      <td id="T_36442_row6_col13" class="data row6 col13" >2.35</td>
-      <td id="T_36442_row6_col14" class="data row6 col14" ></td>
-      <td id="T_36442_row6_col15" class="data row6 col15" ></td>
-      <td id="T_36442_row6_col16" class="data row6 col16" >2.32</td>
-      <td id="T_36442_row6_col17" class="data row6 col17" >2.48</td>
-      <td id="T_36442_row6_col18" class="data row6 col18" >2.36</td>
-      <td id="T_36442_row6_col19" class="data row6 col19" >2.27</td>
-      <td id="T_36442_row6_col20" class="data row6 col20" >2.20</td>
+      <th id="T_cdf60_level0_row6" class="row_heading level0 row6" >7</th>
+      <td id="T_cdf60_row6_col0" class="data row6 col0" >13:13</td>
+      <td id="T_cdf60_row6_col1" class="data row6 col1" >2.31</td>
+      <td id="T_cdf60_row6_col2" class="data row6 col2" >2.33</td>
+      <td id="T_cdf60_row6_col3" class="data row6 col3" >2.34</td>
+      <td id="T_cdf60_row6_col4" class="data row6 col4" >2.27</td>
+      <td id="T_cdf60_row6_col5" class="data row6 col5" >2.42</td>
+      <td id="T_cdf60_row6_col6" class="data row6 col6" >2.51</td>
+      <td id="T_cdf60_row6_col7" class="data row6 col7" ></td>
+      <td id="T_cdf60_row6_col8" class="data row6 col8" ></td>
+      <td id="T_cdf60_row6_col9" class="data row6 col9" ></td>
+      <td id="T_cdf60_row6_col10" class="data row6 col10" >2.42</td>
+      <td id="T_cdf60_row6_col11" class="data row6 col11" >2.46</td>
+      <td id="T_cdf60_row6_col12" class="data row6 col12" >2.60</td>
+      <td id="T_cdf60_row6_col13" class="data row6 col13" >2.56</td>
+      <td id="T_cdf60_row6_col14" class="data row6 col14" ></td>
+      <td id="T_cdf60_row6_col15" class="data row6 col15" ></td>
+      <td id="T_cdf60_row6_col16" class="data row6 col16" >2.45</td>
+      <td id="T_cdf60_row6_col17" class="data row6 col17" ></td>
+      <td id="T_cdf60_row6_col18" class="data row6 col18" >2.45</td>
+      <td id="T_cdf60_row6_col19" class="data row6 col19" >2.38</td>
+      <td id="T_cdf60_row6_col20" class="data row6 col20" >2.44</td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row7" class="row_heading level0 row7" >8</th>
-      <td id="T_36442_row7_col0" class="data row7 col0" >11:13</td>
-      <td id="T_36442_row7_col1" class="data row7 col1" >2.39</td>
-      <td id="T_36442_row7_col2" class="data row7 col2" >2.40</td>
-      <td id="T_36442_row7_col3" class="data row7 col3" >2.40</td>
-      <td id="T_36442_row7_col4" class="data row7 col4" >2.36</td>
-      <td id="T_36442_row7_col5" class="data row7 col5" >2.48</td>
-      <td id="T_36442_row7_col6" class="data row7 col6" >2.56</td>
-      <td id="T_36442_row7_col7" class="data row7 col7" ></td>
-      <td id="T_36442_row7_col8" class="data row7 col8" ></td>
-      <td id="T_36442_row7_col9" class="data row7 col9" ></td>
-      <td id="T_36442_row7_col10" class="data row7 col10" >2.46</td>
-      <td id="T_36442_row7_col11" class="data row7 col11" >2.49</td>
-      <td id="T_36442_row7_col12" class="data row7 col12" ></td>
-      <td id="T_36442_row7_col13" class="data row7 col13" >2.49</td>
-      <td id="T_36442_row7_col14" class="data row7 col14" ></td>
-      <td id="T_36442_row7_col15" class="data row7 col15" ></td>
-      <td id="T_36442_row7_col16" class="data row7 col16" >2.41</td>
-      <td id="T_36442_row7_col17" class="data row7 col17" ></td>
-      <td id="T_36442_row7_col18" class="data row7 col18" >2.45</td>
-      <td id="T_36442_row7_col19" class="data row7 col19" >2.40</td>
-      <td id="T_36442_row7_col20" class="data row7 col20" >2.35</td>
+      <th id="T_cdf60_level0_row7" class="row_heading level0 row7" >8</th>
+      <td id="T_cdf60_row7_col0" class="data row7 col0" >13:33</td>
+      <td id="T_cdf60_row7_col1" class="data row7 col1" >2.48</td>
+      <td id="T_cdf60_row7_col2" class="data row7 col2" >2.50</td>
+      <td id="T_cdf60_row7_col3" class="data row7 col3" >2.50</td>
+      <td id="T_cdf60_row7_col4" class="data row7 col4" >2.45</td>
+      <td id="T_cdf60_row7_col5" class="data row7 col5" >2.58</td>
+      <td id="T_cdf60_row7_col6" class="data row7 col6" >2.66</td>
+      <td id="T_cdf60_row7_col7" class="data row7 col7" ></td>
+      <td id="T_cdf60_row7_col8" class="data row7 col8" ></td>
+      <td id="T_cdf60_row7_col9" class="data row7 col9" ></td>
+      <td id="T_cdf60_row7_col10" class="data row7 col10" >2.55</td>
+      <td id="T_cdf60_row7_col11" class="data row7 col11" >2.58</td>
+      <td id="T_cdf60_row7_col12" class="data row7 col12" ></td>
+      <td id="T_cdf60_row7_col13" class="data row7 col13" >2.66</td>
+      <td id="T_cdf60_row7_col14" class="data row7 col14" ></td>
+      <td id="T_cdf60_row7_col15" class="data row7 col15" ></td>
+      <td id="T_cdf60_row7_col16" class="data row7 col16" >2.61</td>
+      <td id="T_cdf60_row7_col17" class="data row7 col17" ></td>
+      <td id="T_cdf60_row7_col18" class="data row7 col18" >2.60</td>
+      <td id="T_cdf60_row7_col19" class="data row7 col19" >2.54</td>
+      <td id="T_cdf60_row7_col20" class="data row7 col20" >2.60</td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row8" class="row_heading level0 row8" >9</th>
-      <td id="T_36442_row8_col0" class="data row8 col0" >13:33</td>
-      <td id="T_36442_row8_col1" class="data row8 col1" >2.48</td>
-      <td id="T_36442_row8_col2" class="data row8 col2" >2.50</td>
-      <td id="T_36442_row8_col3" class="data row8 col3" >2.48</td>
-      <td id="T_36442_row8_col4" class="data row8 col4" >2.43</td>
-      <td id="T_36442_row8_col5" class="data row8 col5" >2.53</td>
-      <td id="T_36442_row8_col6" class="data row8 col6" ></td>
-      <td id="T_36442_row8_col7" class="data row8 col7" ></td>
-      <td id="T_36442_row8_col8" class="data row8 col8" ></td>
-      <td id="T_36442_row8_col9" class="data row8 col9" ></td>
-      <td id="T_36442_row8_col10" class="data row8 col10" >2.53</td>
-      <td id="T_36442_row8_col11" class="data row8 col11" >2.56</td>
-      <td id="T_36442_row8_col12" class="data row8 col12" ></td>
-      <td id="T_36442_row8_col13" class="data row8 col13" >2.58</td>
-      <td id="T_36442_row8_col14" class="data row8 col14" ></td>
-      <td id="T_36442_row8_col15" class="data row8 col15" ></td>
-      <td id="T_36442_row8_col16" class="data row8 col16" >2.51</td>
-      <td id="T_36442_row8_col17" class="data row8 col17" ></td>
-      <td id="T_36442_row8_col18" class="data row8 col18" >2.55</td>
-      <td id="T_36442_row8_col19" class="data row8 col19" >2.51</td>
-      <td id="T_36442_row8_col20" class="data row8 col20" >2.46</td>
+      <th id="T_cdf60_level0_row8" class="row_heading level0 row8" >9</th>
+      <td id="T_cdf60_row8_col0" class="data row8 col0" >11:13</td>
+      <td id="T_cdf60_row8_col1" class="data row8 col1" >2.57</td>
+      <td id="T_cdf60_row8_col2" class="data row8 col2" >2.58</td>
+      <td id="T_cdf60_row8_col3" class="data row8 col3" >2.58</td>
+      <td id="T_cdf60_row8_col4" class="data row8 col4" >2.54</td>
+      <td id="T_cdf60_row8_col5" class="data row8 col5" >2.66</td>
+      <td id="T_cdf60_row8_col6" class="data row8 col6" >2.73</td>
+      <td id="T_cdf60_row8_col7" class="data row8 col7" ></td>
+      <td id="T_cdf60_row8_col8" class="data row8 col8" ></td>
+      <td id="T_cdf60_row8_col9" class="data row8 col9" ></td>
+      <td id="T_cdf60_row8_col10" class="data row8 col10" >2.63</td>
+      <td id="T_cdf60_row8_col11" class="data row8 col11" >2.64</td>
+      <td id="T_cdf60_row8_col12" class="data row8 col12" ></td>
+      <td id="T_cdf60_row8_col13" class="data row8 col13" ></td>
+      <td id="T_cdf60_row8_col14" class="data row8 col14" ></td>
+      <td id="T_cdf60_row8_col15" class="data row8 col15" ></td>
+      <td id="T_cdf60_row8_col16" class="data row8 col16" >2.67</td>
+      <td id="T_cdf60_row8_col17" class="data row8 col17" ></td>
+      <td id="T_cdf60_row8_col18" class="data row8 col18" >2.67</td>
+      <td id="T_cdf60_row8_col19" class="data row8 col19" >2.62</td>
+      <td id="T_cdf60_row8_col20" class="data row8 col20" >2.67</td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row9" class="row_heading level0 row9" >10</th>
-      <td id="T_36442_row9_col0" class="data row9 col0" >12:53</td>
-      <td id="T_36442_row9_col1" class="data row9 col1" >2.51</td>
-      <td id="T_36442_row9_col2" class="data row9 col2" >2.52</td>
-      <td id="T_36442_row9_col3" class="data row9 col3" >2.51</td>
-      <td id="T_36442_row9_col4" class="data row9 col4" >2.47</td>
-      <td id="T_36442_row9_col5" class="data row9 col5" >2.56</td>
-      <td id="T_36442_row9_col6" class="data row9 col6" ></td>
-      <td id="T_36442_row9_col7" class="data row9 col7" ></td>
-      <td id="T_36442_row9_col8" class="data row9 col8" ></td>
-      <td id="T_36442_row9_col9" class="data row9 col9" ></td>
-      <td id="T_36442_row9_col10" class="data row9 col10" >2.55</td>
-      <td id="T_36442_row9_col11" class="data row9 col11" >2.57</td>
-      <td id="T_36442_row9_col12" class="data row9 col12" ></td>
-      <td id="T_36442_row9_col13" class="data row9 col13" ></td>
-      <td id="T_36442_row9_col14" class="data row9 col14" ></td>
-      <td id="T_36442_row9_col15" class="data row9 col15" ></td>
-      <td id="T_36442_row9_col16" class="data row9 col16" >2.54</td>
-      <td id="T_36442_row9_col17" class="data row9 col17" ></td>
-      <td id="T_36442_row9_col18" class="data row9 col18" >2.57</td>
-      <td id="T_36442_row9_col19" class="data row9 col19" >2.54</td>
-      <td id="T_36442_row9_col20" class="data row9 col20" >2.49</td>
+      <th id="T_cdf60_level0_row9" class="row_heading level0 row9" >10</th>
+      <td id="T_cdf60_row9_col0" class="data row9 col0" >14:33</td>
+      <td id="T_cdf60_row9_col1" class="data row9 col1" >2.64</td>
+      <td id="T_cdf60_row9_col2" class="data row9 col2" >2.65</td>
+      <td id="T_cdf60_row9_col3" class="data row9 col3" >2.64</td>
+      <td id="T_cdf60_row9_col4" class="data row9 col4" >2.60</td>
+      <td id="T_cdf60_row9_col5" class="data row9 col5" >2.69</td>
+      <td id="T_cdf60_row9_col6" class="data row9 col6" ></td>
+      <td id="T_cdf60_row9_col7" class="data row9 col7" ></td>
+      <td id="T_cdf60_row9_col8" class="data row9 col8" ></td>
+      <td id="T_cdf60_row9_col9" class="data row9 col9" ></td>
+      <td id="T_cdf60_row9_col10" class="data row9 col10" >2.69</td>
+      <td id="T_cdf60_row9_col11" class="data row9 col11" >2.70</td>
+      <td id="T_cdf60_row9_col12" class="data row9 col12" ></td>
+      <td id="T_cdf60_row9_col13" class="data row9 col13" ></td>
+      <td id="T_cdf60_row9_col14" class="data row9 col14" ></td>
+      <td id="T_cdf60_row9_col15" class="data row9 col15" ></td>
+      <td id="T_cdf60_row9_col16" class="data row9 col16" >2.75</td>
+      <td id="T_cdf60_row9_col17" class="data row9 col17" ></td>
+      <td id="T_cdf60_row9_col18" class="data row9 col18" >2.74</td>
+      <td id="T_cdf60_row9_col19" class="data row9 col19" >2.69</td>
+      <td id="T_cdf60_row9_col20" class="data row9 col20" >2.73</td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row10" class="row_heading level0 row10" >11</th>
-      <td id="T_36442_row10_col0" class="data row10 col0" >15:13</td>
-      <td id="T_36442_row10_col1" class="data row10 col1" >2.52</td>
-      <td id="T_36442_row10_col2" class="data row10 col2" >2.53</td>
-      <td id="T_36442_row10_col3" class="data row10 col3" >2.52</td>
-      <td id="T_36442_row10_col4" class="data row10 col4" >2.48</td>
-      <td id="T_36442_row10_col5" class="data row10 col5" >2.56</td>
-      <td id="T_36442_row10_col6" class="data row10 col6" ></td>
-      <td id="T_36442_row10_col7" class="data row10 col7" ></td>
-      <td id="T_36442_row10_col8" class="data row10 col8" ></td>
-      <td id="T_36442_row10_col9" class="data row10 col9" ></td>
-      <td id="T_36442_row10_col10" class="data row10 col10" >2.54</td>
-      <td id="T_36442_row10_col11" class="data row10 col11" ></td>
-      <td id="T_36442_row10_col12" class="data row10 col12" ></td>
-      <td id="T_36442_row10_col13" class="data row10 col13" ></td>
-      <td id="T_36442_row10_col14" class="data row10 col14" ></td>
-      <td id="T_36442_row10_col15" class="data row10 col15" ></td>
-      <td id="T_36442_row10_col16" class="data row10 col16" >2.55</td>
-      <td id="T_36442_row10_col17" class="data row10 col17" ></td>
-      <td id="T_36442_row10_col18" class="data row10 col18" >2.57</td>
-      <td id="T_36442_row10_col19" class="data row10 col19" >2.54</td>
-      <td id="T_36442_row10_col20" class="data row10 col20" >2.49</td>
+      <th id="T_cdf60_level0_row10" class="row_heading level0 row10" >11</th>
+      <td id="T_cdf60_row10_col0" class="data row10 col0" >15:53</td>
+      <td id="T_cdf60_row10_col1" class="data row10 col1" >2.67</td>
+      <td id="T_cdf60_row10_col2" class="data row10 col2" >2.68</td>
+      <td id="T_cdf60_row10_col3" class="data row10 col3" >2.68</td>
+      <td id="T_cdf60_row10_col4" class="data row10 col4" >2.64</td>
+      <td id="T_cdf60_row10_col5" class="data row10 col5" >2.73</td>
+      <td id="T_cdf60_row10_col6" class="data row10 col6" ></td>
+      <td id="T_cdf60_row10_col7" class="data row10 col7" ></td>
+      <td id="T_cdf60_row10_col8" class="data row10 col8" ></td>
+      <td id="T_cdf60_row10_col9" class="data row10 col9" ></td>
+      <td id="T_cdf60_row10_col10" class="data row10 col10" >2.71</td>
+      <td id="T_cdf60_row10_col11" class="data row10 col11" >2.73</td>
+      <td id="T_cdf60_row10_col12" class="data row10 col12" ></td>
+      <td id="T_cdf60_row10_col13" class="data row10 col13" ></td>
+      <td id="T_cdf60_row10_col14" class="data row10 col14" ></td>
+      <td id="T_cdf60_row10_col15" class="data row10 col15" ></td>
+      <td id="T_cdf60_row10_col16" class="data row10 col16" ></td>
+      <td id="T_cdf60_row10_col17" class="data row10 col17" ></td>
+      <td id="T_cdf60_row10_col18" class="data row10 col18" >2.75</td>
+      <td id="T_cdf60_row10_col19" class="data row10 col19" >2.71</td>
+      <td id="T_cdf60_row10_col20" class="data row10 col20" >2.75</td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row11" class="row_heading level0 row11" >12</th>
-      <td id="T_36442_row11_col0" class="data row11 col0" >10:53</td>
-      <td id="T_36442_row11_col1" class="data row11 col1" >2.52</td>
-      <td id="T_36442_row11_col2" class="data row11 col2" >2.53</td>
-      <td id="T_36442_row11_col3" class="data row11 col3" >2.52</td>
-      <td id="T_36442_row11_col4" class="data row11 col4" >2.49</td>
-      <td id="T_36442_row11_col5" class="data row11 col5" >2.57</td>
-      <td id="T_36442_row11_col6" class="data row11 col6" ></td>
-      <td id="T_36442_row11_col7" class="data row11 col7" ></td>
-      <td id="T_36442_row11_col8" class="data row11 col8" ></td>
-      <td id="T_36442_row11_col9" class="data row11 col9" ></td>
-      <td id="T_36442_row11_col10" class="data row11 col10" >2.54</td>
-      <td id="T_36442_row11_col11" class="data row11 col11" ></td>
-      <td id="T_36442_row11_col12" class="data row11 col12" ></td>
-      <td id="T_36442_row11_col13" class="data row11 col13" ></td>
-      <td id="T_36442_row11_col14" class="data row11 col14" ></td>
-      <td id="T_36442_row11_col15" class="data row11 col15" ></td>
-      <td id="T_36442_row11_col16" class="data row11 col16" >2.53</td>
-      <td id="T_36442_row11_col17" class="data row11 col17" ></td>
-      <td id="T_36442_row11_col18" class="data row11 col18" ></td>
-      <td id="T_36442_row11_col19" class="data row11 col19" >2.53</td>
-      <td id="T_36442_row11_col20" class="data row11 col20" >2.49</td>
+      <th id="T_cdf60_level0_row11" class="row_heading level0 row11" >12</th>
+      <td id="T_cdf60_row11_col0" class="data row11 col0" >15:13</td>
+      <td id="T_cdf60_row11_col1" class="data row11 col1" >2.68</td>
+      <td id="T_cdf60_row11_col2" class="data row11 col2" >2.69</td>
+      <td id="T_cdf60_row11_col3" class="data row11 col3" >2.68</td>
+      <td id="T_cdf60_row11_col4" class="data row11 col4" >2.64</td>
+      <td id="T_cdf60_row11_col5" class="data row11 col5" >2.73</td>
+      <td id="T_cdf60_row11_col6" class="data row11 col6" ></td>
+      <td id="T_cdf60_row11_col7" class="data row11 col7" ></td>
+      <td id="T_cdf60_row11_col8" class="data row11 col8" ></td>
+      <td id="T_cdf60_row11_col9" class="data row11 col9" ></td>
+      <td id="T_cdf60_row11_col10" class="data row11 col10" >2.72</td>
+      <td id="T_cdf60_row11_col11" class="data row11 col11" >2.73</td>
+      <td id="T_cdf60_row11_col12" class="data row11 col12" ></td>
+      <td id="T_cdf60_row11_col13" class="data row11 col13" ></td>
+      <td id="T_cdf60_row11_col14" class="data row11 col14" ></td>
+      <td id="T_cdf60_row11_col15" class="data row11 col15" ></td>
+      <td id="T_cdf60_row11_col16" class="data row11 col16" ></td>
+      <td id="T_cdf60_row11_col17" class="data row11 col17" ></td>
+      <td id="T_cdf60_row11_col18" class="data row11 col18" >2.75</td>
+      <td id="T_cdf60_row11_col19" class="data row11 col19" >2.72</td>
+      <td id="T_cdf60_row11_col20" class="data row11 col20" ></td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row12" class="row_heading level0 row12" >13</th>
-      <td id="T_36442_row12_col0" class="data row12 col0" >12:33</td>
-      <td id="T_36442_row12_col1" class="data row12 col1" >2.51</td>
-      <td id="T_36442_row12_col2" class="data row12 col2" >2.52</td>
-      <td id="T_36442_row12_col3" class="data row12 col3" >2.51</td>
-      <td id="T_36442_row12_col4" class="data row12 col4" >2.47</td>
-      <td id="T_36442_row12_col5" class="data row12 col5" ></td>
-      <td id="T_36442_row12_col6" class="data row12 col6" ></td>
-      <td id="T_36442_row12_col7" class="data row12 col7" ></td>
-      <td id="T_36442_row12_col8" class="data row12 col8" ></td>
-      <td id="T_36442_row12_col9" class="data row12 col9" ></td>
-      <td id="T_36442_row12_col10" class="data row12 col10" >2.54</td>
-      <td id="T_36442_row12_col11" class="data row12 col11" ></td>
-      <td id="T_36442_row12_col12" class="data row12 col12" ></td>
-      <td id="T_36442_row12_col13" class="data row12 col13" ></td>
-      <td id="T_36442_row12_col14" class="data row12 col14" ></td>
-      <td id="T_36442_row12_col15" class="data row12 col15" ></td>
-      <td id="T_36442_row12_col16" class="data row12 col16" >2.54</td>
-      <td id="T_36442_row12_col17" class="data row12 col17" ></td>
-      <td id="T_36442_row12_col18" class="data row12 col18" ></td>
-      <td id="T_36442_row12_col19" class="data row12 col19" >2.53</td>
-      <td id="T_36442_row12_col20" class="data row12 col20" >2.49</td>
+      <th id="T_cdf60_level0_row12" class="row_heading level0 row12" >13</th>
+      <td id="T_cdf60_row12_col0" class="data row12 col0" >12:53</td>
+      <td id="T_cdf60_row12_col1" class="data row12 col1" >2.68</td>
+      <td id="T_cdf60_row12_col2" class="data row12 col2" >2.69</td>
+      <td id="T_cdf60_row12_col3" class="data row12 col3" >2.69</td>
+      <td id="T_cdf60_row12_col4" class="data row12 col4" >2.65</td>
+      <td id="T_cdf60_row12_col5" class="data row12 col5" >2.73</td>
+      <td id="T_cdf60_row12_col6" class="data row12 col6" ></td>
+      <td id="T_cdf60_row12_col7" class="data row12 col7" ></td>
+      <td id="T_cdf60_row12_col8" class="data row12 col8" ></td>
+      <td id="T_cdf60_row12_col9" class="data row12 col9" ></td>
+      <td id="T_cdf60_row12_col10" class="data row12 col10" >2.73</td>
+      <td id="T_cdf60_row12_col11" class="data row12 col11" >2.74</td>
+      <td id="T_cdf60_row12_col12" class="data row12 col12" ></td>
+      <td id="T_cdf60_row12_col13" class="data row12 col13" ></td>
+      <td id="T_cdf60_row12_col14" class="data row12 col14" ></td>
+      <td id="T_cdf60_row12_col15" class="data row12 col15" ></td>
+      <td id="T_cdf60_row12_col16" class="data row12 col16" ></td>
+      <td id="T_cdf60_row12_col17" class="data row12 col17" ></td>
+      <td id="T_cdf60_row12_col18" class="data row12 col18" ></td>
+      <td id="T_cdf60_row12_col19" class="data row12 col19" >2.71</td>
+      <td id="T_cdf60_row12_col20" class="data row12 col20" ></td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row13" class="row_heading level0 row13" >14</th>
-      <td id="T_36442_row13_col0" class="data row13 col0" >14:33</td>
-      <td id="T_36442_row13_col1" class="data row13 col1" >2.49</td>
-      <td id="T_36442_row13_col2" class="data row13 col2" >2.50</td>
-      <td id="T_36442_row13_col3" class="data row13 col3" >2.49</td>
-      <td id="T_36442_row13_col4" class="data row13 col4" >2.45</td>
-      <td id="T_36442_row13_col5" class="data row13 col5" ></td>
-      <td id="T_36442_row13_col6" class="data row13 col6" ></td>
-      <td id="T_36442_row13_col7" class="data row13 col7" ></td>
-      <td id="T_36442_row13_col8" class="data row13 col8" ></td>
-      <td id="T_36442_row13_col9" class="data row13 col9" ></td>
-      <td id="T_36442_row13_col10" class="data row13 col10" ></td>
-      <td id="T_36442_row13_col11" class="data row13 col11" ></td>
-      <td id="T_36442_row13_col12" class="data row13 col12" ></td>
-      <td id="T_36442_row13_col13" class="data row13 col13" ></td>
-      <td id="T_36442_row13_col14" class="data row13 col14" ></td>
-      <td id="T_36442_row13_col15" class="data row13 col15" ></td>
-      <td id="T_36442_row13_col16" class="data row13 col16" >2.52</td>
-      <td id="T_36442_row13_col17" class="data row13 col17" ></td>
-      <td id="T_36442_row13_col18" class="data row13 col18" ></td>
-      <td id="T_36442_row13_col19" class="data row13 col19" >2.51</td>
-      <td id="T_36442_row13_col20" class="data row13 col20" >2.47</td>
+      <th id="T_cdf60_level0_row13" class="row_heading level0 row13" >14</th>
+      <td id="T_cdf60_row13_col0" class="data row13 col0" >10:53</td>
+      <td id="T_cdf60_row13_col1" class="data row13 col1" >2.68</td>
+      <td id="T_cdf60_row13_col2" class="data row13 col2" >2.69</td>
+      <td id="T_cdf60_row13_col3" class="data row13 col3" >2.68</td>
+      <td id="T_cdf60_row13_col4" class="data row13 col4" >2.65</td>
+      <td id="T_cdf60_row13_col5" class="data row13 col5" >2.73</td>
+      <td id="T_cdf60_row13_col6" class="data row13 col6" ></td>
+      <td id="T_cdf60_row13_col7" class="data row13 col7" ></td>
+      <td id="T_cdf60_row13_col8" class="data row13 col8" ></td>
+      <td id="T_cdf60_row13_col9" class="data row13 col9" ></td>
+      <td id="T_cdf60_row13_col10" class="data row13 col10" >2.70</td>
+      <td id="T_cdf60_row13_col11" class="data row13 col11" ></td>
+      <td id="T_cdf60_row13_col12" class="data row13 col12" ></td>
+      <td id="T_cdf60_row13_col13" class="data row13 col13" ></td>
+      <td id="T_cdf60_row13_col14" class="data row13 col14" ></td>
+      <td id="T_cdf60_row13_col15" class="data row13 col15" ></td>
+      <td id="T_cdf60_row13_col16" class="data row13 col16" ></td>
+      <td id="T_cdf60_row13_col17" class="data row13 col17" ></td>
+      <td id="T_cdf60_row13_col18" class="data row13 col18" ></td>
+      <td id="T_cdf60_row13_col19" class="data row13 col19" >2.71</td>
+      <td id="T_cdf60_row13_col20" class="data row13 col20" ></td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row14" class="row_heading level0 row14" >15</th>
-      <td id="T_36442_row14_col0" class="data row14 col0" >09:52</td>
-      <td id="T_36442_row14_col1" class="data row14 col1" >2.48</td>
-      <td id="T_36442_row14_col2" class="data row14 col2" >2.49</td>
-      <td id="T_36442_row14_col3" class="data row14 col3" >2.48</td>
-      <td id="T_36442_row14_col4" class="data row14 col4" >2.45</td>
-      <td id="T_36442_row14_col5" class="data row14 col5" ></td>
-      <td id="T_36442_row14_col6" class="data row14 col6" ></td>
-      <td id="T_36442_row14_col7" class="data row14 col7" ></td>
-      <td id="T_36442_row14_col8" class="data row14 col8" ></td>
-      <td id="T_36442_row14_col9" class="data row14 col9" ></td>
-      <td id="T_36442_row14_col10" class="data row14 col10" ></td>
-      <td id="T_36442_row14_col11" class="data row14 col11" ></td>
-      <td id="T_36442_row14_col12" class="data row14 col12" ></td>
-      <td id="T_36442_row14_col13" class="data row14 col13" ></td>
-      <td id="T_36442_row14_col14" class="data row14 col14" ></td>
-      <td id="T_36442_row14_col15" class="data row14 col15" ></td>
-      <td id="T_36442_row14_col16" class="data row14 col16" ></td>
-      <td id="T_36442_row14_col17" class="data row14 col17" ></td>
-      <td id="T_36442_row14_col18" class="data row14 col18" ></td>
-      <td id="T_36442_row14_col19" class="data row14 col19" >2.48</td>
-      <td id="T_36442_row14_col20" class="data row14 col20" >2.45</td>
+      <th id="T_cdf60_level0_row14" class="row_heading level0 row14" >15</th>
+      <td id="T_cdf60_row14_col0" class="data row14 col0" >15:33</td>
+      <td id="T_cdf60_row14_col1" class="data row14 col1" >2.66</td>
+      <td id="T_cdf60_row14_col2" class="data row14 col2" >2.67</td>
+      <td id="T_cdf60_row14_col3" class="data row14 col3" >2.66</td>
+      <td id="T_cdf60_row14_col4" class="data row14 col4" >2.62</td>
+      <td id="T_cdf60_row14_col5" class="data row14 col5" ></td>
+      <td id="T_cdf60_row14_col6" class="data row14 col6" ></td>
+      <td id="T_cdf60_row14_col7" class="data row14 col7" ></td>
+      <td id="T_cdf60_row14_col8" class="data row14 col8" ></td>
+      <td id="T_cdf60_row14_col9" class="data row14 col9" ></td>
+      <td id="T_cdf60_row14_col10" class="data row14 col10" >2.69</td>
+      <td id="T_cdf60_row14_col11" class="data row14 col11" ></td>
+      <td id="T_cdf60_row14_col12" class="data row14 col12" ></td>
+      <td id="T_cdf60_row14_col13" class="data row14 col13" ></td>
+      <td id="T_cdf60_row14_col14" class="data row14 col14" ></td>
+      <td id="T_cdf60_row14_col15" class="data row14 col15" ></td>
+      <td id="T_cdf60_row14_col16" class="data row14 col16" ></td>
+      <td id="T_cdf60_row14_col17" class="data row14 col17" ></td>
+      <td id="T_cdf60_row14_col18" class="data row14 col18" ></td>
+      <td id="T_cdf60_row14_col19" class="data row14 col19" >2.69</td>
+      <td id="T_cdf60_row14_col20" class="data row14 col20" ></td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row15" class="row_heading level0 row15" >16</th>
-      <td id="T_36442_row15_col0" class="data row15 col0" >15:33</td>
-      <td id="T_36442_row15_col1" class="data row15 col1" >2.44</td>
-      <td id="T_36442_row15_col2" class="data row15 col2" ></td>
-      <td id="T_36442_row15_col3" class="data row15 col3" >2.44</td>
-      <td id="T_36442_row15_col4" class="data row15 col4" >2.41</td>
-      <td id="T_36442_row15_col5" class="data row15 col5" ></td>
-      <td id="T_36442_row15_col6" class="data row15 col6" ></td>
-      <td id="T_36442_row15_col7" class="data row15 col7" ></td>
-      <td id="T_36442_row15_col8" class="data row15 col8" ></td>
-      <td id="T_36442_row15_col9" class="data row15 col9" ></td>
-      <td id="T_36442_row15_col10" class="data row15 col10" ></td>
-      <td id="T_36442_row15_col11" class="data row15 col11" ></td>
-      <td id="T_36442_row15_col12" class="data row15 col12" ></td>
-      <td id="T_36442_row15_col13" class="data row15 col13" ></td>
-      <td id="T_36442_row15_col14" class="data row15 col14" ></td>
-      <td id="T_36442_row15_col15" class="data row15 col15" ></td>
-      <td id="T_36442_row15_col16" class="data row15 col16" ></td>
-      <td id="T_36442_row15_col17" class="data row15 col17" ></td>
-      <td id="T_36442_row15_col18" class="data row15 col18" ></td>
-      <td id="T_36442_row15_col19" class="data row15 col19" >2.46</td>
-      <td id="T_36442_row15_col20" class="data row15 col20" >2.43</td>
+      <th id="T_cdf60_level0_row15" class="row_heading level0 row15" >16</th>
+      <td id="T_cdf60_row15_col0" class="data row15 col0" >12:33</td>
+      <td id="T_cdf60_row15_col1" class="data row15 col1" >2.63</td>
+      <td id="T_cdf60_row15_col2" class="data row15 col2" >2.64</td>
+      <td id="T_cdf60_row15_col3" class="data row15 col3" >2.63</td>
+      <td id="T_cdf60_row15_col4" class="data row15 col4" >2.60</td>
+      <td id="T_cdf60_row15_col5" class="data row15 col5" ></td>
+      <td id="T_cdf60_row15_col6" class="data row15 col6" ></td>
+      <td id="T_cdf60_row15_col7" class="data row15 col7" ></td>
+      <td id="T_cdf60_row15_col8" class="data row15 col8" ></td>
+      <td id="T_cdf60_row15_col9" class="data row15 col9" ></td>
+      <td id="T_cdf60_row15_col10" class="data row15 col10" >2.66</td>
+      <td id="T_cdf60_row15_col11" class="data row15 col11" ></td>
+      <td id="T_cdf60_row15_col12" class="data row15 col12" ></td>
+      <td id="T_cdf60_row15_col13" class="data row15 col13" ></td>
+      <td id="T_cdf60_row15_col14" class="data row15 col14" ></td>
+      <td id="T_cdf60_row15_col15" class="data row15 col15" ></td>
+      <td id="T_cdf60_row15_col16" class="data row15 col16" ></td>
+      <td id="T_cdf60_row15_col17" class="data row15 col17" ></td>
+      <td id="T_cdf60_row15_col18" class="data row15 col18" ></td>
+      <td id="T_cdf60_row15_col19" class="data row15 col19" ></td>
+      <td id="T_cdf60_row15_col20" class="data row15 col20" ></td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row16" class="row_heading level0 row16" >17</th>
-      <td id="T_36442_row16_col0" class="data row16 col0" >09:32</td>
-      <td id="T_36442_row16_col1" class="data row16 col1" >2.42</td>
-      <td id="T_36442_row16_col2" class="data row16 col2" ></td>
-      <td id="T_36442_row16_col3" class="data row16 col3" >2.42</td>
-      <td id="T_36442_row16_col4" class="data row16 col4" >2.39</td>
-      <td id="T_36442_row16_col5" class="data row16 col5" ></td>
-      <td id="T_36442_row16_col6" class="data row16 col6" ></td>
-      <td id="T_36442_row16_col7" class="data row16 col7" ></td>
-      <td id="T_36442_row16_col8" class="data row16 col8" ></td>
-      <td id="T_36442_row16_col9" class="data row16 col9" ></td>
-      <td id="T_36442_row16_col10" class="data row16 col10" ></td>
-      <td id="T_36442_row16_col11" class="data row16 col11" ></td>
-      <td id="T_36442_row16_col12" class="data row16 col12" ></td>
-      <td id="T_36442_row16_col13" class="data row16 col13" ></td>
-      <td id="T_36442_row16_col14" class="data row16 col14" ></td>
-      <td id="T_36442_row16_col15" class="data row16 col15" ></td>
-      <td id="T_36442_row16_col16" class="data row16 col16" ></td>
-      <td id="T_36442_row16_col17" class="data row16 col17" ></td>
-      <td id="T_36442_row16_col18" class="data row16 col18" ></td>
-      <td id="T_36442_row16_col19" class="data row16 col19" ></td>
-      <td id="T_36442_row16_col20" class="data row16 col20" >2.40</td>
+      <th id="T_cdf60_level0_row16" class="row_heading level0 row16" >17</th>
+      <td id="T_cdf60_row16_col0" class="data row16 col0" >09:52</td>
+      <td id="T_cdf60_row16_col1" class="data row16 col1" >2.61</td>
+      <td id="T_cdf60_row16_col2" class="data row16 col2" >2.62</td>
+      <td id="T_cdf60_row16_col3" class="data row16 col3" >2.61</td>
+      <td id="T_cdf60_row16_col4" class="data row16 col4" >2.57</td>
+      <td id="T_cdf60_row16_col5" class="data row16 col5" ></td>
+      <td id="T_cdf60_row16_col6" class="data row16 col6" ></td>
+      <td id="T_cdf60_row16_col7" class="data row16 col7" ></td>
+      <td id="T_cdf60_row16_col8" class="data row16 col8" ></td>
+      <td id="T_cdf60_row16_col9" class="data row16 col9" ></td>
+      <td id="T_cdf60_row16_col10" class="data row16 col10" ></td>
+      <td id="T_cdf60_row16_col11" class="data row16 col11" ></td>
+      <td id="T_cdf60_row16_col12" class="data row16 col12" ></td>
+      <td id="T_cdf60_row16_col13" class="data row16 col13" ></td>
+      <td id="T_cdf60_row16_col14" class="data row16 col14" ></td>
+      <td id="T_cdf60_row16_col15" class="data row16 col15" ></td>
+      <td id="T_cdf60_row16_col16" class="data row16 col16" ></td>
+      <td id="T_cdf60_row16_col17" class="data row16 col17" ></td>
+      <td id="T_cdf60_row16_col18" class="data row16 col18" ></td>
+      <td id="T_cdf60_row16_col19" class="data row16 col19" ></td>
+      <td id="T_cdf60_row16_col20" class="data row16 col20" ></td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row17" class="row_heading level0 row17" >18</th>
-      <td id="T_36442_row17_col0" class="data row17 col0" >10:13</td>
-      <td id="T_36442_row17_col1" class="data row17 col1" ></td>
-      <td id="T_36442_row17_col2" class="data row17 col2" ></td>
-      <td id="T_36442_row17_col3" class="data row17 col3" >2.37</td>
-      <td id="T_36442_row17_col4" class="data row17 col4" >2.35</td>
-      <td id="T_36442_row17_col5" class="data row17 col5" ></td>
-      <td id="T_36442_row17_col6" class="data row17 col6" ></td>
-      <td id="T_36442_row17_col7" class="data row17 col7" ></td>
-      <td id="T_36442_row17_col8" class="data row17 col8" ></td>
-      <td id="T_36442_row17_col9" class="data row17 col9" ></td>
-      <td id="T_36442_row17_col10" class="data row17 col10" ></td>
-      <td id="T_36442_row17_col11" class="data row17 col11" ></td>
-      <td id="T_36442_row17_col12" class="data row17 col12" ></td>
-      <td id="T_36442_row17_col13" class="data row17 col13" ></td>
-      <td id="T_36442_row17_col14" class="data row17 col14" ></td>
-      <td id="T_36442_row17_col15" class="data row17 col15" ></td>
-      <td id="T_36442_row17_col16" class="data row17 col16" ></td>
-      <td id="T_36442_row17_col17" class="data row17 col17" ></td>
-      <td id="T_36442_row17_col18" class="data row17 col18" ></td>
-      <td id="T_36442_row17_col19" class="data row17 col19" ></td>
-      <td id="T_36442_row17_col20" class="data row17 col20" >2.36</td>
+      <th id="T_cdf60_level0_row17" class="row_heading level0 row17" >18</th>
+      <td id="T_cdf60_row17_col0" class="data row17 col0" >10:13</td>
+      <td id="T_cdf60_row17_col1" class="data row17 col1" >2.55</td>
+      <td id="T_cdf60_row17_col2" class="data row17 col2" ></td>
+      <td id="T_cdf60_row17_col3" class="data row17 col3" >2.55</td>
+      <td id="T_cdf60_row17_col4" class="data row17 col4" >2.53</td>
+      <td id="T_cdf60_row17_col5" class="data row17 col5" ></td>
+      <td id="T_cdf60_row17_col6" class="data row17 col6" ></td>
+      <td id="T_cdf60_row17_col7" class="data row17 col7" ></td>
+      <td id="T_cdf60_row17_col8" class="data row17 col8" ></td>
+      <td id="T_cdf60_row17_col9" class="data row17 col9" ></td>
+      <td id="T_cdf60_row17_col10" class="data row17 col10" ></td>
+      <td id="T_cdf60_row17_col11" class="data row17 col11" ></td>
+      <td id="T_cdf60_row17_col12" class="data row17 col12" ></td>
+      <td id="T_cdf60_row17_col13" class="data row17 col13" ></td>
+      <td id="T_cdf60_row17_col14" class="data row17 col14" ></td>
+      <td id="T_cdf60_row17_col15" class="data row17 col15" ></td>
+      <td id="T_cdf60_row17_col16" class="data row17 col16" ></td>
+      <td id="T_cdf60_row17_col17" class="data row17 col17" ></td>
+      <td id="T_cdf60_row17_col18" class="data row17 col18" ></td>
+      <td id="T_cdf60_row17_col19" class="data row17 col19" ></td>
+      <td id="T_cdf60_row17_col20" class="data row17 col20" ></td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row18" class="row_heading level0 row18" >19</th>
-      <td id="T_36442_row18_col0" class="data row18 col0" >15:53</td>
-      <td id="T_36442_row18_col1" class="data row18 col1" ></td>
-      <td id="T_36442_row18_col2" class="data row18 col2" ></td>
-      <td id="T_36442_row18_col3" class="data row18 col3" ></td>
-      <td id="T_36442_row18_col4" class="data row18 col4" >2.30</td>
-      <td id="T_36442_row18_col5" class="data row18 col5" ></td>
-      <td id="T_36442_row18_col6" class="data row18 col6" ></td>
-      <td id="T_36442_row18_col7" class="data row18 col7" ></td>
-      <td id="T_36442_row18_col8" class="data row18 col8" ></td>
-      <td id="T_36442_row18_col9" class="data row18 col9" ></td>
-      <td id="T_36442_row18_col10" class="data row18 col10" ></td>
-      <td id="T_36442_row18_col11" class="data row18 col11" ></td>
-      <td id="T_36442_row18_col12" class="data row18 col12" ></td>
-      <td id="T_36442_row18_col13" class="data row18 col13" ></td>
-      <td id="T_36442_row18_col14" class="data row18 col14" ></td>
-      <td id="T_36442_row18_col15" class="data row18 col15" ></td>
-      <td id="T_36442_row18_col16" class="data row18 col16" ></td>
-      <td id="T_36442_row18_col17" class="data row18 col17" ></td>
-      <td id="T_36442_row18_col18" class="data row18 col18" ></td>
-      <td id="T_36442_row18_col19" class="data row18 col19" ></td>
-      <td id="T_36442_row18_col20" class="data row18 col20" >2.31</td>
+      <th id="T_cdf60_level0_row18" class="row_heading level0 row18" >19</th>
+      <td id="T_cdf60_row18_col0" class="data row18 col0" >09:32</td>
+      <td id="T_cdf60_row18_col1" class="data row18 col1" >2.49</td>
+      <td id="T_cdf60_row18_col2" class="data row18 col2" ></td>
+      <td id="T_cdf60_row18_col3" class="data row18 col3" ></td>
+      <td id="T_cdf60_row18_col4" class="data row18 col4" >2.46</td>
+      <td id="T_cdf60_row18_col5" class="data row18 col5" ></td>
+      <td id="T_cdf60_row18_col6" class="data row18 col6" ></td>
+      <td id="T_cdf60_row18_col7" class="data row18 col7" ></td>
+      <td id="T_cdf60_row18_col8" class="data row18 col8" ></td>
+      <td id="T_cdf60_row18_col9" class="data row18 col9" ></td>
+      <td id="T_cdf60_row18_col10" class="data row18 col10" ></td>
+      <td id="T_cdf60_row18_col11" class="data row18 col11" ></td>
+      <td id="T_cdf60_row18_col12" class="data row18 col12" ></td>
+      <td id="T_cdf60_row18_col13" class="data row18 col13" ></td>
+      <td id="T_cdf60_row18_col14" class="data row18 col14" ></td>
+      <td id="T_cdf60_row18_col15" class="data row18 col15" ></td>
+      <td id="T_cdf60_row18_col16" class="data row18 col16" ></td>
+      <td id="T_cdf60_row18_col17" class="data row18 col17" ></td>
+      <td id="T_cdf60_row18_col18" class="data row18 col18" ></td>
+      <td id="T_cdf60_row18_col19" class="data row18 col19" ></td>
+      <td id="T_cdf60_row18_col20" class="data row18 col20" ></td>
     </tr>
     <tr>
-      <th id="T_36442_level0_row19" class="row_heading level0 row19" >20</th>
-      <td id="T_36442_row19_col0" class="data row19 col0" >10:33</td>
-      <td id="T_36442_row19_col1" class="data row19 col1" ></td>
-      <td id="T_36442_row19_col2" class="data row19 col2" ></td>
-      <td id="T_36442_row19_col3" class="data row19 col3" ></td>
-      <td id="T_36442_row19_col4" class="data row19 col4" >2.25</td>
-      <td id="T_36442_row19_col5" class="data row19 col5" ></td>
-      <td id="T_36442_row19_col6" class="data row19 col6" ></td>
-      <td id="T_36442_row19_col7" class="data row19 col7" ></td>
-      <td id="T_36442_row19_col8" class="data row19 col8" ></td>
-      <td id="T_36442_row19_col9" class="data row19 col9" ></td>
-      <td id="T_36442_row19_col10" class="data row19 col10" ></td>
-      <td id="T_36442_row19_col11" class="data row19 col11" ></td>
-      <td id="T_36442_row19_col12" class="data row19 col12" ></td>
-      <td id="T_36442_row19_col13" class="data row19 col13" ></td>
-      <td id="T_36442_row19_col14" class="data row19 col14" ></td>
-      <td id="T_36442_row19_col15" class="data row19 col15" ></td>
-      <td id="T_36442_row19_col16" class="data row19 col16" ></td>
-      <td id="T_36442_row19_col17" class="data row19 col17" ></td>
-      <td id="T_36442_row19_col18" class="data row19 col18" ></td>
-      <td id="T_36442_row19_col19" class="data row19 col19" ></td>
-      <td id="T_36442_row19_col20" class="data row19 col20" ></td>
+      <th id="T_cdf60_level0_row19" class="row_heading level0 row19" >20</th>
+      <td id="T_cdf60_row19_col0" class="data row19 col0" >10:33</td>
+      <td id="T_cdf60_row19_col1" class="data row19 col1" ></td>
+      <td id="T_cdf60_row19_col2" class="data row19 col2" ></td>
+      <td id="T_cdf60_row19_col3" class="data row19 col3" ></td>
+      <td id="T_cdf60_row19_col4" class="data row19 col4" >2.40</td>
+      <td id="T_cdf60_row19_col5" class="data row19 col5" ></td>
+      <td id="T_cdf60_row19_col6" class="data row19 col6" ></td>
+      <td id="T_cdf60_row19_col7" class="data row19 col7" ></td>
+      <td id="T_cdf60_row19_col8" class="data row19 col8" ></td>
+      <td id="T_cdf60_row19_col9" class="data row19 col9" ></td>
+      <td id="T_cdf60_row19_col10" class="data row19 col10" ></td>
+      <td id="T_cdf60_row19_col11" class="data row19 col11" ></td>
+      <td id="T_cdf60_row19_col12" class="data row19 col12" ></td>
+      <td id="T_cdf60_row19_col13" class="data row19 col13" ></td>
+      <td id="T_cdf60_row19_col14" class="data row19 col14" ></td>
+      <td id="T_cdf60_row19_col15" class="data row19 col15" ></td>
+      <td id="T_cdf60_row19_col16" class="data row19 col16" ></td>
+      <td id="T_cdf60_row19_col17" class="data row19 col17" ></td>
+      <td id="T_cdf60_row19_col18" class="data row19 col18" ></td>
+      <td id="T_cdf60_row19_col19" class="data row19 col19" ></td>
+      <td id="T_cdf60_row19_col20" class="data row19 col20" ></td>
     </tr>
   </tbody>
 </table>
@@ -5612,286 +6024,286 @@ mostly the first and the last hour, the weakest tranches.
       <th>2</th>
       <td>13:53</td>
       <td>2</td>
-      <td>226</td>
-      <td>452</td>
-      <td>35815.12</td>
-      <td>0.37</td>
-      <td>0.33</td>
+      <td>220</td>
+      <td>440</td>
+      <td>35753.40</td>
+      <td>0.38</td>
+      <td>0.34</td>
       <td>0.45</td>
-      <td>-2378.04</td>
-      <td>87.39</td>
-      <td>82.30</td>
-      <td>158.47</td>
+      <td>-1744.16</td>
+      <td>87.95</td>
+      <td>82.73</td>
+      <td>162.52</td>
     </tr>
     <tr>
       <th>3</th>
       <td>12:13</td>
       <td>3</td>
-      <td>336</td>
-      <td>672</td>
-      <td>53019.32</td>
-      <td>1.32</td>
-      <td>1.24</td>
+      <td>330</td>
+      <td>660</td>
+      <td>52957.60</td>
+      <td>1.35</td>
+      <td>1.29</td>
       <td>1.49</td>
-      <td>-3965.36</td>
-      <td>87.20</td>
-      <td>81.85</td>
-      <td>157.80</td>
+      <td>-3331.48</td>
+      <td>87.58</td>
+      <td>82.12</td>
+      <td>160.48</td>
     </tr>
     <tr>
       <th>4</th>
       <td>14:13</td>
       <td>4</td>
-      <td>447</td>
-      <td>894</td>
-      <td>68493.64</td>
-      <td>1.78</td>
-      <td>1.65</td>
-      <td>2.05</td>
-      <td>-4037.84</td>
-      <td>86.24</td>
-      <td>80.76</td>
-      <td>153.23</td>
+      <td>421</td>
+      <td>842</td>
+      <td>67739.52</td>
+      <td>1.86</td>
+      <td>1.76</td>
+      <td>2.03</td>
+      <td>-2925.08</td>
+      <td>87.29</td>
+      <td>81.71</td>
+      <td>160.90</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>11:33</td>
+      <td>14:53</td>
       <td>5</td>
-      <td>569</td>
-      <td>1138</td>
-      <td>84773.28</td>
-      <td>2.11</td>
-      <td>2.05</td>
-      <td>2.24</td>
-      <td>-4817.12</td>
-      <td>86.82</td>
-      <td>81.20</td>
-      <td>148.99</td>
+      <td>488</td>
+      <td>976</td>
+      <td>79395.56</td>
+      <td>2.18</td>
+      <td>1.94</td>
+      <td>2.64</td>
+      <td>-2294.28</td>
+      <td>87.30</td>
+      <td>81.15</td>
+      <td>162.70</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>13:13</td>
+      <td>11:33</td>
       <td>6</td>
-      <td>684</td>
-      <td>1368</td>
-      <td>101142.08</td>
-      <td>2.33</td>
-      <td>2.25</td>
-      <td>2.50</td>
-      <td>-5515.52</td>
-      <td>86.70</td>
-      <td>80.70</td>
-      <td>147.87</td>
+      <td>610</td>
+      <td>1220</td>
+      <td>95675.20</td>
+      <td>2.43</td>
+      <td>2.28</td>
+      <td>2.73</td>
+      <td>-2995.92</td>
+      <td>87.62</td>
+      <td>81.48</td>
+      <td>156.84</td>
     </tr>
     <tr>
       <th>7</th>
-      <td>14:53</td>
+      <td>13:13</td>
       <td>7</td>
-      <td>791</td>
-      <td>1582</td>
-      <td>113370.92</td>
-      <td>2.48</td>
-      <td>2.33</td>
-      <td>2.83</td>
-      <td>-4888.92</td>
-      <td>85.65</td>
-      <td>79.14</td>
-      <td>143.33</td>
+      <td>725</td>
+      <td>1450</td>
+      <td>112044.00</td>
+      <td>2.60</td>
+      <td>2.44</td>
+      <td>2.92</td>
+      <td>-3808.68</td>
+      <td>87.38</td>
+      <td>80.97</td>
+      <td>154.54</td>
     </tr>
     <tr>
       <th>8</th>
-      <td>11:13</td>
+      <td>13:33</td>
       <td>8</td>
-      <td>906</td>
-      <td>1812</td>
-      <td>128097.72</td>
+      <td>831</td>
+      <td>1662</td>
+      <td>127137.72</td>
+      <td>2.66</td>
       <td>2.56</td>
-      <td>2.45</td>
-      <td>2.84</td>
-      <td>-5252.32</td>
-      <td>86.20</td>
-      <td>79.47</td>
-      <td>141.39</td>
+      <td>2.90</td>
+      <td>-5611.80</td>
+      <td>87.30</td>
+      <td>80.75</td>
+      <td>152.99</td>
     </tr>
     <tr>
       <th>9</th>
-      <td>13:33</td>
+      <td>11:13</td>
       <td>9</td>
-      <td>1016</td>
-      <td>2032</td>
-      <td>141923.92</td>
-      <td>2.58</td>
-      <td>2.47</td>
-      <td>2.85</td>
-      <td>-8413.48</td>
-      <td>86.17</td>
-      <td>79.23</td>
-      <td>139.69</td>
+      <td>946</td>
+      <td>1892</td>
+      <td>141864.52</td>
+      <td>2.73</td>
+      <td>2.64</td>
+      <td>2.93</td>
+      <td>-5975.20</td>
+      <td>87.63</td>
+      <td>80.87</td>
+      <td>149.96</td>
     </tr>
     <tr>
       <th>10</th>
-      <td>12:53</td>
+      <td>14:33</td>
       <td>10</td>
-      <td>1135</td>
-      <td>2270</td>
-      <td>156453.20</td>
-      <td>2.57</td>
-      <td>2.41</td>
+      <td>1026</td>
+      <td>2052</td>
+      <td>150488.12</td>
+      <td>2.75</td>
+      <td>2.63</td>
       <td>2.99</td>
-      <td>-9768.00</td>
-      <td>86.26</td>
-      <td>79.12</td>
-      <td>137.84</td>
+      <td>-5764.72</td>
+      <td>87.33</td>
+      <td>80.02</td>
+      <td>146.67</td>
     </tr>
     <tr>
       <th>11</th>
-      <td>15:13</td>
+      <td>15:53</td>
       <td>11</td>
-      <td>1240</td>
-      <td>2480</td>
-      <td>163889.80</td>
-      <td>2.57</td>
-      <td>2.47</td>
-      <td>2.86</td>
-      <td>-9566.52</td>
-      <td>85.36</td>
-      <td>77.98</td>
-      <td>132.17</td>
+      <td>1027</td>
+      <td>2054</td>
+      <td>150655.24</td>
+      <td>2.75</td>
+      <td>2.64</td>
+      <td>2.99</td>
+      <td>-5764.72</td>
+      <td>87.29</td>
+      <td>80.04</td>
+      <td>146.69</td>
     </tr>
     <tr>
       <th>12</th>
-      <td>10:53</td>
+      <td>15:13</td>
       <td>12</td>
-      <td>1371</td>
-      <td>2742</td>
-      <td>174108.52</td>
-      <td>2.57</td>
-      <td>2.52</td>
-      <td>2.70</td>
-      <td>-9393.80</td>
-      <td>85.52</td>
-      <td>77.75</td>
-      <td>126.99</td>
+      <td>1077</td>
+      <td>2154</td>
+      <td>155924.24</td>
+      <td>2.75</td>
+      <td>2.64</td>
+      <td>2.99</td>
+      <td>-6009.00</td>
+      <td>87.05</td>
+      <td>79.57</td>
+      <td>144.78</td>
     </tr>
     <tr>
       <th>13</th>
-      <td>12:33</td>
+      <td>12:53</td>
       <td>13</td>
-      <td>1486</td>
-      <td>2972</td>
-      <td>185835.32</td>
-      <td>2.54</td>
-      <td>2.43</td>
-      <td>2.83</td>
-      <td>-10625.20</td>
-      <td>85.46</td>
-      <td>77.39</td>
-      <td>125.06</td>
+      <td>1195</td>
+      <td>2390</td>
+      <td>170032.40</td>
+      <td>2.74</td>
+      <td>2.56</td>
+      <td>3.13</td>
+      <td>-6535.00</td>
+      <td>87.03</td>
+      <td>79.41</td>
+      <td>142.29</td>
     </tr>
     <tr>
       <th>14</th>
-      <td>14:33</td>
+      <td>10:53</td>
       <td>14</td>
-      <td>1597</td>
-      <td>3194</td>
-      <td>194142.64</td>
-      <td>2.52</td>
-      <td>2.38</td>
-      <td>2.88</td>
-      <td>-10638.60</td>
-      <td>85.07</td>
-      <td>76.58</td>
-      <td>121.57</td>
+      <td>1325</td>
+      <td>2650</td>
+      <td>180369.00</td>
+      <td>2.73</td>
+      <td>2.62</td>
+      <td>2.97</td>
+      <td>-6362.28</td>
+      <td>87.06</td>
+      <td>79.09</td>
+      <td>136.13</td>
     </tr>
     <tr>
       <th>15</th>
-      <td>09:52</td>
+      <td>15:33</td>
       <td>15</td>
-      <td>1728</td>
-      <td>3456</td>
-      <td>198708.36</td>
-      <td>2.49</td>
-      <td>2.38</td>
-      <td>2.78</td>
-      <td>-12483.64</td>
-      <td>85.13</td>
-      <td>76.22</td>
-      <td>114.99</td>
+      <td>1352</td>
+      <td>2704</td>
+      <td>180418.24</td>
+      <td>2.69</td>
+      <td>2.64</td>
+      <td>2.82</td>
+      <td>-6545.16</td>
+      <td>86.76</td>
+      <td>78.55</td>
+      <td>133.45</td>
     </tr>
     <tr>
       <th>16</th>
-      <td>15:33</td>
+      <td>12:33</td>
       <td>16</td>
-      <td>1829</td>
-      <td>3658</td>
-      <td>201047.48</td>
-      <td>2.46</td>
-      <td>2.39</td>
-      <td>2.65</td>
-      <td>-12015.16</td>
-      <td>84.17</td>
-      <td>75.12</td>
-      <td>109.92</td>
+      <td>1467</td>
+      <td>2934</td>
+      <td>192145.04</td>
+      <td>2.66</td>
+      <td>2.53</td>
+      <td>2.94</td>
+      <td>-7776.56</td>
+      <td>86.61</td>
+      <td>78.12</td>
+      <td>130.98</td>
     </tr>
     <tr>
       <th>17</th>
-      <td>09:32</td>
+      <td>09:52</td>
       <td>17</td>
-      <td>1968</td>
-      <td>3936</td>
-      <td>205475.16</td>
-      <td>2.42</td>
-      <td>2.31</td>
-      <td>2.69</td>
-      <td>-13004.20</td>
-      <td>84.38</td>
-      <td>75.15</td>
-      <td>104.41</td>
+      <td>1598</td>
+      <td>3196</td>
+      <td>196710.76</td>
+      <td>2.62</td>
+      <td>2.52</td>
+      <td>2.83</td>
+      <td>-9621.60</td>
+      <td>86.55</td>
+      <td>77.60</td>
+      <td>123.10</td>
     </tr>
     <tr>
       <th>18</th>
       <td>10:13</td>
       <td>18</td>
-      <td>2080</td>
-      <td>4160</td>
-      <td>210387.60</td>
-      <td>2.37</td>
-      <td>2.27</td>
-      <td>2.62</td>
-      <td>-15060.12</td>
-      <td>84.45</td>
-      <td>75.05</td>
-      <td>101.15</td>
+      <td>1710</td>
+      <td>3420</td>
+      <td>201623.20</td>
+      <td>2.55</td>
+      <td>2.47</td>
+      <td>2.75</td>
+      <td>-11677.52</td>
+      <td>86.49</td>
+      <td>77.31</td>
+      <td>117.91</td>
     </tr>
     <tr>
       <th>19</th>
-      <td>15:53</td>
+      <td>09:32</td>
       <td>19</td>
-      <td>2193</td>
-      <td>4386</td>
-      <td>208032.16</td>
-      <td>2.31</td>
-      <td>2.21</td>
-      <td>2.60</td>
-      <td>-15095.88</td>
-      <td>83.24</td>
-      <td>74.01</td>
-      <td>94.86</td>
+      <td>1849</td>
+      <td>3698</td>
+      <td>206050.88</td>
+      <td>2.49</td>
+      <td>2.36</td>
+      <td>2.76</td>
+      <td>-12666.56</td>
+      <td>86.53</td>
+      <td>77.18</td>
+      <td>111.44</td>
     </tr>
     <tr>
       <th>20</th>
       <td>10:33</td>
       <td>20</td>
-      <td>2315</td>
-      <td>4630</td>
-      <td>213278.80</td>
-      <td>2.25</td>
-      <td>2.16</td>
-      <td>2.48</td>
-      <td>-15130.04</td>
-      <td>83.39</td>
-      <td>73.95</td>
-      <td>92.13</td>
+      <td>1970</td>
+      <td>3940</td>
+      <td>211370.40</td>
+      <td>2.40</td>
+      <td>2.30</td>
+      <td>2.61</td>
+      <td>-12700.72</td>
+      <td>86.52</td>
+      <td>76.95</td>
+      <td>107.29</td>
     </tr>
   </tbody>
 </table>
@@ -5931,89 +6343,89 @@ mostly the first and the last hour, the weakest tranches.
     <tr>
       <th>2023</th>
       <td>2022-05 to 2022</td>
-      <td>11.0</td>
+      <td>10.0</td>
       <td>09:32, 10:13, 10:33, 10:53, 11:13, 11:33, 11:5...</td>
-      <td>1.25</td>
-      <td>2.24</td>
-      <td>2.43</td>
-      <td>24240.60</td>
-      <td>27291.64</td>
-      <td>56324.20</td>
+      <td>1.34</td>
+      <td>2.51</td>
+      <td>2.76</td>
+      <td>20933.28</td>
+      <td>29184.00</td>
+      <td>55997.96</td>
     </tr>
     <tr>
       <th>2024</th>
       <td>2022-05 to 2023</td>
-      <td>13.0</td>
-      <td>09:32, 10:33, 10:53, 12:53, 13:53, 14:33, 15:53</td>
-      <td>1.31</td>
-      <td>2.05</td>
-      <td>1.44</td>
-      <td>27810.76</td>
-      <td>25997.60</td>
-      <td>39950.48</td>
+      <td>14.0</td>
+      <td>09:32, 10:33, 10:53, 12:53, 13:53, 15:53</td>
+      <td>1.17</td>
+      <td>2.18</td>
+      <td>1.53</td>
+      <td>24534.52</td>
+      <td>27668.12</td>
+      <td>38624.56</td>
     </tr>
     <tr>
       <th>2025</th>
       <td>2022-05 to 2024</td>
-      <td>12.0</td>
-      <td>09:32, 09:52, 10:13, 10:33, 12:33, 12:53, 14:3...</td>
-      <td>2.03</td>
-      <td>2.57</td>
-      <td>2.31</td>
-      <td>31527.00</td>
-      <td>27280.52</td>
-      <td>49777.28</td>
+      <td>13.0</td>
+      <td>09:32, 09:52, 10:13, 10:33, 12:33, 12:53, 14:33</td>
+      <td>2.35</td>
+      <td>2.19</td>
+      <td>2.52</td>
+      <td>34908.16</td>
+      <td>25637.40</td>
+      <td>53449.08</td>
     </tr>
     <tr>
       <th>2026</th>
       <td>2022-05 to 2025</td>
-      <td>12.0</td>
-      <td>09:32, 09:52, 10:13, 10:33, 12:33, 14:33, 15:3...</td>
-      <td>3.78</td>
-      <td>3.59</td>
-      <td>3.00</td>
-      <td>17551.44</td>
-      <td>11734.36</td>
-      <td>20006.92</td>
+      <td>11.0</td>
+      <td>09:32, 09:52, 10:13, 10:33, 10:53, 12:33, 12:5...</td>
+      <td>3.85</td>
+      <td>3.62</td>
+      <td>2.92</td>
+      <td>15521.64</td>
+      <td>11523.36</td>
+      <td>18603.72</td>
     </tr>
     <tr>
       <th>out of sample</th>
       <td>expanding</td>
       <td>NaN</td>
       <td>-</td>
-      <td>1.69</td>
-      <td>2.39</td>
-      <td>2.11</td>
-      <td>101129.80</td>
-      <td>92304.12</td>
-      <td>166058.88</td>
+      <td>1.77</td>
+      <td>2.40</td>
+      <td>2.30</td>
+      <td>95897.60</td>
+      <td>94012.88</td>
+      <td>166675.32</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
-    chosen-each-year vs all 20, out of sample: Sharpe difference 95% interval -0.79 to -0.04; better in 2% of resamples
+    chosen-each-year vs all 20, out of sample: Sharpe difference 95% interval -0.96 to -0.15; better in 0% of resamples
     
 
-**Forward selection on this book:** it starts with 11:53 (the best tranche alone), then adds 13:53, 12:13, 14:13, 11:33, 13:13 and 14:53:
-**the strategy's 7, in that order** (Sharpe 2.48 at step 7). It goes on to 11:13 (2.56) and 13:33, where it peaks (2.58, 9 tranches), is
-flat to 12 tranches and falls after.
+**Forward selection on this book** (ratio cap on): it starts with 11:53, then adds 13:53, 12:13, 14:13, **14:53**, 11:33 and 13:13 (Sharpe
+2.60 at 7: the previous live set), then **13:33** eighth (2.66), 11:13 (2.73) and 14:33, and plateaus at 2.75 (10-12 tranches).
+
+- **The live 7 are not a forward-selection prefix any more:** they are the first six plus 13:33 (the eighth), skipping 14:53. That set
+  scores 2.49 here, against 2.60 for the first seven.
 
 **Walk-forward:** for each year from 2023, the selection is re-run on every earlier year only and its pick traded in the next year.
 
 | test year | tranches chosen | chosen on earlier years | the strategy's 7 | all 20 |
 |---|---|---|---|---|
-| 2023 | 11 | 1.25 (\$24.2k) | 2.24 (\$27.3k) | 2.43 (\$56.3k) |
-| 2024 | 13 | 1.31 (\$27.8k) | 2.05 (\$26.0k) | 1.44 (\$40.0k) |
-| 2025 | 12 | 2.03 (\$31.5k) | 2.57 (\$27.3k) | 2.31 (\$49.8k) |
-| 2026 | 12 | 3.78 (\$17.6k) | 3.59 (\$11.7k) | 3.00 (\$20.0k) |
-| **2023-26** | | **1.69 (\$101.1k)** | **2.39 (\$92.3k)** | 2.11 (\$166.1k) |
+| 2023 | 10 | 1.34 (\$20.9k) | 2.51 (\$29.2k) | 2.76 (\$56.0k) |
+| 2024 | 14 | 1.17 (\$24.5k) | 2.18 (\$27.7k) | 1.53 (\$38.6k) |
+| 2025 | 13 | 2.35 (\$34.9k) | 2.19 (\$25.6k) | 2.52 (\$53.4k) |
+| 2026 | 11 | 3.85 (\$15.5k) | 3.62 (\$11.5k) | 2.92 (\$18.6k) |
+| **2023-26** | | **1.77 (\$95.9k)** | **2.40 (\$94.0k)** | 2.30 (\$166.7k) |
 
-- **Re-chosen each year, the selection does worse than trading all 20** (1.69 against 2.11 out of sample; better in only 2% of resamples):
-  with little history it keeps too few tranches, and not always the right ones.
-- **The strategy's 7 score 2.39 over the same years**, ahead of all 20 (2.11), but that set was chosen on all the data, so part of its edge
-  is hindsight. It makes \$92.3k against all 20's \$166.1k.
+- **Re-chosen each year, the selection does worse than trading all 20** (1.77 against 2.30 out of sample; better in under 1% of resamples).
+- **The strategy's 7 score 2.40 over the same years**, a little ahead of all 20 (2.30), but chosen with hindsight.
 - **What holds every year is the first hour:** every walk-forward pick drops 09:32 and 10:33, and three of four drop 10:13.
 
 **Forward selection by drawdown, on its own terms.** A separate search that takes nothing from the strategy's tranche set: **every other
@@ -6023,7 +6435,7 @@ peaks. (Minimising the drawdown alone would just pick the tranches that barely t
 
 
     
-![png](ic_analysis_files/output_52_0.png)
+![png](ic_analysis_files/output_55_0.png)
     
 
 
@@ -6884,14 +7296,10 @@ peaks. (Minimising the drawdown alone would just pick the tranches that barely t
 | 16 | 13:33 | 2,934 | \$192.1k | 2.66 | -\$7.8k | 24.7 |
 | 20 | all | 3,940 | \$211.4k | 2.40 | -\$12.7k | 16.6 |
 
-- **It peaks at 8 tranches: 10:53, 11:13, 11:33, 12:13, 13:53, 14:13, 14:53 and 15:53**, at \$39.8 of P/L per \$ of drawdown: 1,474 trades,
-  \$102.8k, Sharpe 2.29 (2.28 / 2.31 in the two halves), drawdown -\$2.6k.
-- **15:53 is a passenger:** with the ratio cap on it trades twice in four years, so it neither helps nor hurts; the working set is the
-  other seven.
-- **Past the peak, each tranche adds more drawdown than profit:** 11:53 and 13:13 still raise Sharpe (to 2.62 at 12) but deepen the
-  drawdown to -\$4.1k; from 13 tranches on the drawdown grows fast (-\$5.2k to -\$12.7k).
-- **Drawdown and Sharpe point to different sizes:** the ratio peaks at 8 tranches with Sharpe 2.29; Sharpe keeps rising to 2.66 at 16
-  tranches, where the drawdown is three times as deep.
+- **It peaks at 8 tranches: 10:53, 11:13, 11:33, 12:13, 13:53, 14:13, 14:53 and 15:53** (\$39.8 of P/L per \$ of drawdown: \$102.8k, Sharpe
+  2.29, drawdown -\$2.6k). 15:53 trades twice in four years, so the working set is the other seven.
+- **By drawdown, 14:53 is the first tranche picked and 13:33 the 16th:** 13:33 adds the most drawdown per dollar earned of the midday
+  tranches (Section 11 shows why).
 
 **Your 7 against the other sets, with every other setting on** (the finished strategy, only the tranches changed):
 
@@ -6913,23 +7321,23 @@ peaks. (Minimising the drawdown alone would just pick the tranches that barely t
   <tbody>
     <tr>
       <th>the strategy's 7</th>
-      <td>1450.0</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>2.44</td>
-      <td>2.92</td>
-      <td>-3808.68</td>
-      <td>29.42</td>
+      <td>1528.0</td>
+      <td>115481.68</td>
+      <td>2.49</td>
+      <td>2.48</td>
+      <td>2.51</td>
+      <td>-6501.16</td>
+      <td>17.76</td>
     </tr>
     <tr>
-      <th>forward selection's peak (9)</th>
-      <td>1892.0</td>
-      <td>141864.52</td>
-      <td>2.73</td>
+      <th>forward selection's peak (11)</th>
+      <td>2054.0</td>
+      <td>150655.24</td>
+      <td>2.75</td>
       <td>2.64</td>
-      <td>2.93</td>
-      <td>-5975.20</td>
-      <td>23.74</td>
+      <td>2.99</td>
+      <td>-5764.72</td>
+      <td>26.13</td>
     </tr>
     <tr>
       <th>forward selection by drawdown (8)</th>
@@ -6942,7 +7350,17 @@ peaks. (Minimising the drawdown alone would just pick the tranches that barely t
       <td>39.82</td>
     </tr>
     <tr>
-      <th>previous live set (15)</th>
+      <th>previous 7 (with 14:53)</th>
+      <td>1450.0</td>
+      <td>112044.00</td>
+      <td>2.60</td>
+      <td>2.44</td>
+      <td>2.92</td>
+      <td>-3808.68</td>
+      <td>29.42</td>
+    </tr>
+    <tr>
+      <th>earlier live set (15)</th>
       <td>2704.0</td>
       <td>180418.24</td>
       <td>2.69</td>
@@ -6968,451 +7386,27 @@ peaks. (Minimising the drawdown alone would just pick the tranches that barely t
 
 | tranche set (everything else on) | trades | total P/L | Sharpe | 2022-24 / 2025-26 | max drawdown | P/L per \$ of drawdown |
 |---|---|---|---|---|---|---|
-| **the strategy's 7** | **1,450** | \$112.0k | 2.60 | 2.44 / 2.92 | -\$3.8k | 29.4 |
-| forward selection's peak (the 7 + 11:13, 13:33) | 1,892 | \$141.9k | **2.73** | 2.64 / 2.93 | -\$6.0k | 23.7 |
+| **the strategy's 7 (with 13:33)** | **1,528** | \$115.5k | 2.49 | 2.48 / 2.51 | -\$6.5k | 17.8 |
+| previous 7 (with 14:53) | 1,450 | \$112.0k | 2.60 | 2.44 / **2.92** | -\$3.8k | 29.4 |
+| forward selection's peak (11) | 2,054 | \$150.7k | **2.75** | 2.64 / **2.99** | -\$5.8k | 26.1 |
 | forward selection by drawdown (8) | 1,474 | \$102.8k | 2.29 | 2.28 / 2.31 | **-\$2.6k** | **39.8** |
-| previous live set (15) | 2,704 | \$180.4k | 2.69 | 2.64 / 2.82 | -\$6.5k | 27.6 |
+| earlier live set (15) | 2,704 | \$180.4k | 2.69 | 2.64 / 2.82 | -\$6.5k | 27.6 |
 | all 20 | 3,940 | **\$211.4k** | 2.40 | 2.30 / 2.61 | -\$12.7k | 16.6 |
 
-- **The drawdown pick has the smallest drawdown (-\$2.6k) and the most P/L per \$ of drawdown (39.8)**, but the lowest Sharpe here (2.29)
-  and the weakest 2025-26 (2.31).
-- **The 7 come next on drawdown (-\$3.8k, 29.4)**, with the best 2025-26 Sharpe alongside the Sharpe pick.
-- **They don't have the highest Sharpe:** adding 11:13 and 13:33 (the 9) scores 2.73 for \$29.8k more, and the previous 15 score 2.69 for
-  \$68.4k more, each with a drawdown \$2-3k deeper. Fewer tranches means fewer trading days, and every idle day pays the 4% hurdle.
-- **The trade-off is size against depth:** the 7 are the smallest, steadiest book; the 9 and the 15 score a higher Sharpe but draw down
-  further.
-
-## 8. Step 6: the short/long ratio <= 4, on the book after steps 1-5
-
-The backtester caps one short/long ratio for the whole condor: the two short strikes' prices over the two long strikes'.
-
-
-<div>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>spearman_condor</th>
-      <th>ci_low</th>
-      <th>ci_high</th>
-      <th>spearman_session</th>
-      <th>pearson_condor</th>
-      <th>p60_ratio</th>
-      <th>spearman_below_p60</th>
-      <th>spearman_above_p60</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>whole condor</th>
-      <td>0.156</td>
-      <td>0.049</td>
-      <td>0.262</td>
-      <td>0.09</td>
-      <td>-0.11</td>
-      <td>2.651</td>
-      <td>0.507</td>
-      <td>-0.078</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-    partial rank correlation with P/L, controlling for what the ratio moves with:
-    
-
-
-<div>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>whole condor</th>
-    </tr>
-    <tr>
-      <th>controlling for</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>none</th>
-      <td>0.156</td>
-    </tr>
-    <tr>
-      <th>credit</th>
-      <td>-0.055</td>
-    </tr>
-    <tr>
-      <th>strike distance (both sides)</th>
-      <td>0.044</td>
-    </tr>
-    <tr>
-      <th>entry time</th>
-      <td>0.149</td>
-    </tr>
-    <tr>
-      <th>VIX9D</th>
-      <td>0.167</td>
-    </tr>
-    <tr>
-      <th>credit, VIX9D, entry time</th>
-      <td>-0.019</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-    what the ratio moves with (rank correlation):
-    
-
-
-<div>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>whole condor</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>credit</th>
-      <td>0.89</td>
-    </tr>
-    <tr>
-      <th>otm_points_call</th>
-      <td>-0.95</td>
-    </tr>
-    <tr>
-      <th>otm_points_put</th>
-      <td>-0.96</td>
-    </tr>
-    <tr>
-      <th>mins_from_open</th>
-      <td>0.50</td>
-    </tr>
-    <tr>
-      <th>vix9d_open</th>
-      <td>-0.48</td>
-    </tr>
-    <tr>
-      <th>vvix_prev</th>
-      <td>-0.42</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-    rank correlation with P/L by year:
-    
-
-
-<div>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>whole condor</th>
-    </tr>
-    <tr>
-      <th>date</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>2022</th>
-      <td>0.576</td>
-    </tr>
-    <tr>
-      <th>2023</th>
-      <td>-0.006</td>
-    </tr>
-    <tr>
-      <th>2024</th>
-      <td>-0.012</td>
-    </tr>
-    <tr>
-      <th>2025</th>
-      <td>0.207</td>
-    </tr>
-    <tr>
-      <th>2026</th>
-      <td>0.586</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-    
-![png](ic_analysis_files/output_58_7.png)
-    
-
-
-
-<div>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>side</th>
-      <th>quintile</th>
-      <th>range</th>
-      <th>condors</th>
-      <th>trades</th>
-      <th>sessions</th>
-      <th>win_rate</th>
-      <th>avg_pl</th>
-      <th>total_pl</th>
-      <th>avg_pl_to_2024</th>
-      <th>avg_pl_from_2025</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>whole condor</td>
-      <td>1</td>
-      <td>1.25 to 1.87</td>
-      <td>159</td>
-      <td>318</td>
-      <td>67</td>
-      <td>89.9</td>
-      <td>134.2</td>
-      <td>21345.1</td>
-      <td>89.3</td>
-      <td>156.1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>whole condor</td>
-      <td>2</td>
-      <td>1.87 to 2.23</td>
-      <td>158</td>
-      <td>316</td>
-      <td>86</td>
-      <td>86.7</td>
-      <td>197.0</td>
-      <td>31123.0</td>
-      <td>195.0</td>
-      <td>200.8</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>whole condor</td>
-      <td>3</td>
-      <td>2.23 to 2.65</td>
-      <td>158</td>
-      <td>316</td>
-      <td>95</td>
-      <td>82.3</td>
-      <td>187.7</td>
-      <td>29660.0</td>
-      <td>205.0</td>
-      <td>151.5</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>whole condor</td>
-      <td>4</td>
-      <td>2.65 to 3.23</td>
-      <td>158</td>
-      <td>316</td>
-      <td>90</td>
-      <td>71.5</td>
-      <td>116.7</td>
-      <td>18437.0</td>
-      <td>140.2</td>
-      <td>37.1</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>whole condor</td>
-      <td>5</td>
-      <td>3.23 to 8.38</td>
-      <td>158</td>
-      <td>316</td>
-      <td>79</td>
-      <td>65.2</td>
-      <td>81.1</td>
-      <td>12806.0</td>
-      <td>78.8</td>
-      <td>92.5</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-<div>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th></th>
-      <th>kept_pct</th>
-      <th>trades</th>
-      <th>total_pl</th>
-      <th>sharpe</th>
-      <th>max_drawdown</th>
-      <th>sharpe_to_2024</th>
-      <th>sharpe_from_2025</th>
-    </tr>
-    <tr>
-      <th>side</th>
-      <th>max_ratio</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th rowspan="10" valign="top">whole condor</th>
-      <th>2.5</th>
-      <td>54.36</td>
-      <td>860</td>
-      <td>73415.60</td>
-      <td>2.03</td>
-      <td>-3012.16</td>
-      <td>1.62</td>
-      <td>2.72</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>73.96</td>
-      <td>1170</td>
-      <td>94966.20</td>
-      <td>2.45</td>
-      <td>-2357.04</td>
-      <td>2.30</td>
-      <td>2.73</td>
-    </tr>
-    <tr>
-      <th>3.5</th>
-      <td>85.34</td>
-      <td>1350</td>
-      <td>104427.00</td>
-      <td>2.49</td>
-      <td>-3271.64</td>
-      <td>2.33</td>
-      <td>2.82</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>91.66</td>
-      <td>1450</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>-3808.68</td>
-      <td>2.44</td>
-      <td>2.92</td>
-    </tr>
-    <tr>
-      <th>4.5</th>
-      <td>94.94</td>
-      <td>1502</td>
-      <td>113803.12</td>
-      <td>2.57</td>
-      <td>-4716.16</td>
-      <td>2.45</td>
-      <td>2.84</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>98.10</td>
-      <td>1552</td>
-      <td>112994.12</td>
-      <td>2.50</td>
-      <td>-5195.04</td>
-      <td>2.36</td>
-      <td>2.83</td>
-    </tr>
-    <tr>
-      <th>5.5</th>
-      <td>98.74</td>
-      <td>1562</td>
-      <td>112785.72</td>
-      <td>2.48</td>
-      <td>-4888.92</td>
-      <td>2.33</td>
-      <td>2.83</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>99.37</td>
-      <td>1572</td>
-      <td>113926.32</td>
-      <td>2.50</td>
-      <td>-4888.92</td>
-      <td>2.37</td>
-      <td>2.83</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>99.87</td>
-      <td>1580</td>
-      <td>112947.80</td>
-      <td>2.46</td>
-      <td>-4888.92</td>
-      <td>2.31</td>
-      <td>2.83</td>
-    </tr>
-    <tr>
-      <th>off</th>
-      <td>100.00</td>
-      <td>1582</td>
-      <td>113370.92</td>
-      <td>2.48</td>
-      <td>-4888.92</td>
-      <td>2.33</td>
-      <td>2.83</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-**On the 7 tranches the ratio's relationship with P/L is a hump.** Rank correlation with condor P/L +0.16 (interval +0.05 to +0.26);
-below its 60th percentile (2.65) +0.51, above it -0.08. The ratio is strike distance in another form (-0.95 to -0.96 with how far the shorts
-sit from spot, +0.89 with the credit).
-
-| condor short/long ratio | trades | avg P/L | win rate | 2022-24 / 2025-26 |
-|---|---|---|---|---|
-| 1.25-1.87 | 318 | +\$134 | 90% | +\$89 / +\$156 |
-| 1.87-2.23 | 316 | **+\$197** | 87% | +\$195 / +\$201 |
-| 2.23-2.65 | 316 | +\$188 | 82% | +\$205 / +\$152 |
-| 2.65-3.23 | 316 | +\$117 | 72% | +\$140 / +\$37 |
-| above 3.23 | 316 | +\$81 | **65%** | +\$79 / +\$93 |
-
-| maximum ratio | trades | total P/L | Sharpe | max drawdown |
-|---|---|---|---|---|
-| 3.5 | 1,350 | \$104.4k | 2.49 | -\$3.3k |
-| **4 (strategy)** | **1,450** | **\$112.0k** | **2.60** | -\$3.8k |
-| 4.5 | 1,502 | \$113.8k | 2.57 | -\$4.7k |
-| 5 | 1,552 | \$113.0k | 2.50 | -\$5.2k |
-| no cap | 1,582 | \$113.4k | 2.48 | -\$4.9k |
-
-- **On the 7 tranches the cap removes only 132 trades.** Those earn little (\$1.3k between them) and add risk: a cap of 4 is the peak (2.60
-  against 2.48 with no cap), and the drawdown is \$1.1k smaller.
+- **The swap (13:33 for 14:53) adds \$3.4k and costs 0.11 Sharpe, and the drawdown is 70% deeper** (-\$6.5k against -\$3.8k): 13:33 lost the
+  most of any tranche in the winter 2024-25 drawdown, while 14:53 made money through it (Section 11). It is better in 2022-24 (2.48 against
+  2.44) and clearly worse in 2025-26 (2.51 against 2.92).
+- **13:33 is the better tranche on its own** (rank 6 by P/L against 11 for 14:53, Section 11's Pareto), **but the worse addition to the
+  other six:** it moves with 13:13 and 13:53 and adds to their bad stretch, where 14:53 diversifies it.
+- **Of the sets tested, the new 7 have the second-lowest P/L per \$ of drawdown** (17.8, only ahead of all 20) and a drawdown as deep as the
+  earlier 15 tranches' (-\$6.5k) with less than two-thirds of their P/L.
 
 ## 9. The call and put stops: why the strategy uses neither
 
 Not a step: the strategy holds every condor to expiry. Here the finished strategy (all six settings) gets a call-side stop at every level,
 replayed the backtester's way: it fires when the call spread's worst intraday loss reached X% of its credit (never on the 16:00 settlement
 print) and fills where the option chain first crossed it, plus **\$0.20 per contract (\$20) slippage** and fees (blue); \$0 slippage for
-reference (grey); the dotted line is the strategy, with no stop. Every level trades the same 1,450 trades.
+reference (grey); the dotted line is the strategy, with no stop. Every level trades the same 1,528 trades.
 
 
     
@@ -7455,171 +7449,171 @@ reference (grey); the dotted line is the strategy, with no stop. Every level tra
     <tr>
       <th>off</th>
       <td>0.00</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>80.97</td>
-      <td>154.54</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>-3808.68</td>
-      <td>2.44</td>
-      <td>2.92</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>81.02</td>
+      <td>151.15</td>
+      <td>115481.68</td>
+      <td>2.49</td>
+      <td>-6501.16</td>
+      <td>2.48</td>
+      <td>2.51</td>
     </tr>
     <tr>
       <th>25</th>
-      <td>69.79</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>82.07</td>
-      <td>38.58</td>
-      <td>27973.08</td>
-      <td>-0.18</td>
-      <td>-6408.37</td>
-      <td>-0.27</td>
+      <td>70.68</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>83.12</td>
+      <td>39.08</td>
+      <td>29859.27</td>
+      <td>-0.08</td>
+      <td>-10105.83</td>
       <td>0.02</td>
+      <td>-0.32</td>
     </tr>
     <tr>
       <th>50</th>
-      <td>52.41</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>65.24</td>
-      <td>57.99</td>
-      <td>42039.20</td>
+      <td>53.80</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>65.58</td>
+      <td>56.09</td>
+      <td>42851.32</td>
       <td>0.47</td>
-      <td>-4868.86</td>
-      <td>0.34</td>
-      <td>0.78</td>
+      <td>-7661.33</td>
+      <td>0.48</td>
+      <td>0.44</td>
     </tr>
     <tr>
       <th>75</th>
-      <td>42.62</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>53.79</td>
-      <td>67.60</td>
-      <td>49010.97</td>
-      <td>0.75</td>
-      <td>-4292.98</td>
-      <td>0.55</td>
-      <td>1.21</td>
+      <td>43.85</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>54.19</td>
+      <td>66.37</td>
+      <td>50706.45</td>
+      <td>0.77</td>
+      <td>-6129.28</td>
+      <td>0.70</td>
+      <td>0.91</td>
     </tr>
     <tr>
       <th>100</th>
-      <td>35.59</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>54.48</td>
-      <td>78.41</td>
-      <td>56848.43</td>
-      <td>1.02</td>
-      <td>-4292.98</td>
-      <td>0.76</td>
-      <td>1.52</td>
+      <td>36.13</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>54.97</td>
+      <td>79.18</td>
+      <td>60492.22</td>
+      <td>1.09</td>
+      <td>-6289.60</td>
+      <td>0.97</td>
+      <td>1.33</td>
     </tr>
     <tr>
       <th>125</th>
-      <td>28.55</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>60.41</td>
-      <td>91.47</td>
-      <td>66316.24</td>
-      <td>1.35</td>
-      <td>-4392.98</td>
-      <td>1.09</td>
-      <td>1.84</td>
+      <td>29.84</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>59.69</td>
+      <td>89.42</td>
+      <td>68317.17</td>
+      <td>1.34</td>
+      <td>-6522.99</td>
+      <td>1.23</td>
+      <td>1.54</td>
     </tr>
     <tr>
       <th>150</th>
-      <td>23.59</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>64.69</td>
-      <td>99.98</td>
-      <td>72482.71</td>
-      <td>1.52</td>
-      <td>-4392.98</td>
-      <td>1.30</td>
-      <td>1.97</td>
+      <td>25.13</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>63.61</td>
+      <td>95.37</td>
+      <td>72863.88</td>
+      <td>1.44</td>
+      <td>-6765.59</td>
+      <td>1.32</td>
+      <td>1.69</td>
     </tr>
     <tr>
       <th>175</th>
-      <td>19.03</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>68.97</td>
-      <td>112.06</td>
-      <td>81243.63</td>
-      <td>1.76</td>
-      <td>-4450.50</td>
-      <td>1.58</td>
-      <td>2.12</td>
+      <td>21.47</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>67.02</td>
+      <td>102.45</td>
+      <td>78269.86</td>
+      <td>1.57</td>
+      <td>-7016.33</td>
+      <td>1.54</td>
+      <td>1.64</td>
     </tr>
     <tr>
       <th>200</th>
-      <td>16.14</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>71.59</td>
-      <td>120.19</td>
-      <td>87141.21</td>
-      <td>1.91</td>
-      <td>-3882.56</td>
-      <td>1.77</td>
-      <td>2.20</td>
+      <td>18.19</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>70.03</td>
+      <td>111.09</td>
+      <td>84871.13</td>
+      <td>1.75</td>
+      <td>-6292.87</td>
+      <td>1.74</td>
+      <td>1.76</td>
     </tr>
     <tr>
       <th>250</th>
-      <td>11.45</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>75.72</td>
-      <td>131.93</td>
-      <td>95650.81</td>
-      <td>2.16</td>
-      <td>-4056.56</td>
-      <td>2.11</td>
-      <td>2.25</td>
+      <td>12.70</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>75.13</td>
+      <td>126.27</td>
+      <td>96470.09</td>
+      <td>2.05</td>
+      <td>-6884.83</td>
+      <td>2.15</td>
+      <td>1.84</td>
     </tr>
     <tr>
       <th>300</th>
-      <td>9.10</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>77.10</td>
-      <td>135.28</td>
-      <td>98074.45</td>
-      <td>2.23</td>
-      <td>-3982.62</td>
-      <td>2.21</td>
-      <td>2.29</td>
+      <td>9.55</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>77.23</td>
+      <td>132.50</td>
+      <td>101226.75</td>
+      <td>2.17</td>
+      <td>-7120.31</td>
+      <td>2.37</td>
+      <td>1.75</td>
     </tr>
     <tr>
       <th>350</th>
-      <td>6.48</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>78.62</td>
-      <td>141.47</td>
-      <td>102569.15</td>
-      <td>2.37</td>
-      <td>-3808.68</td>
-      <td>2.31</td>
-      <td>2.49</td>
+      <td>6.41</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>78.93</td>
+      <td>140.03</td>
+      <td>106984.78</td>
+      <td>2.34</td>
+      <td>-6501.16</td>
+      <td>2.44</td>
+      <td>2.13</td>
     </tr>
     <tr>
       <th>400</th>
-      <td>4.41</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>79.59</td>
-      <td>145.98</td>
-      <td>105832.53</td>
-      <td>2.46</td>
-      <td>-3808.68</td>
-      <td>2.36</td>
-      <td>2.67</td>
+      <td>4.58</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>79.84</td>
+      <td>143.94</td>
+      <td>109972.64</td>
+      <td>2.41</td>
+      <td>-6501.16</td>
+      <td>2.47</td>
+      <td>2.27</td>
     </tr>
   </tbody>
 </table>
@@ -7628,24 +7622,24 @@ reference (grey); the dotted line is the strategy, with no stop. Every level tra
 
 | call stop at \$0.20 slippage | fires on | total P/L | Sharpe | max drawdown | 2022-24 / 2025-26 |
 |---|---|---|---|---|---|
-| **none (strategy)** | | **\$112.0k** | **2.60** | **-\$3.8k** | **2.44 / 2.92** |
-| 100% | 36% of condors | \$56.8k | 1.02 | -\$4.3k | 0.76 / 1.52 |
-| 200% | 16% | \$87.1k | 1.91 | -\$3.9k | 1.77 / 2.20 |
-| 300% | 9% | \$98.1k | 2.23 | -\$4.0k | 2.21 / 2.29 |
-| 400% | 4% | \$105.8k | 2.46 | -\$3.8k | 2.36 / 2.67 |
+| **none (strategy)** | | **\$115.5k** | **2.49** | -\$6.5k | **2.48 / 2.51** |
+| 100% | 36% of condors | \$60.5k | 1.09 | -\$6.3k | 0.97 / 1.33 |
+| 200% | 18% | \$84.9k | 1.75 | -\$6.3k | 1.74 / 1.76 |
+| 300% | 10% | \$101.2k | 2.17 | -\$7.1k | 2.37 / 1.75 |
+| 400% | 5% | \$110.0k | 2.41 | -\$6.5k | 2.47 / 2.27 |
 
-- **Every stop level lowers Sharpe and P/L, in both halves, and none makes the drawdown smaller.** The 400% stop the strategy used until now
-  costs 0.14 Sharpe and \$6.2k for the same -\$3.8k drawdown.
+- **Every call-stop level lowers Sharpe and P/L, and none cuts the drawdown by more than \$0.4k.** The 400% stop costs 0.08 Sharpe and \$5.5k
+  for the same -\$6.5k drawdown.
 - **The entry filters already do the stop's job:** with SPX at or below the open and above its 10-day SMA, the call side rarely runs away, so a
   stopped call usually would have recovered by the close. Tight stops are ruined by slippage and real fills (at 25-100% the stop fires on
-  36-70% of condors and Sharpe falls to -0.18 to 1.02).
-- **What the backtest can't show is a day far worse than any in these four years.** Going without a stop accepts that risk; the -\$3.8k
-  drawdown is the worst the data shows, not the worst possible.
+  36-71% of condors and Sharpe falls to -0.08 to 1.09).
+- **What the backtest can't show is a day far worse than any in these four years.** Going without a stop accepts that risk (Section 14
+  shows it arriving in 2026).
 
 ### The same test on the puts
 
 The same replay on the put side: a put-side stop at every level, filled where the option chain first crossed it, plus \$0.20 per contract
-slippage and fees (blue; \$0 slippage in grey), the call side held to expiry. The dotted line is the strategy, with no stop. Same 1,450
+slippage and fees (blue; \$0 slippage in grey), the call side held to expiry. The dotted line is the strategy, with no stop. Same 1,528
 trades at every level.
 
 
@@ -7689,171 +7683,171 @@ trades at every level.
     <tr>
       <th>off</th>
       <td>0.00</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>80.97</td>
-      <td>154.54</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>-3808.68</td>
-      <td>2.44</td>
-      <td>2.92</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>81.02</td>
+      <td>151.15</td>
+      <td>115481.68</td>
+      <td>2.49</td>
+      <td>-6501.16</td>
+      <td>2.48</td>
+      <td>2.51</td>
     </tr>
     <tr>
       <th>25</th>
-      <td>74.76</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>84.00</td>
-      <td>52.85</td>
-      <td>38313.67</td>
-      <td>0.34</td>
-      <td>-4098.26</td>
-      <td>0.40</td>
-      <td>0.22</td>
+      <td>75.13</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>84.29</td>
+      <td>50.64</td>
+      <td>38688.67</td>
+      <td>0.32</td>
+      <td>-5109.02</td>
+      <td>0.38</td>
+      <td>0.20</td>
     </tr>
     <tr>
       <th>50</th>
-      <td>57.52</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>82.21</td>
-      <td>66.15</td>
-      <td>47958.01</td>
-      <td>0.77</td>
-      <td>-3926.68</td>
-      <td>0.92</td>
-      <td>0.47</td>
+      <td>58.38</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>82.46</td>
+      <td>62.57</td>
+      <td>47806.16</td>
+      <td>0.68</td>
+      <td>-5094.38</td>
+      <td>0.85</td>
+      <td>0.33</td>
     </tr>
     <tr>
       <th>75</th>
-      <td>47.03</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>71.17</td>
-      <td>75.81</td>
-      <td>54964.50</td>
-      <td>1.03</td>
-      <td>-3191.60</td>
-      <td>1.29</td>
-      <td>0.49</td>
+      <td>47.91</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>72.12</td>
+      <td>71.81</td>
+      <td>54865.32</td>
+      <td>0.92</td>
+      <td>-4873.38</td>
+      <td>1.20</td>
+      <td>0.35</td>
     </tr>
     <tr>
       <th>100</th>
-      <td>38.76</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>63.45</td>
-      <td>86.71</td>
-      <td>62867.32</td>
-      <td>1.29</td>
-      <td>-4687.50</td>
-      <td>1.57</td>
-      <td>0.72</td>
+      <td>39.66</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>63.35</td>
+      <td>81.34</td>
+      <td>62142.31</td>
+      <td>1.15</td>
+      <td>-6777.03</td>
+      <td>1.47</td>
+      <td>0.50</td>
     </tr>
     <tr>
       <th>125</th>
-      <td>32.83</td>
-      <td>187</td>
-      <td>1450</td>
+      <td>33.51</td>
+      <td>182</td>
+      <td>1528</td>
       <td>59.03</td>
-      <td>93.36</td>
-      <td>67687.65</td>
-      <td>1.40</td>
-      <td>-5564.73</td>
-      <td>1.73</td>
-      <td>0.72</td>
+      <td>89.25</td>
+      <td>68187.95</td>
+      <td>1.31</td>
+      <td>-7615.32</td>
+      <td>1.71</td>
+      <td>0.48</td>
     </tr>
     <tr>
       <th>150</th>
-      <td>30.48</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>59.31</td>
-      <td>91.11</td>
-      <td>66053.96</td>
-      <td>1.31</td>
-      <td>-7358.33</td>
-      <td>1.63</td>
-      <td>0.67</td>
+      <td>31.15</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>59.03</td>
+      <td>86.72</td>
+      <td>66251.10</td>
+      <td>1.22</td>
+      <td>-9055.97</td>
+      <td>1.64</td>
+      <td>0.38</td>
     </tr>
     <tr>
       <th>175</th>
-      <td>26.07</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>62.62</td>
-      <td>98.54</td>
-      <td>71441.15</td>
-      <td>1.44</td>
-      <td>-8558.52</td>
-      <td>1.90</td>
-      <td>0.53</td>
+      <td>25.92</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>62.96</td>
+      <td>96.84</td>
+      <td>73982.99</td>
+      <td>1.43</td>
+      <td>-9491.54</td>
+      <td>1.91</td>
+      <td>0.42</td>
     </tr>
     <tr>
       <th>200</th>
-      <td>22.34</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>65.79</td>
-      <td>107.43</td>
-      <td>77883.22</td>
-      <td>1.64</td>
-      <td>-7830.13</td>
-      <td>2.11</td>
-      <td>0.72</td>
+      <td>22.64</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>65.71</td>
+      <td>103.41</td>
+      <td>79006.38</td>
+      <td>1.56</td>
+      <td>-10297.91</td>
+      <td>2.08</td>
+      <td>0.45</td>
     </tr>
     <tr>
       <th>250</th>
-      <td>18.76</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>69.10</td>
-      <td>112.57</td>
-      <td>81612.85</td>
-      <td>1.73</td>
-      <td>-5315.73</td>
+      <td>18.85</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>68.98</td>
+      <td>108.41</td>
+      <td>82822.24</td>
+      <td>1.67</td>
+      <td>-8845.90</td>
       <td>2.06</td>
-      <td>1.06</td>
+      <td>0.79</td>
     </tr>
     <tr>
       <th>300</th>
-      <td>15.72</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>71.59</td>
-      <td>115.66</td>
-      <td>83851.58</td>
-      <td>1.77</td>
-      <td>-4637.92</td>
-      <td>2.07</td>
-      <td>1.13</td>
+      <td>15.58</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>71.86</td>
+      <td>113.07</td>
+      <td>86382.45</td>
+      <td>1.73</td>
+      <td>-8636.01</td>
+      <td>2.09</td>
+      <td>0.93</td>
     </tr>
     <tr>
       <th>350</th>
-      <td>13.10</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>73.52</td>
-      <td>116.88</td>
-      <td>84741.26</td>
-      <td>1.75</td>
-      <td>-4601.38</td>
-      <td>1.99</td>
-      <td>1.25</td>
+      <td>13.09</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>73.82</td>
+      <td>114.66</td>
+      <td>87602.69</td>
+      <td>1.72</td>
+      <td>-8859.91</td>
+      <td>2.03</td>
+      <td>1.02</td>
     </tr>
     <tr>
       <th>400</th>
-      <td>9.79</td>
-      <td>187</td>
-      <td>1450</td>
-      <td>75.72</td>
-      <td>124.47</td>
-      <td>90244.15</td>
-      <td>1.91</td>
-      <td>-4544.33</td>
-      <td>2.10</td>
-      <td>1.51</td>
+      <td>9.69</td>
+      <td>182</td>
+      <td>1528</td>
+      <td>76.05</td>
+      <td>122.61</td>
+      <td>93674.89</td>
+      <td>1.88</td>
+      <td>-8104.86</td>
+      <td>2.12</td>
+      <td>1.36</td>
     </tr>
   </tbody>
 </table>
@@ -7862,29 +7856,26 @@ trades at every level.
 
 | put stop at \$0.20 slippage | fires on | total P/L | Sharpe | max drawdown | 2022-24 / 2025-26 |
 |---|---|---|---|---|---|
-| **none (strategy)** | | **\$112.0k** | **2.60** | **-\$3.8k** | **2.44 / 2.92** |
-| 100% | 39% of condors | \$62.9k | 1.29 | -\$4.7k | 1.57 / 0.72 |
-| 200% | 22% | \$77.9k | 1.64 | -\$7.8k | 2.11 / 0.72 |
-| 300% | 16% | \$83.9k | 1.77 | -\$4.6k | 2.07 / 1.13 |
-| 400% | 10% | \$90.2k | 1.91 | -\$4.5k | 2.10 / 1.51 |
+| **none (strategy)** | | **\$115.5k** | **2.49** | **-\$6.5k** | **2.48 / 2.51** |
+| 100% | 40% of condors | \$62.1k | 1.15 | -\$6.8k | 1.47 / 0.50 |
+| 200% | 23% | \$79.0k | 1.56 | -\$10.3k | 2.08 / 0.45 |
+| 300% | 16% | \$86.4k | 1.73 | -\$8.6k | 2.09 / 0.93 |
+| 400% | 10% | \$93.7k | 1.88 | -\$8.1k | 2.12 / 1.36 |
 
 | a 400% stop on each side | fires on | spreads stopped | of them, would have expired winning | P/L of the stopped spreads: stopped / held | cost of the stop | Sharpe |
 |---|---|---|---|---|---|---|
-| call side | 4% of condors | 32 | 31% | -\$21.1k / -\$14.9k | -\$6.2k | 2.46 |
-| **put side** | **10%** | **71** | **42%** | **-\$41.7k / -\$19.9k** | **-\$21.8k** | **1.91** |
+| call side | 5% of condors | 35 | 26% | -\$23.6k / -\$18.1k | -\$5.5k | 2.41 |
+| **put side** | **10%** | **74** | **42%** | **-\$43.9k / -\$22.1k** | **-\$21.8k** | **1.88** |
 
-- **A put stop costs far more than a call stop:** the 400% put stop takes Sharpe from 2.60 to 1.91 and P/L down \$21.8k (the call stop:
-  2.46, -\$6.2k), and it makes the drawdown deeper (-\$4.5k), not shallower. Even with no slippage the best put stop scores 1.96. Only the 75%
-  level trims the drawdown (to -\$3.2k), at a Sharpe of 1.03.
-- **The put side touches its stop twice as often and recovers more often:** 71 put spreads reached 400% against 32 calls, and 42% of
-  those puts would have expired winning (31% of the calls). Stopping them turns -\$19.9k of held losses into -\$41.7k.
-- **The reason is the entry rule:** the strategy sells its condor after SPX has dipped below its open, in an uptrend (above its 10-day
-  SMA). Those intraday dips usually revert by the close, so a put that is deep in trouble at 13:00 is often fine at 16:00, and a stop
-  sells it at the worst point.
-- **It hurts most in 2025-26** (2.92 -> 1.51 at 400%).
-- **The 2026 drawdown (Section 14) can't be tested here:** its two put-side days (2026-06-16 and 06-17) are after the option-chain data
-  ends. Whether a put stop would have cut them is a question for the backtester, but over 2022-2026 a put stop costs much more than it
-  saves.
+- **A put stop costs far more than a call stop:** the 400% put stop takes Sharpe from 2.49 to 1.88 and P/L down \$21.8k, and makes the drawdown
+  deeper (-\$8.1k), not shallower. Even with no slippage the best put stop scores 1.93. Only the 25-75% levels trim the drawdown (to
+  -\$4.9k to -\$5.1k), at a Sharpe of 0.3-0.9.
+- **The put side touches its stop twice as often and recovers more often:** 74 put spreads reached 400% against 35 calls, and 42% of those
+  puts would have expired winning (26% of the calls).
+- **The reason is the entry rule:** the strategy sells after SPX has dipped below its open, in an uptrend (above its 10-day SMA). Those
+  intraday dips usually revert by the close, so a put deep in trouble at 13:00 is often fine at 16:00, and a stop sells it at the worst point.
+- **It hurts most in 2025-26** (2.51 -> 1.36 at 400%). The 2026 drawdown's put-side days (2026-06-16 and 06-17) are after the option-chain
+  data ends (2025-12-30), so they can't be tested here.
 
 ## 10. With everything on: is each threshold still at its best?
 
@@ -7924,36 +7915,36 @@ bar at step 3). The real test is with **everything** on: each threshold moved on
     <tr>
       <th>ts_high</th>
       <td>1.02</td>
-      <td>2.6</td>
+      <td>2.49</td>
       <td>1.02</td>
-      <td>2.6</td>
+      <td>2.49</td>
       <td>1.02</td>
       <td>1.04</td>
     </tr>
     <tr>
       <th>ts_low</th>
       <td>0.87</td>
-      <td>2.6</td>
+      <td>2.49</td>
       <td>0.87</td>
-      <td>2.6</td>
+      <td>2.49</td>
       <td>0.87</td>
       <td>0.87</td>
     </tr>
     <tr>
       <th>max_move</th>
       <td>0</td>
-      <td>2.6</td>
+      <td>2.49</td>
       <td>0</td>
-      <td>2.6</td>
+      <td>2.49</td>
       <td>0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>sma10_min</th>
       <td>0</td>
-      <td>2.6</td>
+      <td>2.49</td>
       <td>0</td>
-      <td>2.6</td>
+      <td>2.49</td>
       <td>0</td>
       <td>0</td>
     </tr>
@@ -7993,103 +7984,103 @@ bar at step 3). The real test is with **everything** on: each threshold moved on
     <tr>
       <th rowspan="10" valign="top">whole condor</th>
       <th>2.5</th>
-      <td>54.36</td>
-      <td>860</td>
-      <td>73415.60</td>
-      <td>2.03</td>
-      <td>-3012.16</td>
-      <td>1.62</td>
-      <td>2.72</td>
+      <td>56.93</td>
+      <td>904</td>
+      <td>74838.24</td>
+      <td>1.89</td>
+      <td>-3092.16</td>
+      <td>1.55</td>
+      <td>2.48</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>73.96</td>
-      <td>1170</td>
-      <td>94966.20</td>
-      <td>2.45</td>
-      <td>-2357.04</td>
-      <td>2.30</td>
-      <td>2.73</td>
+      <td>78.46</td>
+      <td>1246</td>
+      <td>97605.76</td>
+      <td>2.27</td>
+      <td>-4908.76</td>
+      <td>2.20</td>
+      <td>2.38</td>
     </tr>
     <tr>
       <th>3.5</th>
-      <td>85.34</td>
-      <td>1350</td>
-      <td>104427.00</td>
-      <td>2.49</td>
-      <td>-3271.64</td>
-      <td>2.33</td>
-      <td>2.82</td>
+      <td>90.93</td>
+      <td>1444</td>
+      <td>111968.64</td>
+      <td>2.48</td>
+      <td>-5947.28</td>
+      <td>2.48</td>
+      <td>2.47</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>91.66</td>
-      <td>1450</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>-3808.68</td>
-      <td>2.44</td>
-      <td>2.92</td>
+      <td>96.22</td>
+      <td>1528</td>
+      <td>115481.68</td>
+      <td>2.49</td>
+      <td>-6501.16</td>
+      <td>2.48</td>
+      <td>2.51</td>
     </tr>
     <tr>
       <th>4.5</th>
-      <td>94.94</td>
-      <td>1502</td>
-      <td>113803.12</td>
-      <td>2.57</td>
-      <td>-4716.16</td>
-      <td>2.45</td>
-      <td>2.84</td>
+      <td>98.87</td>
+      <td>1570</td>
+      <td>116100.20</td>
+      <td>2.43</td>
+      <td>-8197.80</td>
+      <td>2.40</td>
+      <td>2.53</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>98.10</td>
-      <td>1552</td>
-      <td>112994.12</td>
-      <td>2.50</td>
-      <td>-5195.04</td>
-      <td>2.36</td>
-      <td>2.83</td>
+      <td>99.75</td>
+      <td>1584</td>
+      <td>115101.04</td>
+      <td>2.38</td>
+      <td>-8676.68</td>
+      <td>2.32</td>
+      <td>2.53</td>
     </tr>
     <tr>
       <th>5.5</th>
-      <td>98.74</td>
-      <td>1562</td>
-      <td>112785.72</td>
-      <td>2.48</td>
-      <td>-4888.92</td>
-      <td>2.33</td>
-      <td>2.83</td>
+      <td>100.00</td>
+      <td>1588</td>
+      <td>114968.28</td>
+      <td>2.35</td>
+      <td>-8676.68</td>
+      <td>2.29</td>
+      <td>2.53</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>99.37</td>
-      <td>1572</td>
-      <td>113926.32</td>
-      <td>2.50</td>
-      <td>-4888.92</td>
-      <td>2.37</td>
-      <td>2.83</td>
+      <td>100.00</td>
+      <td>1588</td>
+      <td>114968.28</td>
+      <td>2.35</td>
+      <td>-8676.68</td>
+      <td>2.29</td>
+      <td>2.53</td>
     </tr>
     <tr>
       <th>7</th>
-      <td>99.87</td>
-      <td>1580</td>
-      <td>112947.80</td>
-      <td>2.46</td>
-      <td>-4888.92</td>
-      <td>2.31</td>
-      <td>2.83</td>
+      <td>100.00</td>
+      <td>1588</td>
+      <td>114968.28</td>
+      <td>2.35</td>
+      <td>-8676.68</td>
+      <td>2.29</td>
+      <td>2.53</td>
     </tr>
     <tr>
       <th>off</th>
       <td>100.00</td>
-      <td>1582</td>
-      <td>113370.92</td>
-      <td>2.48</td>
-      <td>-4888.92</td>
-      <td>2.33</td>
-      <td>2.83</td>
+      <td>1588</td>
+      <td>114968.28</td>
+      <td>2.35</td>
+      <td>-8676.68</td>
+      <td>2.29</td>
+      <td>2.53</td>
     </tr>
   </tbody>
 </table>
@@ -8098,19 +8089,19 @@ bar at step 3). The real test is with **everything** on: each threshold moved on
 
 | threshold | strategy | Sharpe | nearest alternatives | verdict |
 |---|---|---|---|---|
-| floor (VIX9D/VIX >=) | 0.87 | **2.60** | 0.85: 2.27; 0.89: 2.31 | **at the peak** |
-| cap (VIX9D/VIX <=) | 1.02 | **2.60** | 1.03: 2.38; 1.04: 2.49 | **at the peak** |
-| max move up | 0% | **2.60** | -0.05%: 2.26; +0.05%: 2.44 | **at the peak** |
-| SMA10 bar | 0% | **2.60** | -0.5%: 2.06; +0.5%: 2.22 | **at the peak** |
-| short/long cap | 4 | **2.60** | 3.5: 2.49; 4.5: 2.57 | **at the peak** |
+| floor (VIX9D/VIX >=) | 0.87 | **2.49** | 0.85: 2.13; 0.89: 2.23 | **at the peak** |
+| cap (VIX9D/VIX <=) | 1.02 | **2.49** | 1.03: 2.32; 1.04: 2.41 | **at the peak** |
+| max move up | 0% | **2.49** | -0.05%: 2.19; +0.05%: 2.31 | **at the peak** |
+| SMA10 bar | 0% | **2.49** | -0.5%: 1.90; +0.5%: 2.17 | **at the peak** |
+| short/long cap | 4 | **2.49** | 3.5: 2.48; 4.5: 2.43 | **at the peak** (3.5 is level) |
 
-**With everything on, every threshold is at the top of its sweep, by a clear margin.** The +0.5% SMA10 bar that led at step 3 was ahead only
-because the band wasn't on yet.
+**With everything on, every threshold is at the top of its sweep.** The +0.5% SMA10 bar that led at step 3 was ahead only because the band
+wasn't on yet. In 2025-26 alone, a slightly looser cap (1.04: 2.64 against 2.51) scores higher.
 
 ## 11. Drawdowns by tranche: where the losses come from, and whether to cut the 7 further
 
-Everything in this section is on **the finished strategy** (all six settings, held to expiry): 1,450 trades, \$112.0k, Sharpe 2.60, max
-drawdown -\$3.8k. First, the book's drawdowns: the equity curve, the curve below its last peak, and its five deepest drawdowns.
+Everything in this section is on **the finished strategy** (all six settings, held to expiry): 1,528 trades, \$115.5k, Sharpe 2.49, max
+drawdown -\$6.5k. First, the book's drawdowns: the equity curve, the curve below its last peak, and its five deepest drawdowns.
 
 
     
@@ -8145,47 +8136,47 @@ drawdown -\$3.8k. First, the book's drawdowns: the equity curve, the curve below
     <tr>
       <th>DD1</th>
       <td>2024-12-02</td>
-      <td>2024-12-10</td>
-      <td>2025-05-21</td>
-      <td>-3809.0</td>
-      <td>6</td>
-      <td>115</td>
+      <td>2025-03-21</td>
+      <td>2025-07-28</td>
+      <td>-6501.0</td>
+      <td>74</td>
+      <td>160</td>
     </tr>
     <tr>
       <th>DD2</th>
       <td>2023-11-28</td>
-      <td>2023-12-20</td>
-      <td>2023-12-29</td>
-      <td>-2543.0</td>
-      <td>16</td>
-      <td>21</td>
+      <td>2023-12-13</td>
+      <td>2024-01-12</td>
+      <td>-2958.0</td>
+      <td>11</td>
+      <td>30</td>
     </tr>
     <tr>
       <th>DD3</th>
       <td>2024-10-03</td>
       <td>2024-10-07</td>
       <td>2024-11-12</td>
-      <td>-2338.0</td>
+      <td>-2005.0</td>
       <td>2</td>
       <td>27</td>
     </tr>
     <tr>
       <th>DD4</th>
-      <td>2025-05-27</td>
-      <td>2025-06-02</td>
-      <td>2025-06-17</td>
-      <td>-1796.0</td>
-      <td>4</td>
-      <td>14</td>
+      <td>2024-06-10</td>
+      <td>2024-06-11</td>
+      <td>2024-07-08</td>
+      <td>-1902.0</td>
+      <td>1</td>
+      <td>17</td>
     </tr>
     <tr>
       <th>DD5</th>
-      <td>2023-05-22</td>
-      <td>2023-05-23</td>
-      <td>2023-05-30</td>
-      <td>-1721.0</td>
-      <td>1</td>
-      <td>4</td>
+      <td>2023-10-10</td>
+      <td>2023-11-06</td>
+      <td>2023-11-27</td>
+      <td>-1776.0</td>
+      <td>19</td>
+      <td>32</td>
     </tr>
   </tbody>
 </table>
@@ -8194,14 +8185,15 @@ drawdown -\$3.8k. First, the book's drawdowns: the equity curve, the curve below
 
 | drawdown | peak | trough | recovered | depth | sessions to the trough |
 |---|---|---|---|---|---|
-| **DD1** | 2024-12-02 | 2024-12-10 | 2025-05-21 | **-\$3.8k** | 6 (115 under water) |
-| DD2 | 2023-11-28 | 2023-12-20 | 2023-12-29 | -\$2.5k | 16 |
-| DD3 | 2024-10-03 | 2024-10-07 | 2024-11-12 | -\$2.3k | 2 |
-| DD4 | 2025-05-27 | 2025-06-02 | 2025-06-17 | -\$1.8k | 4 |
-| DD5 | 2023-05-22 | 2023-05-23 | 2023-05-30 | -\$1.7k | 1 |
+| **DD1** | 2024-12-02 | 2025-03-21 | 2025-07-28 | **-\$6.5k** | 74 (160 under water) |
+| DD2 | 2023-11-28 | 2023-12-13 | 2024-01-12 | -\$3.0k | 11 |
+| DD3 | 2024-10-03 | 2024-10-07 | 2024-11-12 | -\$2.0k | 2 |
+| DD4 | 2024-06-10 | 2024-06-11 | 2024-07-08 | -\$1.9k | 1 |
+| DD5 | 2023-10-10 | 2023-11-06 | 2023-11-27 | -\$1.8k | 19 |
 
-- **The deepest drawdown is -\$3.8k, reached in six sessions in December 2024**; recovering took until May 2025 (115 sessions).
-- **The others are -\$1.7k to -\$2.5k**, each recovered within six weeks.
+- **The deepest drawdown is the winter of 2024-25: -\$6.5k from December to March, eight months under water** (recovered at the end of July
+  2025). With 14:53 instead of 13:33 the same stretch cost -\$3.8k and was over by May.
+- **The others are -\$1.8k to -\$3.0k**, each recovered within seven weeks.
 
 **Which tranches lost money in each drawdown**, from its peak to its trough:
 
@@ -8235,76 +8227,76 @@ drawdown -\$3.8k. First, the book's drawdowns: the equity curve, the curve below
   <tbody>
     <tr>
       <th>11:33</th>
-      <td>-702.0</td>
+      <td>-779.0</td>
       <td>336.0</td>
       <td>-729.0</td>
-      <td>-513.0</td>
       <td>0.0</td>
+      <td>57.0</td>
     </tr>
     <tr>
       <th>11:53</th>
-      <td>-1150.0</td>
+      <td>-1700.0</td>
       <td>-61.0</td>
       <td>-699.0</td>
-      <td>271.0</td>
-      <td>0.0</td>
+      <td>-649.0</td>
+      <td>983.0</td>
     </tr>
     <tr>
       <th>12:13</th>
-      <td>-1145.0</td>
+      <td>-1336.0</td>
       <td>-486.0</td>
       <td>0.0</td>
-      <td>101.0</td>
-      <td>0.0</td>
+      <td>-624.0</td>
+      <td>474.0</td>
     </tr>
     <tr>
       <th>13:13</th>
-      <td>-813.0</td>
-      <td>-919.0</td>
+      <td>-698.0</td>
+      <td>-1275.0</td>
       <td>-296.0</td>
-      <td>-744.0</td>
-      <td>-634.0</td>
+      <td>0.0</td>
+      <td>-864.0</td>
+    </tr>
+    <tr>
+      <th>13:33</th>
+      <td>-2098.0</td>
+      <td>-749.0</td>
+      <td>-281.0</td>
+      <td>-629.0</td>
+      <td>-1253.0</td>
     </tr>
     <tr>
       <th>13:53</th>
+      <td>-45.0</td>
+      <td>-724.0</td>
       <td>0.0</td>
-      <td>-707.0</td>
       <td>0.0</td>
-      <td>-699.0</td>
-      <td>-581.0</td>
+      <td>-872.0</td>
     </tr>
     <tr>
       <th>14:13</th>
+      <td>155.0</td>
       <td>0.0</td>
-      <td>-38.0</td>
       <td>0.0</td>
-      <td>-559.0</td>
-      <td>-506.0</td>
-    </tr>
-    <tr>
-      <th>14:53</th>
       <td>0.0</td>
-      <td>-669.0</td>
-      <td>-614.0</td>
-      <td>346.0</td>
-      <td>0.0</td>
+      <td>-303.0</td>
     </tr>
     <tr>
       <th>book</th>
-      <td>-3809.0</td>
-      <td>-2543.0</td>
-      <td>-2338.0</td>
-      <td>-1796.0</td>
-      <td>-1721.0</td>
+      <td>-6501.0</td>
+      <td>-2958.0</td>
+      <td>-2005.0</td>
+      <td>-1902.0</td>
+      <td>-1776.0</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
-- **DD1 is the late-morning tranches:** 11:53 (-\$1.15k), 12:13 (-\$1.14k), 13:13 (-\$0.8k) and 11:33 (-\$0.7k); the three afternoon tranches
-  didn't lose in it.
-- **The others are spread out:** 13:13 lost in all five (-\$0.3k to -\$0.9k), and with 13:53-14:53 it carries most of DD2, DD4 and DD5.
+- **DD1 is the midday core, led by 13:33** (-\$2.1k), then 11:53 (-\$1.7k), 12:13 (-\$1.3k), 11:33 (-\$0.8k) and 13:13 (-\$0.7k); 13:53 and 14:13 held
+  up. **13:33 is the single biggest contributor to the strategy's deepest drawdown.**
+- **13:33 loses in all five drawdowns** (-\$0.3k to -\$2.1k); 13:13 in four.
 
 Each tranche's own drawdown, on one scale, and its P/L year by year:
 
@@ -8321,149 +8313,148 @@ Each tranche's own drawdown, on one scale, and its P/L year by year:
 
 
 
-<div>
-<table border="1" class="dataframe">
+<table id="T_a2161">
   <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>trades</th>
-      <th>total_pl</th>
-      <th>max_drawdown</th>
-      <th>pl_per_dd</th>
-      <th>worst_day</th>
-      <th>pl_in_worst_dd</th>
-      <th>share_of_worst_dd_pct</th>
-      <th>pl_on_20_worst_days</th>
-      <th>pl_in_top_dds</th>
-      <th>sharpe_if_dropped</th>
-      <th>pl_if_dropped</th>
-      <th>max_dd_if_dropped</th>
+    <tr>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_a2161_level0_col0" class="col_heading level0 col0" >trades</th>
+      <th id="T_a2161_level0_col1" class="col_heading level0 col1" >total_pl</th>
+      <th id="T_a2161_level0_col2" class="col_heading level0 col2" >max_drawdown</th>
+      <th id="T_a2161_level0_col3" class="col_heading level0 col3" >pl_per_dd</th>
+      <th id="T_a2161_level0_col4" class="col_heading level0 col4" >worst_day</th>
+      <th id="T_a2161_level0_col5" class="col_heading level0 col5" >pl_in_worst_dd</th>
+      <th id="T_a2161_level0_col6" class="col_heading level0 col6" >share_of_worst_dd_pct</th>
+      <th id="T_a2161_level0_col7" class="col_heading level0 col7" >pl_on_20_worst_days</th>
+      <th id="T_a2161_level0_col8" class="col_heading level0 col8" >pl_in_top_dds</th>
+      <th id="T_a2161_level0_col9" class="col_heading level0 col9" >sharpe_if_dropped</th>
+      <th id="T_a2161_level0_col10" class="col_heading level0 col10" >pl_if_dropped</th>
+      <th id="T_a2161_level0_col11" class="col_heading level0 col11" >max_dd_if_dropped</th>
     </tr>
     <tr>
-      <th>tranche</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
+      <th class="index_name level0" >tranche</th>
+      <th class="blank col0" >&nbsp;</th>
+      <th class="blank col1" >&nbsp;</th>
+      <th class="blank col2" >&nbsp;</th>
+      <th class="blank col3" >&nbsp;</th>
+      <th class="blank col4" >&nbsp;</th>
+      <th class="blank col5" >&nbsp;</th>
+      <th class="blank col6" >&nbsp;</th>
+      <th class="blank col7" >&nbsp;</th>
+      <th class="blank col8" >&nbsp;</th>
+      <th class="blank col9" >&nbsp;</th>
+      <th class="blank col10" >&nbsp;</th>
+      <th class="blank col11" >&nbsp;</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>11:33</th>
-      <td>244</td>
-      <td>16279.64</td>
-      <td>-1853.68</td>
-      <td>8.78</td>
-      <td>-758.88</td>
-      <td>-701.64</td>
-      <td>18.42</td>
-      <td>-5317.32</td>
-      <td>-1607.16</td>
-      <td>-0.20</td>
-      <td>-16279.64</td>
-      <td>701.64</td>
+      <th id="T_a2161_level0_row0" class="row_heading level0 row0" >11:33</th>
+      <td id="T_a2161_row0_col0" class="data row0 col0" >244</td>
+      <td id="T_a2161_row0_col1" class="data row0 col1" >16279.64</td>
+      <td id="T_a2161_row0_col2" class="data row0 col2" >-1853.68</td>
+      <td id="T_a2161_row0_col3" class="data row0 col3" >8.78</td>
+      <td id="T_a2161_row0_col4" class="data row0 col4" >-758.88</td>
+      <td id="T_a2161_row0_col5" class="data row0 col5" >-779.28</td>
+      <td id="T_a2161_row0_col6" class="data row0 col6" >11.99</td>
+      <td id="T_a2161_row0_col7" class="data row0 col7" >-4943.32</td>
+      <td id="T_a2161_row0_col8" class="data row0 col8" >-1114.80</td>
+      <td id="T_a2161_row0_col9" class="data row0 col9" >-0.21</td>
+      <td id="T_a2161_row0_col10" class="data row0 col10" >-16279.64</td>
+      <td id="T_a2161_row0_col11" class="data row0 col11" >779.28</td>
     </tr>
     <tr>
-      <th>11:53</th>
-      <td>238</td>
-      <td>18079.28</td>
-      <td>-2052.68</td>
-      <td>8.81</td>
-      <td>-798.88</td>
-      <td>-1149.64</td>
-      <td>30.18</td>
-      <td>-6134.20</td>
-      <td>-1638.28</td>
-      <td>-0.22</td>
-      <td>-18079.28</td>
-      <td>807.24</td>
+      <th id="T_a2161_level0_row1" class="row_heading level0 row1" >11:53</th>
+      <td id="T_a2161_row1_col0" class="data row1 col0" >238</td>
+      <td id="T_a2161_row1_col1" class="data row1 col1" >18079.28</td>
+      <td id="T_a2161_row1_col2" class="data row1 col2" >-2052.68</td>
+      <td id="T_a2161_row1_col3" class="data row1 col3" >8.81</td>
+      <td id="T_a2161_row1_col4" class="data row1 col4" >-798.88</td>
+      <td id="T_a2161_row1_col5" class="data row1 col5" >-1699.52</td>
+      <td id="T_a2161_row1_col6" class="data row1 col6" >26.14</td>
+      <td id="T_a2161_row1_col7" class="data row1 col7" >-5452.20</td>
+      <td id="T_a2161_row1_col8" class="data row1 col8" >-2124.80</td>
+      <td id="T_a2161_row1_col9" class="data row1 col9" >-0.23</td>
+      <td id="T_a2161_row1_col10" class="data row1 col10" >-18079.28</td>
+      <td id="T_a2161_row1_col11" class="data row1 col11" >1364.16</td>
     </tr>
     <tr>
-      <th>12:13</th>
-      <td>220</td>
-      <td>17204.20</td>
-      <td>-1783.04</td>
-      <td>9.65</td>
-      <td>-758.88</td>
-      <td>-1144.64</td>
-      <td>30.05</td>
-      <td>-3985.32</td>
-      <td>-1529.40</td>
-      <td>-0.21</td>
-      <td>-17204.20</td>
-      <td>975.40</td>
+      <th id="T_a2161_level0_row2" class="row_heading level0 row2" >12:13</th>
+      <td id="T_a2161_row2_col0" class="data row2 col0" >220</td>
+      <td id="T_a2161_row2_col1" class="data row2 col1" >17204.20</td>
+      <td id="T_a2161_row2_col2" class="data row2 col2" >-1783.04</td>
+      <td id="T_a2161_row2_col3" class="data row2 col3" >9.65</td>
+      <td id="T_a2161_row2_col4" class="data row2 col4" >-758.88</td>
+      <td id="T_a2161_row2_col5" class="data row2 col5" >-1336.40</td>
+      <td id="T_a2161_row2_col6" class="data row2 col6" >20.56</td>
+      <td id="T_a2161_row2_col7" class="data row2 col7" >-3681.32</td>
+      <td id="T_a2161_row2_col8" class="data row2 col8" >-1971.68</td>
+      <td id="T_a2161_row2_col9" class="data row2 col9" >-0.21</td>
+      <td id="T_a2161_row2_col10" class="data row2 col10" >-17204.20</td>
+      <td id="T_a2161_row2_col11" class="data row2 col11" >1167.16</td>
     </tr>
     <tr>
-      <th>13:13</th>
-      <td>230</td>
-      <td>16368.80</td>
-      <td>-1729.04</td>
-      <td>9.47</td>
-      <td>-743.88</td>
-      <td>-812.76</td>
-      <td>21.34</td>
-      <td>-5624.44</td>
-      <td>-3405.04</td>
-      <td>-0.16</td>
-      <td>-16368.80</td>
-      <td>812.76</td>
+      <th id="T_a2161_level0_row3" class="row_heading level0 row3" >13:13</th>
+      <td id="T_a2161_row3_col0" class="data row3 col0" >230</td>
+      <td id="T_a2161_row3_col1" class="data row3 col1" >16368.80</td>
+      <td id="T_a2161_row3_col2" class="data row3 col2" >-1729.04</td>
+      <td id="T_a2161_row3_col3" class="data row3 col3" >9.47</td>
+      <td id="T_a2161_row3_col4" class="data row3 col4" >-743.88</td>
+      <td id="T_a2161_row3_col5" class="data row3 col5" >-698.40</td>
+      <td id="T_a2161_row3_col6" class="data row3 col6" >10.74</td>
+      <td id="T_a2161_row3_col7" class="data row3 col7" >-5311.44</td>
+      <td id="T_a2161_row3_col8" class="data row3 col8" >-3132.56</td>
+      <td id="T_a2161_row3_col9" class="data row3 col9" >-0.14</td>
+      <td id="T_a2161_row3_col10" class="data row3 col10" >-16368.80</td>
+      <td id="T_a2161_row3_col11" class="data row3 col11" >698.40</td>
     </tr>
     <tr>
-      <th>13:53</th>
-      <td>202</td>
-      <td>17674.12</td>
-      <td>-1595.52</td>
-      <td>11.08</td>
-      <td>-723.88</td>
-      <td>0.00</td>
-      <td>-0.00</td>
-      <td>-2638.04</td>
-      <td>-1986.52</td>
-      <td>-0.28</td>
-      <td>-17674.12</td>
-      <td>0.00</td>
+      <th id="T_a2161_level0_row4" class="row_heading level0 row4" >13:33</th>
+      <td id="T_a2161_row4_col0" class="data row4 col0" >212</td>
+      <td id="T_a2161_row4_col1" class="data row4 col1" >15093.72</td>
+      <td id="T_a2161_row4_col2" class="data row4 col2" >-2221.20</td>
+      <td id="T_a2161_row4_col3" class="data row4 col3" >6.80</td>
+      <td id="T_a2161_row4_col4" class="data row4 col4" >-748.88</td>
+      <td id="T_a2161_row4_col5" class="data row4 col5" >-2098.40</td>
+      <td id="T_a2161_row4_col6" class="data row4 col6" >32.28</td>
+      <td id="T_a2161_row4_col7" class="data row4 col7" >-4731.68</td>
+      <td id="T_a2161_row4_col8" class="data row4 col8" >-5009.80</td>
+      <td id="T_a2161_row4_col9" class="data row4 col9" >-0.09</td>
+      <td id="T_a2161_row4_col10" class="data row4 col10" >-15093.72</td>
+      <td id="T_a2161_row4_col11" class="data row4 col11" >2098.40</td>
     </tr>
     <tr>
-      <th>14:13</th>
-      <td>182</td>
-      <td>14781.92</td>
-      <td>-1508.64</td>
-      <td>9.80</td>
-      <td>-648.88</td>
-      <td>0.00</td>
-      <td>-0.00</td>
-      <td>-1766.04</td>
-      <td>-1102.64</td>
-      <td>-0.22</td>
-      <td>-14781.92</td>
-      <td>0.00</td>
+      <th id="T_a2161_level0_row5" class="row_heading level0 row5" >13:53</th>
+      <td id="T_a2161_row5_col0" class="data row5 col0" >202</td>
+      <td id="T_a2161_row5_col1" class="data row5 col1" >17674.12</td>
+      <td id="T_a2161_row5_col2" class="data row5 col2" >-1595.52</td>
+      <td id="T_a2161_row5_col3" class="data row5 col3" >11.08</td>
+      <td id="T_a2161_row5_col4" class="data row5 col4" >-723.88</td>
+      <td id="T_a2161_row5_col5" class="data row5 col5" >-44.64</td>
+      <td id="T_a2161_row5_col6" class="data row5 col6" >0.69</td>
+      <td id="T_a2161_row5_col7" class="data row5 col7" >-3489.04</td>
+      <td id="T_a2161_row5_col8" class="data row5 col8" >-1640.16</td>
+      <td id="T_a2161_row5_col9" class="data row5 col9" >-0.24</td>
+      <td id="T_a2161_row5_col10" class="data row5 col10" >-17674.12</td>
+      <td id="T_a2161_row5_col11" class="data row5 col11" >44.64</td>
     </tr>
     <tr>
-      <th>14:53</th>
-      <td>134</td>
-      <td>11656.04</td>
-      <td>-870.76</td>
-      <td>13.39</td>
-      <td>-668.88</td>
-      <td>0.00</td>
-      <td>-0.00</td>
-      <td>-51.40</td>
-      <td>-936.64</td>
-      <td>-0.20</td>
-      <td>-11656.04</td>
-      <td>-594.08</td>
+      <th id="T_a2161_level0_row6" class="row_heading level0 row6" >14:13</th>
+      <td id="T_a2161_row6_col0" class="data row6 col0" >182</td>
+      <td id="T_a2161_row6_col1" class="data row6 col1" >14781.92</td>
+      <td id="T_a2161_row6_col2" class="data row6 col2" >-1508.64</td>
+      <td id="T_a2161_row6_col3" class="data row6 col3" >9.80</td>
+      <td id="T_a2161_row6_col4" class="data row6 col4" >-648.88</td>
+      <td id="T_a2161_row6_col5" class="data row6 col5" >155.48</td>
+      <td id="T_a2161_row6_col6" class="data row6 col6" >-2.39</td>
+      <td id="T_a2161_row6_col7" class="data row6 col7" >-2120.16</td>
+      <td id="T_a2161_row6_col8" class="data row6 col8" >-147.28</td>
+      <td id="T_a2161_row6_col9" class="data row6 col9" >-0.22</td>
+      <td id="T_a2161_row6_col10" class="data row6 col10" >-14781.92</td>
+      <td id="T_a2161_row6_col11" class="data row6 col11" >-155.48</td>
     </tr>
   </tbody>
 </table>
-</div>
+
 
 
 
@@ -8527,6 +8518,15 @@ Each tranche's own drawdown, on one scale, and its P/L year by year:
       <td>0</td>
     </tr>
     <tr>
+      <th>13:33</th>
+      <td>3694.0</td>
+      <td>4027.0</td>
+      <td>3628.0</td>
+      <td>2202.0</td>
+      <td>1543.0</td>
+      <td>0</td>
+    </tr>
+    <tr>
       <th>13:53</th>
       <td>3700.0</td>
       <td>900.0</td>
@@ -8544,15 +8544,6 @@ Each tranche's own drawdown, on one scale, and its P/L year by year:
       <td>2059.0</td>
       <td>0</td>
     </tr>
-    <tr>
-      <th>14:53</th>
-      <td>3292.0</td>
-      <td>1575.0</td>
-      <td>544.0</td>
-      <td>4491.0</td>
-      <td>1754.0</td>
-      <td>0</td>
-    </tr>
   </tbody>
 </table>
 </div>
@@ -8560,24 +8551,24 @@ Each tranche's own drawdown, on one scale, and its P/L year by year:
 
 | tranche | trades | total P/L | own max drawdown | P/L per \$ of drawdown | losing years | in DD1 | book without it: Sharpe / P/L / max DD |
 |---|---|---|---|---|---|---|---|
-| 11:33 | 244 | \$16.3k | -\$1.9k | 8.8 | 0 | -\$0.7k | -0.20 / -\$16.3k / +\$0.7k |
-| 11:53 | 238 | **\$18.1k** | **-\$2.1k** | 8.8 | 0 | **-\$1.1k** | -0.22 / -\$18.1k / +\$0.8k |
-| 12:13 | 220 | \$17.2k | -\$1.8k | 9.6 | 0 | **-\$1.1k** | -0.21 / -\$17.2k / +\$1.0k |
-| 13:13 | 230 | \$16.4k | -\$1.7k | 9.5 | 0 | -\$0.8k | -0.16 / -\$16.4k / +\$0.8k |
-| 13:53 | 202 | \$17.7k | -\$1.6k | 11.1 | 0 | \$0.0k | **-0.28** / -\$17.7k / \$0.0k |
-| 14:13 | 182 | \$14.8k | -\$1.5k | 9.8 | 0 | \$0.0k | -0.22 / -\$14.8k / \$0.0k |
-| 14:53 | 134 | \$11.7k | **-\$0.9k** | **13.4** | 0 | \$0.0k | -0.20 / -\$11.7k / -\$0.6k |
+| 11:33 | 244 | \$16.3k | -\$1.9k | 8.8 | 0 | -\$0.8k | -0.21 / -\$16.3k / +\$0.8k |
+| 11:53 | 238 | **\$18.1k** | -\$2.1k | 8.8 | 0 | -\$1.7k | -0.23 / -\$18.1k / +\$1.4k |
+| 12:13 | 220 | \$17.2k | -\$1.8k | 9.6 | 0 | -\$1.3k | -0.21 / -\$17.2k / +\$1.2k |
+| 13:13 | 230 | \$16.4k | -\$1.7k | 9.5 | 0 | -\$0.7k | -0.14 / -\$16.4k / +\$0.7k |
+| **13:33 (swapped in)** | 212 | \$15.1k | **-\$2.2k** | **6.8** | 0 | **-\$2.1k** | **-0.09** / -\$15.1k / **+\$2.1k** |
+| 13:53 | 202 | \$17.7k | -\$1.6k | **11.1** | 0 | \$0.0k | **-0.24** / -\$17.7k / \$0.0k |
+| 14:13 | 182 | \$14.8k | -\$1.5k | 9.8 | 0 | +\$0.2k | -0.22 / -\$14.8k / -\$0.2k |
 
 (A single tranche's Sharpe isn't shown: on its own it never clears the 4% hurdle on \$200k, so P/L per \$ of drawdown compares them instead.
 "Book without it: max DD" is the change in the book's max drawdown: + means smaller.)
 
-- **All seven made money in every year**, \$11.7k to \$18.1k each.
-- **Dropping any one costs 0.16 to 0.28 Sharpe and \$12k-18k.** The four late-morning tranches each carry part of DD1, so dropping one would
-  shrink it by \$0.7k-1.0k, but each is among the best earners.
+- **All seven made money in every year**, \$14.8k to \$18.1k each.
+- **13:33 is the weakest of the seven by every risk measure:** the deepest own drawdown (-\$2.2k), the lowest P/L per \$ of drawdown (6.8),
+  the biggest share of DD1, and the smallest Sharpe cost if dropped (-0.09). Dropping it would shrink the max drawdown by \$2.1k.
 
 **Cutting further, one tranche at a time.** Starting from the 7, each step drops the tranche whose removal gives the best book: by Sharpe
-(blue), or by max drawdown (orange). Each rule stops at the highest Sharpe or (by drawdown) the most P/L per \$ of drawdown; the printed
-line under the chart names where.
+(blue), or by max drawdown (orange). The middle chart is P/L per \$ of peak margin. Each rule stops at the highest Sharpe or (by drawdown)
+the most P/L per \$ of drawdown; the printed line under the chart names where.
 
 
     
@@ -8623,45 +8614,45 @@ line under the chart names where.
     <tr>
       <th>7</th>
       <td>-</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>2.44</td>
-      <td>2.92</td>
-      <td>-3808.68</td>
-      <td>29.42</td>
-      <td>16006.29</td>
-      <td>6060.0</td>
-      <td>18.49</td>
+      <td>115481.68</td>
+      <td>2.49</td>
+      <td>2.48</td>
+      <td>2.51</td>
+      <td>-6501.16</td>
+      <td>17.76</td>
+      <td>16497.38</td>
+      <td>6125.0</td>
+      <td>18.85</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>13:13</td>
-      <td>95675.20</td>
-      <td>2.43</td>
-      <td>2.28</td>
-      <td>2.73</td>
-      <td>-2995.92</td>
-      <td>31.94</td>
-      <td>15945.87</td>
-      <td>5185.0</td>
-      <td>18.45</td>
+      <td>13:33</td>
+      <td>100387.96</td>
+      <td>2.40</td>
+      <td>2.35</td>
+      <td>2.49</td>
+      <td>-4402.76</td>
+      <td>22.80</td>
+      <td>16731.33</td>
+      <td>5250.0</td>
+      <td>19.12</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>11:33</td>
-      <td>79395.56</td>
+      <td>13:13</td>
+      <td>84019.16</td>
       <td>2.18</td>
-      <td>1.94</td>
-      <td>2.64</td>
-      <td>-2294.28</td>
-      <td>34.61</td>
-      <td>15879.11</td>
-      <td>4300.0</td>
-      <td>18.46</td>
+      <td>2.15</td>
+      <td>2.22</td>
+      <td>-3704.36</td>
+      <td>22.68</td>
+      <td>16803.83</td>
+      <td>4375.0</td>
+      <td>19.20</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>14:53</td>
+      <td>11:33</td>
       <td>67739.52</td>
       <td>1.86</td>
       <td>1.76</td>
@@ -8716,7 +8707,7 @@ line under the chart names where.
 </div>
 
 
-    cut by drawdown: stops at 4 tranches, cutting 11:53, 12:13, 13:13
+    cut by drawdown: stops at 4 tranches, cutting 11:53, 13:13, 13:33
     
 
 
@@ -8754,109 +8745,108 @@ line under the chart names where.
     <tr>
       <th>7</th>
       <td>-</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>2.44</td>
-      <td>2.92</td>
-      <td>-3808.68</td>
-      <td>29.42</td>
-      <td>16006.29</td>
-      <td>6060.0</td>
-      <td>18.49</td>
+      <td>115481.68</td>
+      <td>2.49</td>
+      <td>2.48</td>
+      <td>2.51</td>
+      <td>-6501.16</td>
+      <td>17.76</td>
+      <td>16497.38</td>
+      <td>6125.0</td>
+      <td>18.85</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>12:13</td>
-      <td>94839.80</td>
-      <td>2.39</td>
-      <td>2.26</td>
-      <td>2.65</td>
-      <td>-2833.28</td>
-      <td>33.47</td>
-      <td>15806.63</td>
-      <td>5175.0</td>
-      <td>18.33</td>
+      <td>13:33</td>
+      <td>100387.96</td>
+      <td>2.40</td>
+      <td>2.35</td>
+      <td>2.49</td>
+      <td>-4402.76</td>
+      <td>22.80</td>
+      <td>16731.33</td>
+      <td>5250.0</td>
+      <td>19.12</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>13:13</td>
-      <td>78471.00</td>
-      <td>2.14</td>
-      <td>2.01</td>
-      <td>2.39</td>
-      <td>-2041.64</td>
-      <td>38.44</td>
-      <td>15694.20</td>
-      <td>4300.0</td>
-      <td>18.25</td>
+      <td>11:53</td>
+      <td>82308.68</td>
+      <td>2.13</td>
+      <td>2.08</td>
+      <td>2.25</td>
+      <td>-3038.60</td>
+      <td>27.09</td>
+      <td>16461.74</td>
+      <td>4370.0</td>
+      <td>18.83</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>11:53</td>
-      <td>60391.72</td>
-      <td>1.63</td>
-      <td>1.45</td>
-      <td>1.97</td>
-      <td>-1424.40</td>
-      <td>42.40</td>
-      <td>15097.93</td>
-      <td>3420.0</td>
-      <td>17.66</td>
+      <td>13:13</td>
+      <td>65939.88</td>
+      <td>1.81</td>
+      <td>1.77</td>
+      <td>1.87</td>
+      <td>-2340.20</td>
+      <td>28.18</td>
+      <td>16484.97</td>
+      <td>3495.0</td>
+      <td>18.87</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>14:13</td>
-      <td>45609.80</td>
-      <td>1.04</td>
-      <td>0.85</td>
-      <td>1.39</td>
-      <td>-1375.64</td>
-      <td>33.16</td>
-      <td>15203.27</td>
-      <td>2575.0</td>
-      <td>17.71</td>
+      <td>12:13</td>
+      <td>48735.68</td>
+      <td>1.15</td>
+      <td>1.15</td>
+      <td>1.13</td>
+      <td>-1770.52</td>
+      <td>27.53</td>
+      <td>16245.23</td>
+      <td>2610.0</td>
+      <td>18.67</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>14:53</td>
-      <td>33953.76</td>
-      <td>0.21</td>
-      <td>0.29</td>
-      <td>0.04</td>
-      <td>-1378.28</td>
-      <td>24.63</td>
-      <td>16976.88</td>
-      <td>1765.0</td>
-      <td>19.24</td>
+      <td>13:53</td>
+      <td>31061.56</td>
+      <td>-0.06</td>
+      <td>0.02</td>
+      <td>-0.21</td>
+      <td>-1233.28</td>
+      <td>25.19</td>
+      <td>15530.78</td>
+      <td>1730.0</td>
+      <td>17.95</td>
     </tr>
     <tr>
       <th>1</th>
       <td>11:33</td>
-      <td>17674.12</td>
-      <td>-2.14</td>
-      <td>-2.32</td>
-      <td>-1.78</td>
-      <td>-1595.52</td>
-      <td>11.08</td>
-      <td>17674.12</td>
-      <td>880.0</td>
-      <td>20.08</td>
+      <td>14781.92</td>
+      <td>-2.62</td>
+      <td>-2.96</td>
+      <td>-2.06</td>
+      <td>-1508.64</td>
+      <td>9.80</td>
+      <td>14781.92</td>
+      <td>845.0</td>
+      <td>17.49</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
-| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD | cut by drawdown: removed | Sharpe | P/L | max DD |
-|---|---|---|---|---|---|---|---|---|
-| **7 (strategy)** | | **2.60** | **\$112.0k** | **-\$3.8k** | | 2.60 | \$112.0k | -\$3.8k |
-| 6 | 13:13 | 2.43 | \$95.7k | -\$3.0k | 12:13 | 2.39 | \$94.8k | -\$2.8k |
-| 5 | 11:33 | 2.18 | \$79.4k | -\$2.3k | 13:13 | 2.14 | \$78.5k | -\$2.0k |
-| 4 | 14:53 | 1.86 | \$67.7k | -\$2.9k | 11:53 | 1.63 | \$60.4k | -\$1.4k |
+| tranches kept | cut (both rules) | Sharpe | P/L | max DD | P/L per \$ of margin |
+|---|---|---|---|---|---|
+| **7 (strategy)** | | **2.49** | **\$115.5k** | -\$6.5k | 18.9x |
+| 6 | **13:33** | 2.40 | \$100.4k | **-\$4.4k** | 19.1x |
+| 5 (by Sharpe) | 13:13 | 2.18 | \$84.0k | -\$3.7k | 19.2x |
+| 5 (by drawdown) | 11:53 | 2.13 | \$82.3k | -\$3.0k | 18.8x |
 
-- **By Sharpe there is nothing to cut:** every removal lowers it, so the rule keeps all 7.
-- **By drawdown every cut shrinks the drawdown, and the P/L with it:** at 4 tranches the drawdown is -\$1.4k but the book makes \$60.4k at
-  Sharpe 1.63.
+- **Both rules cut 13:33 first.** Without it the drawdown falls from -\$6.5k to -\$4.4k for 0.09 Sharpe and \$15.1k.
+- **By Sharpe nothing is worth cutting** (every removal lowers Sharpe), so the rule keeps all 7; by drawdown it goes down to 4 tranches.
 
 **The same cut, starting from all 20 tranches** (every other setting on), to see how the curve goes and where the 7 sit on it:
 
@@ -8866,7 +8856,7 @@ line under the chart names where.
     
 
 
-    cut by Sharpe: stops at 11 tranches; the 7 it keeps: 11:33, 11:53, 12:13, 13:13, 13:53, 14:13, 14:53 (the strategy's 7: True)
+    cut by Sharpe: stops at 11 tranches; the 7 it keeps: 11:33, 11:53, 12:13, 13:13, 13:53, 14:13, 14:53 (the strategy's 7: False)
     
 
 
@@ -9466,31 +9456,23 @@ line under the chart names where.
 </div>
 
 
-| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD |
-|---|---|---|---|---|
-| 20 | | 2.40 | \$211.4k | -\$12.7k |
-| 16 | 10:33, 09:32, 10:13, 09:52 | 2.66 | \$192.1k | -\$7.8k |
-| 15 | 12:33 | 2.69 | \$180.4k | -\$6.5k |
-| 12 | 15:33, 10:53, 12:53 | **2.75** | \$155.9k | -\$6.0k |
-| 10 | 15:13, 15:53 | **2.75** | \$150.5k | -\$5.8k |
-| 9 | 14:33 | 2.73 | \$141.9k | -\$6.0k |
-| 8 | 11:13 | 2.66 | \$127.1k | -\$5.6k |
-| **7** | **13:33** | **2.60** | **\$112.0k** | **-\$3.8k** |
-| 6 | 13:13 | 2.43 | \$95.7k | -\$3.0k |
+| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD | P/L per \$ of margin |
+|---|---|---|---|---|---|
+| 20 | | 2.40 | \$211.4k | -\$12.7k | 14.7x |
+| 16 | 10:33, 09:32, 10:13, 09:52 | 2.66 | \$192.1k | -\$7.8k | 15.2x |
+| 12 | 12:33, 15:33, 10:53, 12:53 | **2.75** | \$155.9k | -\$6.0k | 16.6x |
+| 10 | 15:13, 15:53 | **2.75** | \$150.5k | -\$5.8k | 17.4x |
+| 8 | 14:33, 11:13 | 2.66 | \$127.1k | -\$5.6k | 18.3x |
+| **7** | **13:33** | **2.60** | **\$112.0k** | **-\$3.8k** | **18.5x** |
 
-- **Cutting by Sharpe from all 20 lands exactly on the strategy's 7:** it drops the first hour first, then 12:33, then the late tranches
-  (15:33, 15:13, 15:53) and 10:53, 12:53, 14:33, 11:13 and 13:33. The seven left are 11:33, 11:53, 12:13, 13:13, 13:53, 14:13 and 14:53.
-- **The Sharpe curve is a plateau from 10 to 12 tranches (2.75)**; going down to 7 costs 0.15 Sharpe and \$38k but takes the drawdown from
-  -\$5.6k to -\$3.8k at the last step alone (cutting 13:33).
-- **Cutting by drawdown from 20 picks a different book** (it also stops at 11, Sharpe 2.24, drawdown -\$3.9k), and its 7 aren't the
-  strategy's: the drawdown rule keeps weaker, rarely-traded tranches that smooth the curve.
-- **P/L per \$ of margin (middle chart) rises all the way down to the 7:** each condor ties up one wing less its credit (~\$700), and a set's
-  margin is its busiest day. All 20 tranches make 14.7x their peak margin over the four years (\$211.4k on \$14.4k); the 7 make **18.5x**
-  (\$112.0k on \$6.1k). Per tranche, \$10.6k for all 20 against \$16.0k for the 7. Cutting below 7 keeps raising P/L per \$ of margin (to 20x)
-  but lowers Sharpe: fewer trading days, and every idle day pays the 4% hurdle.
+- **Cutting by Sharpe from all 20 lands on the previous 7 (with 14:53), not the new ones:** its last cut before 7 tranches is 13:33. The
+  new 7 are never on this path.
+- **P/L per \$ of margin rises steadily down the path** (14.7x for all 20, 18.5x at the previous 7); the new 7 make 18.9x (\$115.5k on \$6.1k of
+  peak margin), about the same.
+- **Cutting by drawdown from 20 picks a different book** (it also stops at 11, Sharpe 2.24, drawdown -\$3.9k).
 
 **Pareto: how the profit is spread across the tranches.** Each tranche's total P/L with every other setting on, largest first (blue: the
-strategy's 7), and the cumulative share of the profit (right axis):
+strategy's 7; green: 13:33, swapped in; red: 14:53, swapped out), and the cumulative share of the profit (right axis):
 
 
     
@@ -9510,9 +9492,11 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <th>peak_margin</th>
       <th>pl_per_margin</th>
       <th>in_strategy</th>
+      <th>status</th>
     </tr>
     <tr>
       <th>tranche</th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -9530,6 +9514,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>880.0</td>
       <td>20.54</td>
       <td>True</td>
+      <td>traded</td>
     </tr>
     <tr>
       <th>13:53</th>
@@ -9539,6 +9524,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>880.0</td>
       <td>20.08</td>
       <td>True</td>
+      <td>traded</td>
     </tr>
     <tr>
       <th>12:13</th>
@@ -9548,6 +9534,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>885.0</td>
       <td>19.44</td>
       <td>True</td>
+      <td>traded</td>
     </tr>
     <tr>
       <th>13:13</th>
@@ -9557,6 +9544,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>875.0</td>
       <td>18.71</td>
       <td>True</td>
+      <td>traded</td>
     </tr>
     <tr>
       <th>11:33</th>
@@ -9566,6 +9554,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>885.0</td>
       <td>18.40</td>
       <td>True</td>
+      <td>traded</td>
     </tr>
     <tr>
       <th>13:33</th>
@@ -9574,7 +9563,8 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>47.64</td>
       <td>875.0</td>
       <td>17.25</td>
-      <td>False</td>
+      <td>True</td>
+      <td>traded (swapped in)</td>
     </tr>
     <tr>
       <th>14:13</th>
@@ -9584,6 +9574,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>845.0</td>
       <td>17.49</td>
       <td>True</td>
+      <td>traded</td>
     </tr>
     <tr>
       <th>11:13</th>
@@ -9593,6 +9584,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>890.0</td>
       <td>16.55</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
     <tr>
       <th>12:53</th>
@@ -9602,6 +9594,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>885.0</td>
       <td>15.94</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
     <tr>
       <th>12:33</th>
@@ -9611,6 +9604,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>880.0</td>
       <td>13.33</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
     <tr>
       <th>14:53</th>
@@ -9619,7 +9613,8 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>79.34</td>
       <td>825.0</td>
       <td>14.13</td>
-      <td>True</td>
+      <td>False</td>
+      <td>dropped (swapped out)</td>
     </tr>
     <tr>
       <th>10:53</th>
@@ -9629,6 +9624,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>885.0</td>
       <td>11.68</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
     <tr>
       <th>14:33</th>
@@ -9638,6 +9634,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>855.0</td>
       <td>10.09</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
     <tr>
       <th>10:33</th>
@@ -9647,6 +9644,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>865.0</td>
       <td>6.15</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
     <tr>
       <th>15:13</th>
@@ -9656,6 +9654,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>795.0</td>
       <td>6.63</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
     <tr>
       <th>10:13</th>
@@ -9665,6 +9664,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>870.0</td>
       <td>5.65</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
     <tr>
       <th>09:52</th>
@@ -9674,6 +9674,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>840.0</td>
       <td>5.44</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
     <tr>
       <th>09:32</th>
@@ -9683,6 +9684,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>840.0</td>
       <td>5.27</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
     <tr>
       <th>15:53</th>
@@ -9692,6 +9694,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>655.0</td>
       <td>0.26</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
     <tr>
       <th>15:33</th>
@@ -9701,6 +9704,7 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <td>710.0</td>
       <td>0.07</td>
       <td>False</td>
+      <td>dropped</td>
     </tr>
   </tbody>
 </table>
@@ -9714,26 +9718,25 @@ strategy's 7), and the cumulative share of the profit (right axis):
 | 3 | 12:13 | \$17.2k | 8.1% | 25.1% | 19.4x | **yes** |
 | 4 | 13:13 | \$16.4k | 7.7% | 32.8% | 18.7x | **yes** |
 | 5 | 11:33 | \$16.3k | 7.7% | 40.5% | 18.4x | **yes** |
-| 6 | 13:33 | \$15.1k | 7.1% | 47.6% | 17.2x | no |
+| **6** | **13:33** | **\$15.1k** | **7.1%** | 47.6% | 17.2x | **yes (swapped in)** |
 | 7 | 14:13 | \$14.8k | 7.0% | 54.6% | 17.5x | **yes** |
 | 8 | 11:13 | \$14.7k | 7.0% | 61.6% | 16.5x | no |
 | 9 | 12:53 | \$14.1k | 6.7% | 68.3% | 15.9x | no |
 | 10 | 12:33 | \$11.7k | 5.5% | 73.8% | 13.3x | no |
-| 11 | 14:53 | \$11.7k | 5.5% | 79.3% | 14.1x | **yes** |
+| **11** | **14:53** | **\$11.7k** | **5.5%** | 79.3% | 14.1x | **no (swapped out)** |
 | 12 | 10:53 | \$10.3k | 4.9% | 84.2% | 11.7x | no |
 | 13-20 | 14:33, first hour, 15:13, 15:33, 15:53 | \$33.3k | 15.8% | 100% | 0.1-10.1x | no |
 
+- **With the swap the strategy trades exactly the top 7 tranches by P/L: 54.6% of the profit from 35% of the tranches.** 14:53, swapped out,
+  is 11th.
 - **It isn't an 80/20 book:** the profit is spread fairly evenly over the middle of the day (5-9% per tranche), and 80% of it takes the top
-  **12** of 20 tranches. The tail is the first hour (2-2.5% each), 15:13 and 14:33, and 15:33 / 15:53, which make nothing.
-- **The strategy's 7 are the top 5, the 7th and the 11th: 53% of the profit from 35% of the tranches** (and 37% of the trades), with 30%
-  of all-20's drawdown (-\$3.8k against -\$12.7k).
-- **13:33, 11:13 and 12:53 (ranks 6, 8 and 9) are the profitable tranches the strategy leaves out**, each about 7% of the profit; they are
-  the ones that lift Sharpe to the 2.75 plateau when added back, at the cost of a deeper drawdown. 14:53 (rank 11) earns less but trades
-  on fewer days and adds least to the drawdown, which is why forward selection keeps it.
+  **12** of 20.
+- **Ranking by P/L and ranking by contribution to the book disagree:** 13:33 earns \$3.4k more than 14:53, but adds \$2.7k of drawdown;
+  Sections 8 and 11 show the book is steadier with 14:53.
 
 **Do the cuts hold out of sample?** The same rules re-run for each year on the earlier years only:
 
-    cut by Sharpe: cut vs the strategy's set out of sample, Sharpe difference 95% interval -0.69 to -0.31; cut better in 0% of resamples
+    cut by Sharpe: cut vs the strategy's set out of sample, Sharpe difference 95% interval -0.81 to -0.42; cut better in 0% of resamples
     
 
 
@@ -9768,43 +9771,43 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <th>2023</th>
       <td>5.0</td>
       <td>11:33, 11:53</td>
-      <td>0.58</td>
-      <td>2.48</td>
-      <td>11424.08</td>
-      <td>26732.80</td>
-      <td>-4632.28</td>
-      <td>-2542.80</td>
+      <td>0.86</td>
+      <td>2.51</td>
+      <td>13875.28</td>
+      <td>29184.00</td>
+      <td>-5472.28</td>
+      <td>-2958.16</td>
     </tr>
     <tr>
       <th>2024</th>
-      <td>7.0</td>
-      <td>-</td>
-      <td>2.08</td>
-      <td>2.08</td>
-      <td>24584.48</td>
-      <td>24584.48</td>
-      <td>-3808.68</td>
-      <td>-3808.68</td>
+      <td>6.0</td>
+      <td>13:53</td>
+      <td>1.65</td>
+      <td>2.18</td>
+      <td>21331.88</td>
+      <td>27668.12</td>
+      <td>-4417.56</td>
+      <td>-4417.56</td>
     </tr>
     <tr>
       <th>2025</th>
       <td>7.0</td>
       <td>-</td>
-      <td>2.69</td>
-      <td>2.69</td>
-      <td>27925.56</td>
-      <td>27925.56</td>
-      <td>-1796.04</td>
-      <td>-1796.04</td>
+      <td>2.19</td>
+      <td>2.19</td>
+      <td>25637.40</td>
+      <td>25637.40</td>
+      <td>-3120.44</td>
+      <td>-3120.44</td>
     </tr>
     <tr>
       <th>2026</th>
       <td>7.0</td>
       <td>-</td>
-      <td>3.59</td>
-      <td>3.59</td>
-      <td>11734.36</td>
-      <td>11734.36</td>
+      <td>3.62</td>
+      <td>3.62</td>
+      <td>11523.36</td>
+      <td>11523.36</td>
       <td>-154.88</td>
       <td>-154.88</td>
     </tr>
@@ -9812,19 +9815,19 @@ strategy's 7), and the cumulative share of the profit (right axis):
       <th>out of sample</th>
       <td>NaN</td>
       <td>-</td>
-      <td>2.04</td>
-      <td>2.53</td>
-      <td>75668.48</td>
-      <td>90977.20</td>
-      <td>-4632.28</td>
-      <td>-3808.68</td>
+      <td>1.79</td>
+      <td>2.40</td>
+      <td>72367.92</td>
+      <td>94012.88</td>
+      <td>-6501.16</td>
+      <td>-6501.16</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
-    cut by drawdown: cut vs the strategy's set out of sample, Sharpe difference 95% interval -1.88 to -0.97; cut better in 0% of resamples
+    cut by drawdown: cut vs the strategy's set out of sample, Sharpe difference 95% interval -1.41 to -0.60; cut better in 0% of resamples
     
 
 
@@ -9858,69 +9861,70 @@ strategy's 7), and the cumulative share of the profit (right axis):
     <tr>
       <th>2023</th>
       <td>3.0</td>
-      <td>11:33, 11:53, 12:13, 14:53</td>
-      <td>-0.61</td>
-      <td>2.48</td>
-      <td>5213.16</td>
-      <td>26732.80</td>
-      <td>-3918.08</td>
-      <td>-2542.80</td>
+      <td>11:33, 11:53, 12:13, 13:53</td>
+      <td>0.09</td>
+      <td>2.51</td>
+      <td>8339.40</td>
+      <td>29184.00</td>
+      <td>-3514.20</td>
+      <td>-2958.16</td>
     </tr>
     <tr>
       <th>2024</th>
       <td>6.0</td>
       <td>13:13</td>
-      <td>2.11</td>
-      <td>2.08</td>
-      <td>22342.00</td>
-      <td>24584.48</td>
-      <td>-2995.92</td>
-      <td>-3808.68</td>
+      <td>2.20</td>
+      <td>2.18</td>
+      <td>25425.64</td>
+      <td>27668.12</td>
+      <td>-3604.80</td>
+      <td>-4417.56</td>
     </tr>
     <tr>
       <th>2025</th>
       <td>3.0</td>
-      <td>11:53, 12:13, 13:13, 14:53</td>
-      <td>0.87</td>
-      <td>2.69</td>
-      <td>11496.64</td>
-      <td>27925.56</td>
-      <td>-1770.52</td>
-      <td>-1796.04</td>
+      <td>11:33, 12:13, 13:13, 13:33</td>
+      <td>1.13</td>
+      <td>2.19</td>
+      <td>12618.04</td>
+      <td>25637.40</td>
+      <td>-1775.64</td>
+      <td>-3120.44</td>
     </tr>
     <tr>
       <th>2026</th>
       <td>4.0</td>
-      <td>11:53, 12:13, 13:13</td>
-      <td>2.63</td>
-      <td>3.59</td>
-      <td>6925.60</td>
-      <td>11734.36</td>
-      <td>-237.40</td>
+      <td>11:53, 13:13, 13:33</td>
+      <td>2.72</td>
+      <td>3.62</td>
+      <td>6740.60</td>
+      <td>11523.36</td>
+      <td>-154.88</td>
       <td>-154.88</td>
     </tr>
     <tr>
       <th>out of sample</th>
       <td>NaN</td>
       <td>-</td>
-      <td>1.11</td>
-      <td>2.53</td>
-      <td>45977.40</td>
-      <td>90977.20</td>
-      <td>-3918.08</td>
-      <td>-3808.68</td>
+      <td>1.40</td>
+      <td>2.40</td>
+      <td>53123.68</td>
+      <td>94012.88</td>
+      <td>-4043.84</td>
+      <td>-6501.16</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
-- **By Sharpe, the rule cuts nothing in 2024-26**; only in 2023, with a single year of history, does it cut (11:33 and 11:53), and that
-  year it loses (0.58 against 2.48).
-- **By drawdown, the cuts lose out of sample** (1.11 against 2.53, \$46.0k against \$91.0k).
+- **By Sharpe, the rule cuts nothing in 2025-26;** in 2023 and 2024, with one or two years of history, it cuts (11:33 and 11:53, then
+  13:53) and loses those years (0.86 against 2.51, 1.65 against 2.18): out of sample 1.79 against 2.40.
+- **By drawdown, the cuts lose out of sample** (1.40 against 2.40, \$53.1k against \$94.0k).
 
-**What this says about cutting the selection:** nothing. Every one of the 7 made money every year, each one's removal lowers Sharpe, and the
-drawdowns are shallow market episodes that a smaller book would only make smaller in proportion.
+**What this says about the selection:** the drawdowns are market episodes, and the one tranche that stands out on risk is **13:33**: the
+biggest share of the deepest drawdown, the lowest P/L per \$ of drawdown, the first cut by both rules. On this data the swap from 14:53 to
+13:33 makes the book a little richer and noticeably less steady.
 
 ## 12. Feature ranking and correlation
 
@@ -9928,14 +9932,14 @@ Every feature on one Sharpe scale, against the finished strategy:
 
 - **the strategy's settings (blue, bold, "ON:"):** the Sharpe **lost** when the setting is removed from the finished strategy;
 - **every other feature (orange):** the Sharpe **gained** by its best single cut as a further filter (a min or max at a decile, keeping
-  at least 30% of condors). Dark orange means the gain holds in both halves;
+  at least 30% of condors). Dark orange means the gain holds in both halves. **A day on which a feature doesn't exist is kept** (VIX1D, for
+  example, only starts on 2023-04-24): a filter can't act on missing data;
 - **a noise feature (grey):** a random number per session put through the same search: **whatever it scores is what luck alone finds.**
 
-The red line is the noise bar, corrected for testing many candidates: 200 random features go through the same search, and the
-bar is the 95th percentile of the **best** of 33 of them (as many as there are candidates). Picking the best of 33 features is
-itself a search, so a candidate has to beat what the luckiest of 33 random features would score. The candidates are price,
-volatility, curve and calendar features, including the 20-day SMA (now a candidate, not a setting) and the vol-regime feature library's
-findings (VIX9D gap, month end, rule W, ATR20, low VRP).
+The red line is the noise bar, corrected for testing many candidates: 200 random features go through the same search, and the bar is the
+95th percentile of the **best** of 33 of them (as many as there are candidates). The candidates are price, volatility, curve and calendar
+features, including the 20-day SMA (now a candidate, not a setting) and the vol-regime feature library's findings (VIX9D gap, month end,
+rule W, ATR20, low VRP).
 
 
     
@@ -9943,7 +9947,7 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
     
 
 
-    the noise feature (one random draw) gains -0.11; 200 random features: median -0.16, 95th pct +0.01; noise bar (95th pct of the best of 33) +0.17
+    the noise feature (one random draw) gains -0.16; 200 random features: median -0.14, 95th pct +0.05; noise bar (95th pct of the best of 33) +0.28
     
 
 
@@ -9968,87 +9972,87 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
   <tbody>
     <tr>
       <th>strategy</th>
-      <td>187.0</td>
-      <td>1450.0</td>
-      <td>80.97</td>
-      <td>154.54</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>-3808.68</td>
-      <td>2.44</td>
-      <td>2.92</td>
+      <td>182.0</td>
+      <td>1528.0</td>
+      <td>81.02</td>
+      <td>151.15</td>
+      <td>115481.68</td>
+      <td>2.49</td>
+      <td>-6501.16</td>
+      <td>2.48</td>
+      <td>2.51</td>
       <td>0.00</td>
       <td>0.00</td>
     </tr>
     <tr>
       <th>with a 400% call stop (not traded)</th>
-      <td>187.0</td>
-      <td>1450.0</td>
-      <td>79.59</td>
-      <td>145.98</td>
-      <td>105832.53</td>
-      <td>2.46</td>
-      <td>-3808.68</td>
-      <td>2.36</td>
-      <td>2.67</td>
-      <td>-0.14</td>
-      <td>-6211.47</td>
+      <td>182.0</td>
+      <td>1528.0</td>
+      <td>79.84</td>
+      <td>143.94</td>
+      <td>109972.64</td>
+      <td>2.41</td>
+      <td>-6501.16</td>
+      <td>2.47</td>
+      <td>2.27</td>
+      <td>-0.08</td>
+      <td>-5509.04</td>
     </tr>
     <tr>
       <th>without the band</th>
-      <td>277.0</td>
-      <td>2324.0</td>
-      <td>75.99</td>
-      <td>100.00</td>
-      <td>116202.44</td>
-      <td>1.89</td>
-      <td>-5095.72</td>
-      <td>1.84</td>
-      <td>1.96</td>
-      <td>-0.71</td>
-      <td>4158.44</td>
+      <td>271.0</td>
+      <td>2450.0</td>
+      <td>76.24</td>
+      <td>99.32</td>
+      <td>121668.00</td>
+      <td>1.85</td>
+      <td>-5832.96</td>
+      <td>1.81</td>
+      <td>1.94</td>
+      <td>-0.64</td>
+      <td>6186.32</td>
     </tr>
     <tr>
       <th>without move &lt;= 0%</th>
-      <td>365.0</td>
-      <td>3946.0</td>
-      <td>70.20</td>
-      <td>62.05</td>
-      <td>122433.76</td>
+      <td>360.0</td>
+      <td>4164.0</td>
+      <td>70.27</td>
+      <td>62.21</td>
+      <td>129520.84</td>
+      <td>1.39</td>
+      <td>-10093.64</td>
       <td>1.42</td>
-      <td>-11084.88</td>
-      <td>1.37</td>
-      <td>1.52</td>
-      <td>-1.18</td>
-      <td>10389.76</td>
+      <td>1.33</td>
+      <td>-1.10</td>
+      <td>14039.16</td>
     </tr>
     <tr>
       <th>without SPX &gt; SMA10</th>
-      <td>319.0</td>
-      <td>2864.0</td>
-      <td>73.32</td>
-      <td>70.42</td>
-      <td>100836.84</td>
-      <td>1.32</td>
-      <td>-11768.68</td>
-      <td>1.39</td>
-      <td>1.15</td>
-      <td>-1.28</td>
-      <td>-11207.16</td>
+      <td>311.0</td>
+      <td>2970.0</td>
+      <td>72.93</td>
+      <td>65.31</td>
+      <td>96984.20</td>
+      <td>1.16</td>
+      <td>-11927.56</td>
+      <td>1.36</td>
+      <td>0.73</td>
+      <td>-1.33</td>
+      <td>-18497.48</td>
     </tr>
     <tr>
       <th>trading Thursdays</th>
-      <td>237.0</td>
-      <td>1862.0</td>
-      <td>76.69</td>
-      <td>115.50</td>
-      <td>107530.72</td>
-      <td>2.03</td>
-      <td>-10773.60</td>
-      <td>2.02</td>
-      <td>2.05</td>
-      <td>-0.56</td>
-      <td>-4513.28</td>
+      <td>232.0</td>
+      <td>1958.0</td>
+      <td>76.40</td>
+      <td>109.72</td>
+      <td>107419.48</td>
+      <td>1.86</td>
+      <td>-14649.96</td>
+      <td>1.90</td>
+      <td>1.80</td>
+      <td>-0.63</td>
+      <td>-8062.20</td>
     </tr>
     <tr>
       <th>keeping the morning tranches</th>
@@ -10061,22 +10065,22 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
       <td>-12700.72</td>
       <td>2.30</td>
       <td>2.61</td>
-      <td>-0.20</td>
-      <td>99326.40</td>
+      <td>-0.09</td>
+      <td>95888.72</td>
     </tr>
     <tr>
       <th>without short/long ratio &lt;= 4</th>
-      <td>188.0</td>
-      <td>1582.0</td>
-      <td>79.14</td>
-      <td>143.33</td>
-      <td>113370.92</td>
-      <td>2.48</td>
-      <td>-4888.92</td>
-      <td>2.33</td>
-      <td>2.83</td>
-      <td>-0.12</td>
-      <td>1326.92</td>
+      <td>184.0</td>
+      <td>1588.0</td>
+      <td>80.23</td>
+      <td>144.80</td>
+      <td>114968.28</td>
+      <td>2.35</td>
+      <td>-8676.68</td>
+      <td>2.29</td>
+      <td>2.53</td>
+      <td>-0.14</td>
+      <td>-513.40</td>
     </tr>
   </tbody>
 </table>
@@ -10118,10 +10122,10 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
       <td>ON: above 10-day SMA (in strategy)</td>
       <td>in strategy</td>
       <td>as set</td>
-      <td>1.28</td>
-      <td>1.05</td>
-      <td>1.77</td>
-      <td>11207.16</td>
+      <td>1.33</td>
+      <td>1.13</td>
+      <td>1.79</td>
+      <td>18497.48</td>
       <td>True</td>
       <td>filter: pays in both halves</td>
     </tr>
@@ -10130,10 +10134,10 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
       <td>ON: move up max 0% (in strategy)</td>
       <td>in strategy</td>
       <td>as set</td>
-      <td>1.18</td>
-      <td>1.07</td>
-      <td>1.40</td>
-      <td>-10389.76</td>
+      <td>1.10</td>
+      <td>1.06</td>
+      <td>1.19</td>
+      <td>-14039.16</td>
       <td>True</td>
       <td>filter: pays in both halves</td>
     </tr>
@@ -10142,10 +10146,10 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
       <td>ON: VIX9D/VIX 0.87-1.02 band (in strategy)</td>
       <td>in strategy</td>
       <td>as set</td>
-      <td>0.71</td>
-      <td>0.60</td>
-      <td>0.96</td>
-      <td>-4158.44</td>
+      <td>0.64</td>
+      <td>0.67</td>
+      <td>0.58</td>
+      <td>-6186.32</td>
       <td>True</td>
       <td>filter: pays in both halves</td>
     </tr>
@@ -10154,94 +10158,94 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
       <td>ON: no Thursdays (in strategy)</td>
       <td>in strategy</td>
       <td>as set</td>
-      <td>0.56</td>
-      <td>0.42</td>
-      <td>0.87</td>
-      <td>4513.28</td>
+      <td>0.63</td>
+      <td>0.59</td>
+      <td>0.72</td>
+      <td>8062.20</td>
       <td>True</td>
       <td>filter: pays in both halves</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>ON: forward-selected tranches (in strategy)</td>
-      <td>in strategy</td>
-      <td>as set</td>
-      <td>0.20</td>
-      <td>0.14</td>
-      <td>0.31</td>
-      <td>-99326.40</td>
-      <td>True</td>
-      <td>filter: pays in both halves</td>
+      <td>SPX 5-day return, prior close, %</td>
+      <td>candidate</td>
+      <td>ret5_prev_pct &gt;= 0.274</td>
+      <td>0.16</td>
+      <td>-0.05</td>
+      <td>0.60</td>
+      <td>-544.88</td>
+      <td>False</td>
+      <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>6</th>
       <td>ON: max short/long 4, whole condor (in strategy)</td>
       <td>in strategy</td>
       <td>as set</td>
-      <td>0.12</td>
-      <td>0.11</td>
-      <td>0.10</td>
-      <td>-1326.92</td>
-      <td>True</td>
-      <td>filter: pays in both halves</td>
+      <td>0.14</td>
+      <td>0.19</td>
+      <td>-0.01</td>
+      <td>513.40</td>
+      <td>False</td>
+      <td>filter: pays in one half only</td>
     </tr>
     <tr>
       <th>7</th>
-      <td>SPX 5-day return, prior close, %</td>
-      <td>candidate</td>
-      <td>ret5_prev_pct &gt;= 0.302</td>
-      <td>0.10</td>
-      <td>-0.03</td>
-      <td>0.34</td>
-      <td>-2357.64</td>
+      <td>ON: forward-selected tranches (in strategy)</td>
+      <td>in strategy</td>
+      <td>as set</td>
+      <td>0.09</td>
+      <td>0.18</td>
+      <td>-0.10</td>
+      <td>-95888.72</td>
       <td>False</td>
-      <td>candidate: not useful</td>
+      <td>filter: pays in one half only</td>
     </tr>
     <tr>
       <th>8</th>
-      <td>VIX at the open vs 5 sessions ago, %</td>
+      <td>VIX1D at the open</td>
       <td>candidate</td>
-      <td>vix_5d_chg_pct &lt;= 6.111</td>
-      <td>-0.01</td>
-      <td>0.14</td>
-      <td>-0.32</td>
-      <td>-5336.76</td>
+      <td>vix1d_open &gt;= 6.72</td>
+      <td>0.05</td>
+      <td>0.12</td>
+      <td>-0.10</td>
+      <td>-1373.72</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>9</th>
-      <td>premium collected, whole condor</td>
+      <td>VIX at the open vs 5 sessions ago, %</td>
       <td>candidate</td>
-      <td>credit &lt;= 425</td>
-      <td>-0.01</td>
-      <td>-0.05</td>
+      <td>vix_5d_chg_pct &lt;= 6.058</td>
       <td>0.05</td>
-      <td>-5402.32</td>
+      <td>0.13</td>
+      <td>-0.15</td>
+      <td>-4237.88</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>10</th>
-      <td>put credit minus call credit, $</td>
+      <td>VIX at the open vs its 20-day SMA, %</td>
       <td>candidate</td>
-      <td>skew_credit &lt;= 10</td>
-      <td>-0.04</td>
-      <td>-0.08</td>
-      <td>0.02</td>
-      <td>-8596.40</td>
+      <td>vix_vs_sma20_pct &lt;= 3.527</td>
+      <td>0.01</td>
+      <td>0.21</td>
+      <td>-0.43</td>
+      <td>-2588.88</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>11</th>
-      <td>SPX SMA5 &gt; SMA9, prior close</td>
+      <td>SPX at entry vs its 20-day SMA (backtester rul...</td>
       <td>candidate</td>
-      <td>sma5_gt_sma9 = 1</td>
-      <td>-0.04</td>
-      <td>-0.12</td>
-      <td>0.14</td>
-      <td>-5625.16</td>
+      <td>spx_vs_sma20_pct &gt;= 0.9002</td>
+      <td>-0.01</td>
+      <td>-0.06</td>
+      <td>0.08</td>
+      <td>-8332.88</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
@@ -10249,179 +10253,179 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
       <th>12</th>
       <td>SPX high-low range from 09:32 to entry, %</td>
       <td>candidate</td>
-      <td>range_so_far &gt;= 0.2032</td>
-      <td>-0.05</td>
-      <td>-0.08</td>
-      <td>0.02</td>
-      <td>-6156.76</td>
-      <td>False</td>
-      <td>candidate: not useful</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>VIX-implied daily move / 5-day average range</td>
-      <td>candidate</td>
-      <td>implied_vs_range5 &lt;= 2.072</td>
+      <td>range_so_far &gt;= 0.1987</td>
+      <td>-0.01</td>
       <td>-0.06</td>
-      <td>0.26</td>
-      <td>-0.73</td>
-      <td>-5739.40</td>
-      <td>False</td>
-      <td>candidate: not useful</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>VIX at the open</td>
-      <td>candidate</td>
-      <td>vix30_open &gt;= 13.47</td>
-      <td>-0.11</td>
-      <td>-0.18</td>
-      <td>0.00</td>
-      <td>-7436.64</td>
-      <td>False</td>
-      <td>candidate: not useful</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>SPX opening gap, %</td>
-      <td>candidate</td>
-      <td>gap_pct &gt;= -0.3433</td>
-      <td>-0.11</td>
-      <td>-0.05</td>
-      <td>-0.25</td>
-      <td>-7632.64</td>
-      <td>False</td>
-      <td>candidate: not useful</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>random number per session (control)</td>
-      <td>noise control</td>
-      <td>noise &gt;= -1.337</td>
-      <td>-0.11</td>
-      <td>-0.09</td>
-      <td>-0.15</td>
-      <td>-7492.64</td>
-      <td>False</td>
-      <td>noise: what luck alone scores</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>SPX up days in the last 5 sessions</td>
-      <td>candidate</td>
-      <td>up_days_5 &gt;= 2</td>
-      <td>-0.12</td>
-      <td>-0.21</td>
-      <td>0.07</td>
+      <td>0.08</td>
       <td>-5632.24</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
-      <th>18</th>
-      <td>VIX9D/VIX30 change over 5 sessions</td>
+      <th>13</th>
+      <td>SPX SMA5 &gt; SMA9, prior close</td>
       <td>candidate</td>
-      <td>ts_5d_chg &lt;= 0.0627</td>
-      <td>-0.13</td>
-      <td>0.02</td>
-      <td>-0.44</td>
-      <td>-6997.28</td>
+      <td>sma5_gt_sma9 = 1</td>
+      <td>-0.02</td>
+      <td>-0.16</td>
+      <td>0.31</td>
+      <td>-5211.52</td>
+      <td>False</td>
+      <td>candidate: not useful</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>prior day |close - open| / range</td>
+      <td>candidate</td>
+      <td>day_efficiency_prev &lt;= 1.024</td>
+      <td>-0.02</td>
+      <td>-0.08</td>
+      <td>0.10</td>
+      <td>-5321.00</td>
+      <td>False</td>
+      <td>candidate: not useful</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>put credit minus call credit, $</td>
+      <td>candidate</td>
+      <td>skew_credit &lt;= 0</td>
+      <td>-0.03</td>
+      <td>-0.08</td>
+      <td>0.06</td>
+      <td>-13670.72</td>
+      <td>False</td>
+      <td>candidate: not useful</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>VIX1D / VIX30 at the open</td>
+      <td>candidate</td>
+      <td>ts_1d_30_open &lt;= 0.7155</td>
+      <td>-0.04</td>
+      <td>-0.06</td>
+      <td>0.01</td>
+      <td>-3834.96</td>
+      <td>False</td>
+      <td>candidate: not useful</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>VIX-implied daily move / 5-day average range</td>
+      <td>candidate</td>
+      <td>implied_vs_range5 &lt;= 2.072</td>
+      <td>-0.04</td>
+      <td>0.25</td>
+      <td>-0.67</td>
+      <td>-5210.00</td>
+      <td>False</td>
+      <td>candidate: not useful</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>VIX9D overnight gap, open vs prior close, %</td>
+      <td>candidate</td>
+      <td>vix9d_gap_pct &gt;= -2.531</td>
+      <td>-0.05</td>
+      <td>-0.03</td>
+      <td>-0.10</td>
+      <td>-5216.00</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>19</th>
-      <td>SPX change over the 20 minutes before entry, %</td>
+      <td>SPX 20-day ATR, % of prior close</td>
       <td>candidate</td>
-      <td>ret_last_tranche &lt;= 0.1214</td>
-      <td>-0.13</td>
-      <td>-0.21</td>
-      <td>-0.00</td>
-      <td>-10580.76</td>
+      <td>atr20_pct &gt;= 0.6738</td>
+      <td>-0.06</td>
+      <td>0.18</td>
+      <td>-0.59</td>
+      <td>-6480.76</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>20</th>
-      <td>SPX 10-day realized vol, prior close, % (annua...</td>
+      <td>premium collected, whole condor</td>
       <td>candidate</td>
-      <td>rv10_prev &gt;= 8.526</td>
-      <td>-0.13</td>
-      <td>0.23</td>
-      <td>-0.91</td>
-      <td>-11570.16</td>
+      <td>credit &lt;= 420</td>
+      <td>-0.06</td>
+      <td>-0.10</td>
+      <td>0.01</td>
+      <td>-8354.12</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>21</th>
-      <td>prior day |close - open| / range</td>
+      <td>IV rank of the VIX open, 90 sessions</td>
       <td>candidate</td>
-      <td>day_efficiency_prev &lt;= 1.026</td>
-      <td>-0.13</td>
-      <td>-0.14</td>
+      <td>ivr90 &lt;= 31.99</td>
+      <td>-0.06</td>
+      <td>-0.02</td>
       <td>-0.15</td>
-      <td>-8038.04</td>
+      <td>-4441.44</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>22</th>
-      <td>SPX prior close below its 20-day high, %</td>
+      <td>SPX up days in the last 5 sessions</td>
       <td>candidate</td>
-      <td>spx_off_20d_high_pct &lt;= 0</td>
-      <td>-0.14</td>
+      <td>up_days_5 &gt;= 2</td>
+      <td>-0.07</td>
       <td>-0.21</td>
-      <td>0.00</td>
-      <td>-5296.52</td>
+      <td>0.24</td>
+      <td>-4678.24</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>23</th>
-      <td>VVIX 252-day rank, prior close</td>
+      <td>VIX at the open</td>
       <td>candidate</td>
-      <td>vvix_rank252 &lt;= 33.88</td>
-      <td>-0.14</td>
-      <td>-0.20</td>
-      <td>-0.06</td>
-      <td>-8535.76</td>
+      <td>vix30_open &gt;= 13.43</td>
+      <td>-0.08</td>
+      <td>-0.12</td>
+      <td>0.00</td>
+      <td>-7576.00</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>24</th>
-      <td>VIX9D at the open</td>
+      <td>SPX prior close below its 20-day high, %</td>
       <td>candidate</td>
-      <td>vix9d_open &gt;= 12.66</td>
-      <td>-0.15</td>
-      <td>-0.23</td>
-      <td>0.00</td>
-      <td>-8001.64</td>
+      <td>spx_off_20d_high_pct &gt;= -1.751</td>
+      <td>-0.09</td>
+      <td>-0.12</td>
+      <td>-0.03</td>
+      <td>-6201.88</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>25</th>
-      <td>VIX9D overnight gap, open vs prior close, %</td>
+      <td>SPX opening gap, %</td>
       <td>candidate</td>
-      <td>vix9d_gap_pct &gt;= -2.531</td>
-      <td>-0.15</td>
-      <td>-0.06</td>
-      <td>-0.32</td>
-      <td>-7628.40</td>
+      <td>gap_pct &gt;= -0.3409</td>
+      <td>-0.10</td>
+      <td>-0.05</td>
+      <td>-0.23</td>
+      <td>-7176.24</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>26</th>
-      <td>VIX at the open vs its 20-day SMA, %</td>
+      <td>SPX 10-day realized vol, prior close, % (annua...</td>
       <td>candidate</td>
-      <td>vix_vs_sma20_pct &lt;= 3.614</td>
-      <td>-0.15</td>
-      <td>-0.02</td>
-      <td>-0.44</td>
-      <td>-8762.04</td>
+      <td>rv10_prev &gt;= 6.565</td>
+      <td>-0.11</td>
+      <td>0.05</td>
+      <td>-0.45</td>
+      <td>-6012.88</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
@@ -10430,166 +10434,166 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
       <td>SPX prior day's high-low range, %</td>
       <td>candidate</td>
       <td>prior_day_range_pct &gt;= 0.3294</td>
-      <td>-0.15</td>
-      <td>-0.04</td>
-      <td>-0.38</td>
-      <td>-8552.40</td>
+      <td>-0.12</td>
+      <td>-0.05</td>
+      <td>-0.27</td>
+      <td>-7585.88</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>28</th>
-      <td>SPX 20-day ATR, % of prior close</td>
+      <td>SPX at entry vs SMA5 of prior closes, %</td>
       <td>candidate</td>
-      <td>atr20_pct &gt;= 0.6738</td>
-      <td>-0.18</td>
-      <td>0.01</td>
-      <td>-0.59</td>
-      <td>-10952.68</td>
+      <td>spx_entry_over_sma5 &gt;= -0.2908</td>
+      <td>-0.13</td>
+      <td>-0.10</td>
+      <td>-0.21</td>
+      <td>-9241.24</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>29</th>
-      <td>SPX at entry vs SMA5 of prior closes, %</td>
+      <td>VVIX 252-day rank, prior close</td>
       <td>candidate</td>
-      <td>spx_entry_over_sma5 &gt;= -0.3165</td>
+      <td>vvix_rank252 &lt;= 33.05</td>
+      <td>-0.14</td>
       <td>-0.20</td>
-      <td>-0.20</td>
-      <td>-0.22</td>
-      <td>-11123.76</td>
+      <td>-0.03</td>
+      <td>-8938.00</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>30</th>
-      <td>VIX9D/VIX30 change, prior close to open</td>
+      <td>VIX9D at the open</td>
       <td>candidate</td>
-      <td>ts_overnight_chg &gt;= -0.005313</td>
-      <td>-0.21</td>
-      <td>-0.11</td>
-      <td>-0.42</td>
-      <td>-8427.52</td>
+      <td>vix9d_open &gt;= 12.51</td>
+      <td>-0.15</td>
+      <td>-0.22</td>
+      <td>0.00</td>
+      <td>-9019.24</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>31</th>
-      <td>SPX at entry vs its 20-day SMA (backtester rul...</td>
+      <td>VIX9D/VIX30 change, prior close to open</td>
       <td>candidate</td>
-      <td>spx_vs_sma20_pct &gt;= 0.8513</td>
-      <td>-0.22</td>
-      <td>-0.32</td>
-      <td>-0.02</td>
-      <td>-14645.44</td>
+      <td>ts_overnight_chg &gt;= -0.005313</td>
+      <td>-0.15</td>
+      <td>-0.13</td>
+      <td>-0.19</td>
+      <td>-7184.88</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>32</th>
-      <td>VIX9D gap in [-3.3%, -0.8%) (1) or not (0)</td>
+      <td>SPX change over the 20 minutes before entry, %</td>
       <td>candidate</td>
-      <td>vix9d_gap_band = 0</td>
-      <td>-0.24</td>
-      <td>-0.17</td>
-      <td>-0.36</td>
-      <td>-10732.16</td>
+      <td>ret_last_tranche &lt;= 0.1159</td>
+      <td>-0.16</td>
+      <td>-0.25</td>
+      <td>0.04</td>
+      <td>-11935.24</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>33</th>
-      <td>last session of the month (1) or not (0)</td>
-      <td>candidate</td>
-      <td>month_end = 0</td>
-      <td>-0.24</td>
-      <td>-0.22</td>
-      <td>-0.26</td>
-      <td>-9216.84</td>
+      <td>random number per session (control)</td>
+      <td>noise control</td>
+      <td>noise &gt;= -1.337</td>
+      <td>-0.16</td>
+      <td>-0.18</td>
+      <td>-0.11</td>
+      <td>-9647.12</td>
       <td>False</td>
-      <td>candidate: not useful</td>
+      <td>noise: what luck alone scores</td>
     </tr>
     <tr>
       <th>34</th>
-      <td>SPX below its intraday high at entry, %</td>
+      <td>VIX9D/VIX30 change over 5 sessions</td>
       <td>candidate</td>
-      <td>dd_from_hi &lt;= -0.09967</td>
-      <td>-0.24</td>
-      <td>-0.24</td>
-      <td>-0.24</td>
-      <td>-11949.76</td>
+      <td>ts_5d_chg &lt;= 0.0627</td>
+      <td>-0.18</td>
+      <td>-0.06</td>
+      <td>-0.43</td>
+      <td>-9414.88</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>35</th>
-      <td>VIX9D prior close / prior day's Parkinson vol</td>
+      <td>SPX below its intraday high at entry, %</td>
       <td>candidate</td>
-      <td>ivrv_vix9d_pk1 &lt;= 4.449</td>
-      <td>-0.24</td>
-      <td>-0.10</td>
-      <td>-0.54</td>
-      <td>-10721.64</td>
+      <td>dd_from_hi &lt;= -0.2046</td>
+      <td>-0.19</td>
+      <td>-0.19</td>
+      <td>-0.17</td>
+      <td>-21611.48</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>36</th>
-      <td>monthly options-expiration week (1) or not (0)</td>
+      <td>last session of the month (1) or not (0)</td>
       <td>candidate</td>
-      <td>opex_week = 0</td>
-      <td>-0.36</td>
-      <td>-0.55</td>
-      <td>0.05</td>
-      <td>-16632.16</td>
+      <td>month_end = 0</td>
+      <td>-0.20</td>
+      <td>-0.20</td>
+      <td>-0.18</td>
+      <td>-8332.08</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>37</th>
-      <td>VIX prior close minus SPX 20-day realized vol</td>
+      <td>VIX9D prior close / prior day's Parkinson vol</td>
       <td>candidate</td>
-      <td>vrp20 &gt;= -1.797</td>
-      <td>-0.37</td>
-      <td>-0.44</td>
-      <td>-0.27</td>
-      <td>-16394.80</td>
+      <td>ivrv_vix9d_pk1 &lt;= 4.449</td>
+      <td>-0.22</td>
+      <td>-0.10</td>
+      <td>-0.48</td>
+      <td>-10509.00</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>38</th>
-      <td>IV rank of the VIX open, 90 sessions</td>
+      <td>monthly options-expiration week (1) or not (0)</td>
       <td>candidate</td>
-      <td>ivr90 &lt;= 32.02</td>
-      <td>-0.56</td>
-      <td>-0.76</td>
-      <td>-0.22</td>
-      <td>-23775.00</td>
+      <td>opex_week = 0</td>
+      <td>-0.24</td>
+      <td>-0.45</td>
+      <td>0.24</td>
+      <td>-14927.12</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>39</th>
-      <td>VIX1D at the open</td>
+      <td>VIX prior close minus SPX 20-day realized vol</td>
       <td>candidate</td>
-      <td>vix1d_open &gt;= 6.806</td>
-      <td>-0.69</td>
-      <td>-0.99</td>
-      <td>-0.23</td>
-      <td>-32021.08</td>
+      <td>vrp20 &gt;= -1.714</td>
+      <td>-0.24</td>
+      <td>-0.26</td>
+      <td>-0.22</td>
+      <td>-11787.00</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
     <tr>
       <th>40</th>
-      <td>VIX1D / VIX30 at the open</td>
+      <td>VIX9D gap in [-3.3%, -0.8%) (1) or not (0)</td>
       <td>candidate</td>
-      <td>ts_1d_30_open &gt;= 0.4698</td>
-      <td>-0.76</td>
-      <td>-0.91</td>
-      <td>-0.55</td>
-      <td>-33983.08</td>
+      <td>vix9d_gap_band = 0</td>
+      <td>-0.25</td>
+      <td>-0.19</td>
+      <td>-0.38</td>
+      <td>-11902.52</td>
       <td>False</td>
       <td>candidate: not useful</td>
     </tr>
@@ -10598,26 +10602,36 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
 </div>
 
 
-**How to read the noise.** The noise feature scores **-0.11**: one random draw, close to the middle of what random features score
-(median -0.16 over 200 draws; most random cuts lower Sharpe, because with 187 trading days every idle day pays the 4% hurdle). One random
-feature beats +0.01 only 5% of the time, but **the best of 33 random features beats +0.17 5% of the time**, and typically scores +0.06.
-That is the bar a candidate has to clear: **+0.17**.
+**How to read the noise.** The noise feature scores **-0.16**: one random draw, close to the middle of what random features score
+(median -0.14 over 200 draws; most random cuts lower Sharpe, because every idle day pays the 4% hurdle). One random feature beats +0.05 only
+5% of the time, but **the best of 33 random features beats +0.28 5% of the time**, and typically scores +0.09. That is the bar a candidate has
+to clear: **+0.28**.
 
 | removed from the finished strategy | trades | Sharpe | change | total P/L change |
 |---|---|---|---|---|
-| above the 10-day SMA | 2,864 | 1.32 | **-1.28** | -\$11.2k |
-| max move up 0% | 3,946 | 1.42 | **-1.18** | +\$10.4k |
-| the VIX9D/VIX band | 2,324 | 1.89 | **-0.71** | +\$4.2k |
-| no Thursdays | 1,862 | 2.03 | **-0.56** | -\$4.5k |
-| the 7 tranches (trade all 20) | 3,940 | 2.40 | -0.20 | +\$99.3k |
-| short/long ratio <= 4 | 1,582 | 2.48 | -0.12 | +\$1.3k |
-| *added: a 400% call stop* | 1,450 | 2.46 | *-0.14* | *-\$6.2k* |
+| above the 10-day SMA | 2,970 | 1.16 | **-1.33** | -\$18.5k |
+| max move up 0% | 4,164 | 1.39 | **-1.10** | +\$14.0k |
+| the VIX9D/VIX band | 2,450 | 1.85 | **-0.64** | +\$6.2k |
+| no Thursdays | 1,958 | 1.86 | **-0.63** | -\$8.1k |
+| short/long ratio <= 4 | 1,588 | 2.35 | -0.14 | -\$0.5k |
+| the 7 tranches (trade all 20) | 3,940 | 2.40 | -0.09 | +\$95.9k |
+| *added: a 400% call stop* | 1,528 | 2.41 | *-0.08* | *-\$5.5k* |
 
-- **Every setting pays, in both halves.** The 10-day SMA is now the most important: without it Sharpe falls to 1.32, the book loses \$11.2k
-  and the drawdown triples (-\$3.8k to -\$11.8k).
-- **No candidate clears the noise bar, and none adds in both halves.** The best, SPX's 5-day return (+0.10), is what the luckiest of 33
-  random features would typically score, and it only works from 2025 (-0.03 in 2022-24).
-  SMA5 > SMA9 loses (-0.04).
+- **The four entry filters pay in both halves.** The 10-day SMA is the most important: without it Sharpe falls to 1.16, the book makes \$18.5k
+  less and the drawdown nearly doubles (-\$6.5k to -\$11.9k).
+- **The ratio cap and the 7 tranches now pay in 2022-24 only** (+0.19 and +0.18), not in 2025-26 (-0.01 and -0.10): with 13:33 in, the set's
+  edge over trading all 20 is gone in the recent half.
+- **No candidate clears the noise bar, and none adds in both halves.** The best, SPX's 5-day return (+0.16), is what the luckiest of 33
+  random features would typically score, and it only works from 2025 (-0.05 in 2022-24).
+
+**Why the VIX1D features looked so bad, and what they really score.** In an earlier version of this ranking, VIX1D at the open (-0.69) and
+VIX1D/VIX30 (-0.76) were the two worst candidates, far below the random-noise control (-0.11); VIX1D/VIX9D was weak and redundant and is left
+out of the ranking (`DROPPED_FEATURES` in `final_version.py`). **That was missing data, not a signal:** VIX1D only exists from 2023-04-24, and
+20% of the strategy's condors (+\$30.8k) come before it. The search treated a blank as failing the rule, so every VIX1D cut threw out all of
+2022 to April 2023 and lost ~\$31k. **With those days kept (a filter can't act on a day its feature doesn't exist), VIX1D at the open scores
++0.05 and VIX1D/VIX30 -0.04**: mid-table, above the noise control, below the bar, and neither works in both halves. On the days it exists,
+VIX1D at the open is only weakly related to the condor's P/L (rank correlation -0.15; P/L per condor \$99-160 across its quintiles, lowest
+at the highest VIX1D): it measures today's priced risk, which the band and the move filter already capture.
 
 
     
@@ -10644,7 +10658,7 @@ That is the bar a candidate has to clear: **+0.17**.
       <td>VIX</td>
       <td>VIX9D</td>
       <td>0.96</td>
-      <td>-0.06</td>
+      <td>-0.07</td>
       <td>-0.07</td>
     </tr>
     <tr>
@@ -10652,7 +10666,7 @@ That is the bar a candidate has to clear: **+0.17**.
       <td>VIX9D gap</td>
       <td>VIX9D/VIX30 overnight</td>
       <td>0.91</td>
-      <td>0.06</td>
+      <td>0.07</td>
       <td>0.06</td>
     </tr>
     <tr>
@@ -10660,8 +10674,8 @@ That is the bar a candidate has to clear: **+0.17**.
       <td>prior-day range</td>
       <td>VIX9D / Parkinson vol</td>
       <td>-0.89</td>
-      <td>0.03</td>
-      <td>-0.07</td>
+      <td>0.02</td>
+      <td>-0.06</td>
     </tr>
     <tr>
       <th>3</th>
@@ -10669,102 +10683,102 @@ That is the bar a candidate has to clear: **+0.17**.
       <td>credit</td>
       <td>0.89</td>
       <td>0.26</td>
-      <td>0.30</td>
+      <td>0.31</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>range so far</td>
-      <td>below intraday high</td>
-      <td>-0.80</td>
-      <td>0.05</td>
-      <td>-0.02</td>
+      <td>ATR20</td>
+      <td>VIX9D</td>
+      <td>0.79</td>
+      <td>-0.01</td>
+      <td>-0.07</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>VIX9D</td>
-      <td>ATR20</td>
-      <td>0.80</td>
-      <td>-0.07</td>
-      <td>0.00</td>
+      <td>range so far</td>
+      <td>below intraday high</td>
+      <td>-0.79</td>
+      <td>0.05</td>
+      <td>-0.04</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>VIX1D</td>
-      <td>VIX1D/VIX30</td>
-      <td>0.77</td>
-      <td>-0.12</td>
-      <td>-0.06</td>
-    </tr>
-    <tr>
-      <th>7</th>
       <td>SPX vs SMA10</td>
       <td>SPX at entry vs SMA5</td>
       <td>0.77</td>
-      <td>0.09</td>
+      <td>0.11</td>
       <td>0.05</td>
     </tr>
     <tr>
-      <th>8</th>
-      <td>10-day realized vol</td>
-      <td>ATR20</td>
+      <th>7</th>
+      <td>VIX1D</td>
+      <td>VIX1D/VIX30</td>
       <td>0.77</td>
-      <td>0.07</td>
-      <td>0.00</td>
+      <td>-0.15</td>
+      <td>-0.07</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>ATR20</td>
+      <td>10-day realized vol</td>
+      <td>0.76</td>
+      <td>-0.01</td>
+      <td>0.05</td>
     </tr>
     <tr>
       <th>9</th>
-      <td>VIX</td>
-      <td>ATR20</td>
+      <td>SPX vs SMA10</td>
+      <td>5-day return</td>
       <td>0.75</td>
-      <td>-0.06</td>
-      <td>0.00</td>
+      <td>0.11</td>
+      <td>0.05</td>
     </tr>
     <tr>
       <th>10</th>
       <td>move since open</td>
       <td>below intraday high</td>
       <td>0.75</td>
-      <td>-0.02</td>
-      <td>-0.02</td>
+      <td>-0.03</td>
+      <td>-0.04</td>
     </tr>
     <tr>
       <th>11</th>
-      <td>SPX vs SMA10</td>
-      <td>5-day return</td>
+      <td>ATR20</td>
+      <td>VIX</td>
       <td>0.74</td>
-      <td>0.09</td>
-      <td>0.04</td>
+      <td>-0.01</td>
+      <td>-0.07</td>
     </tr>
     <tr>
       <th>12</th>
       <td>ATR20</td>
       <td>VRP (VIX - RV20)</td>
-      <td>-0.68</td>
-      <td>0.00</td>
-      <td>-0.06</td>
+      <td>-0.67</td>
+      <td>-0.01</td>
+      <td>-0.05</td>
     </tr>
     <tr>
       <th>13</th>
       <td>move since open</td>
       <td>range so far</td>
-      <td>-0.66</td>
-      <td>-0.02</td>
+      <td>-0.65</td>
+      <td>-0.03</td>
       <td>0.05</td>
     </tr>
     <tr>
       <th>14</th>
+      <td>10-day realized vol</td>
       <td>VIX9D</td>
-      <td>VIX1D</td>
-      <td>0.66</td>
+      <td>0.63</td>
+      <td>0.05</td>
       <td>-0.07</td>
-      <td>-0.12</td>
     </tr>
     <tr>
       <th>15</th>
-      <td>10-day realized vol</td>
+      <td>VIX1D</td>
       <td>VIX9D</td>
-      <td>0.65</td>
-      <td>0.07</td>
+      <td>0.63</td>
+      <td>-0.15</td>
       <td>-0.07</td>
     </tr>
     <tr>
@@ -10772,24 +10786,32 @@ That is the bar a candidate has to clear: **+0.17**.
       <td>implied / 5-day range</td>
       <td>prior-day range</td>
       <td>-0.63</td>
-      <td>-0.04</td>
-      <td>0.03</td>
+      <td>-0.05</td>
+      <td>0.02</td>
     </tr>
     <tr>
       <th>17</th>
       <td>VIX vs its SMA20</td>
       <td>SPX vs SMA20</td>
-      <td>-0.63</td>
+      <td>-0.62</td>
       <td>-0.10</td>
-      <td>0.17</td>
+      <td>0.18</td>
     </tr>
     <tr>
       <th>18</th>
-      <td>VIX</td>
-      <td>10-day realized vol</td>
-      <td>0.61</td>
-      <td>-0.06</td>
-      <td>0.07</td>
+      <td>VIX1D</td>
+      <td>VVIX rank</td>
+      <td>0.60</td>
+      <td>-0.15</td>
+      <td>-0.04</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>5-day return</td>
+      <td>up days (5)</td>
+      <td>0.60</td>
+      <td>0.05</td>
+      <td>0.09</td>
     </tr>
   </tbody>
 </table>
@@ -10808,95 +10830,87 @@ That is the bar a candidate has to clear: **+0.17**.
   <tbody>
     <tr>
       <th>credit</th>
-      <td>0.30</td>
+      <td>0.31</td>
     </tr>
     <tr>
       <th>S/L ratio, condor</th>
       <td>0.26</td>
     </tr>
     <tr>
-      <th>SPX vs SMA20</th>
-      <td>0.17</td>
+      <th>below 20-day high</th>
+      <td>0.19</td>
     </tr>
     <tr>
-      <th>below 20-day high</th>
-      <td>0.16</td>
+      <th>SPX vs SMA20</th>
+      <td>0.18</td>
     </tr>
     <tr>
       <th>IV rank 90</th>
-      <td>-0.14</td>
+      <td>-0.17</td>
     </tr>
     <tr>
       <th>VIX1D</th>
-      <td>-0.12</td>
+      <td>-0.15</td>
     </tr>
     <tr>
-      <th>VIX9D/VIX at entry</th>
-      <td>-0.11</td>
+      <th>SPX vs SMA10</th>
+      <td>0.11</td>
     </tr>
     <tr>
       <th>VIX vs its SMA20</th>
       <td>-0.10</td>
     </tr>
     <tr>
-      <th>SPX vs SMA10</th>
-      <td>0.09</td>
+      <th>VIX9D/VIX at entry</th>
+      <td>-0.10</td>
     </tr>
     <tr>
       <th>up days (5)</th>
       <td>0.09</td>
     </tr>
     <tr>
-      <th>month end</th>
-      <td>0.08</td>
-    </tr>
-    <tr>
       <th>put-call credit skew</th>
       <td>-0.08</td>
-    </tr>
-    <tr>
-      <th>10-day realized vol</th>
-      <td>0.07</td>
     </tr>
     <tr>
       <th>OPEX week</th>
       <td>-0.07</td>
     </tr>
     <tr>
-      <th>VIX9D / Parkinson vol</th>
+      <th>VIX1D/VIX30</th>
       <td>-0.07</td>
-    </tr>
-    <tr>
-      <th>noise</th>
-      <td>0.07</td>
     </tr>
     <tr>
       <th>VIX9D</th>
       <td>-0.07</td>
     </tr>
     <tr>
-      <th>VRP (VIX - RV20)</th>
-      <td>-0.06</td>
+      <th>VIX</th>
+      <td>-0.07</td>
     </tr>
     <tr>
       <th>VIX9D gap</th>
-      <td>0.06</td>
-    </tr>
-    <tr>
-      <th>VIX</th>
-      <td>-0.06</td>
+      <td>0.07</td>
     </tr>
     <tr>
       <th>VIX9D/VIX30 overnight</th>
       <td>0.06</td>
     </tr>
     <tr>
-      <th>VIX1D/VIX30</th>
+      <th>noise</th>
+      <td>0.06</td>
+    </tr>
+    <tr>
+      <th>VIX9D / Parkinson vol</th>
       <td>-0.06</td>
     </tr>
     <tr>
       <th>VIX 5-day change</th>
       <td>-0.05</td>
+    </tr>
+    <tr>
+      <th>SPX at entry vs SMA5</th>
+      <td>0.05</td>
     </tr>
     <tr>
       <th>range so far</th>
@@ -10907,7 +10921,23 @@ That is the bar a candidate has to clear: **+0.17**.
       <td>0.05</td>
     </tr>
     <tr>
-      <th>SPX at entry vs SMA5</th>
+      <th>VRP (VIX - RV20)</th>
+      <td>-0.05</td>
+    </tr>
+    <tr>
+      <th>prior-day efficiency</th>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>implied / 5-day range</th>
+      <td>-0.05</td>
+    </tr>
+    <tr>
+      <th>5-day return</th>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>10-day realized vol</th>
       <td>0.05</td>
     </tr>
     <tr>
@@ -10915,48 +10945,40 @@ That is the bar a candidate has to clear: **+0.17**.
       <td>-0.04</td>
     </tr>
     <tr>
-      <th>prior-day efficiency</th>
-      <td>0.04</td>
-    </tr>
-    <tr>
-      <th>VIX9D/VIX30 5-day change</th>
-      <td>-0.04</td>
-    </tr>
-    <tr>
-      <th>5-day return</th>
-      <td>0.04</td>
-    </tr>
-    <tr>
-      <th>implied / 5-day range</th>
-      <td>-0.04</td>
-    </tr>
-    <tr>
       <th>SMA5 &gt; SMA9</th>
       <td>0.04</td>
     </tr>
     <tr>
-      <th>prior-day range</th>
-      <td>0.03</td>
-    </tr>
-    <tr>
-      <th>move since open</th>
-      <td>-0.02</td>
-    </tr>
-    <tr>
-      <th>gap</th>
-      <td>0.02</td>
+      <th>month end</th>
+      <td>0.04</td>
     </tr>
     <tr>
       <th>below intraday high</th>
+      <td>-0.04</td>
+    </tr>
+    <tr>
+      <th>move since open</th>
+      <td>-0.03</td>
+    </tr>
+    <tr>
+      <th>VIX9D/VIX30 5-day change</th>
       <td>-0.02</td>
     </tr>
     <tr>
-      <th>VIX9D gap band</th>
-      <td>-0.02</td>
+      <th>prior-day range</th>
+      <td>0.02</td>
     </tr>
     <tr>
       <th>ATR20</th>
-      <td>0.00</td>
+      <td>-0.01</td>
+    </tr>
+    <tr>
+      <th>gap</th>
+      <td>0.01</td>
+    </tr>
+    <tr>
+      <th>VIX9D gap band</th>
+      <td>-0.00</td>
     </tr>
   </tbody>
 </table>
@@ -10985,12 +11007,12 @@ That is the bar a candidate has to clear: **+0.17**.
   <tbody>
     <tr>
       <th>strategy</th>
-      <td>187.0</td>
-      <td>112044.00</td>
-      <td>2.60</td>
-      <td>-3808.68</td>
-      <td>2.44</td>
-      <td>2.92</td>
+      <td>182.0</td>
+      <td>115481.68</td>
+      <td>2.49</td>
+      <td>-6501.16</td>
+      <td>2.48</td>
+      <td>2.51</td>
       <td>0.00</td>
       <td>0.00</td>
       <td>0.00</td>
@@ -10999,68 +11021,68 @@ That is the bar a candidate has to clear: **+0.17**.
     </tr>
     <tr>
       <th>+ VVIX 252-day rank &lt;= 25</th>
-      <td>135.0</td>
-      <td>83062.76</td>
-      <td>1.93</td>
-      <td>-4843.48</td>
-      <td>1.75</td>
-      <td>2.26</td>
-      <td>-0.67</td>
-      <td>-0.70</td>
-      <td>-0.66</td>
-      <td>-28981.24</td>
+      <td>133.0</td>
+      <td>86493.96</td>
+      <td>1.86</td>
+      <td>-7025.24</td>
+      <td>1.80</td>
+      <td>1.98</td>
+      <td>-0.63</td>
+      <td>-0.68</td>
+      <td>-0.54</td>
+      <td>-28987.72</td>
       <td>False</td>
     </tr>
     <tr>
       <th>+ VVIX 252-day rank &lt;= 30</th>
-      <td>157.0</td>
-      <td>101696.60</td>
-      <td>2.41</td>
-      <td>-3808.68</td>
-      <td>2.23</td>
-      <td>2.77</td>
-      <td>-0.18</td>
-      <td>-0.22</td>
+      <td>154.0</td>
+      <td>105298.16</td>
+      <td>2.33</td>
+      <td>-6501.16</td>
+      <td>2.28</td>
+      <td>2.43</td>
       <td>-0.16</td>
-      <td>-10347.40</td>
+      <td>-0.20</td>
+      <td>-0.08</td>
+      <td>-10183.52</td>
       <td>False</td>
     </tr>
     <tr>
       <th>+ VVIX 252-day rank &lt;= 35</th>
-      <td>166.0</td>
-      <td>106202.20</td>
-      <td>2.53</td>
-      <td>-3808.68</td>
-      <td>2.36</td>
-      <td>2.87</td>
-      <td>-0.07</td>
-      <td>-0.09</td>
+      <td>162.0</td>
+      <td>109643.76</td>
+      <td>2.43</td>
+      <td>-6501.16</td>
+      <td>2.40</td>
+      <td>2.49</td>
       <td>-0.06</td>
-      <td>-5841.80</td>
+      <td>-0.09</td>
+      <td>-0.03</td>
+      <td>-5837.92</td>
       <td>False</td>
     </tr>
     <tr>
       <th>+ VVIX 252-day rank &lt;= 40</th>
-      <td>176.0</td>
-      <td>108349.80</td>
-      <td>2.56</td>
-      <td>-3808.68</td>
-      <td>2.40</td>
-      <td>2.87</td>
-      <td>-0.04</td>
-      <td>-0.04</td>
-      <td>-0.05</td>
-      <td>-3694.20</td>
+      <td>172.0</td>
+      <td>110939.24</td>
+      <td>2.42</td>
+      <td>-6501.16</td>
+      <td>2.39</td>
+      <td>2.49</td>
+      <td>-0.07</td>
+      <td>-0.09</td>
+      <td>-0.03</td>
+      <td>-4542.44</td>
       <td>False</td>
     </tr>
     <tr>
       <th>+ VVIX 252-day rank &lt;= 50</th>
-      <td>186.0</td>
-      <td>111784.76</td>
-      <td>2.59</td>
-      <td>-3808.68</td>
-      <td>2.43</td>
-      <td>2.92</td>
+      <td>181.0</td>
+      <td>115222.44</td>
+      <td>2.48</td>
+      <td>-6501.16</td>
+      <td>2.47</td>
+      <td>2.51</td>
       <td>-0.01</td>
       <td>-0.01</td>
       <td>0.00</td>
@@ -11069,72 +11091,72 @@ That is the bar a candidate has to clear: **+0.17**.
     </tr>
     <tr>
       <th>+ condor credit &lt;= $450</th>
-      <td>186.0</td>
-      <td>109223.16</td>
-      <td>2.59</td>
-      <td>-3549.80</td>
-      <td>2.42</td>
-      <td>2.94</td>
-      <td>-0.01</td>
-      <td>-0.03</td>
-      <td>0.02</td>
-      <td>-2820.84</td>
+      <td>181.0</td>
+      <td>113586.20</td>
+      <td>2.49</td>
+      <td>-6242.28</td>
+      <td>2.50</td>
+      <td>2.49</td>
+      <td>0.00</td>
+      <td>0.01</td>
+      <td>-0.02</td>
+      <td>-1895.48</td>
       <td>False</td>
     </tr>
     <tr>
       <th>+ SPX gap &gt;= -0.5%</th>
-      <td>174.0</td>
-      <td>108674.80</td>
-      <td>2.55</td>
-      <td>-3808.68</td>
-      <td>2.48</td>
-      <td>2.71</td>
+      <td>170.0</td>
+      <td>112296.36</td>
+      <td>2.45</td>
+      <td>-6152.40</td>
+      <td>2.51</td>
+      <td>2.32</td>
       <td>-0.04</td>
       <td>0.03</td>
-      <td>-0.21</td>
-      <td>-3369.20</td>
+      <td>-0.20</td>
+      <td>-3185.32</td>
       <td>False</td>
     </tr>
     <tr>
       <th>+ SPX gap &gt;= -0.25%</th>
-      <td>155.0</td>
-      <td>97596.52</td>
-      <td>2.30</td>
-      <td>-3808.68</td>
-      <td>2.21</td>
-      <td>2.47</td>
-      <td>-0.30</td>
-      <td>-0.23</td>
-      <td>-0.45</td>
-      <td>-14447.48</td>
+      <td>151.0</td>
+      <td>101437.08</td>
+      <td>2.22</td>
+      <td>-6814.28</td>
+      <td>2.31</td>
+      <td>2.01</td>
+      <td>-0.28</td>
+      <td>-0.17</td>
+      <td>-0.50</td>
+      <td>-14044.60</td>
       <td>False</td>
     </tr>
     <tr>
       <th>+ SPX gap &gt;= 0%</th>
-      <td>111.0</td>
-      <td>75546.96</td>
-      <td>1.78</td>
-      <td>-2440.52</td>
+      <td>110.0</td>
+      <td>76689.92</td>
+      <td>1.65</td>
+      <td>-4686.36</td>
       <td>1.64</td>
-      <td>2.06</td>
-      <td>-0.81</td>
-      <td>-0.80</td>
+      <td>1.66</td>
+      <td>-0.84</td>
+      <td>-0.84</td>
       <td>-0.86</td>
-      <td>-36497.04</td>
+      <td>-38791.76</td>
       <td>False</td>
     </tr>
     <tr>
       <th>+ SMA5 &gt; SMA9</th>
-      <td>164.0</td>
-      <td>106418.84</td>
-      <td>2.55</td>
-      <td>-4647.88</td>
+      <td>159.0</td>
+      <td>110270.16</td>
+      <td>2.47</td>
+      <td>-6590.64</td>
       <td>2.32</td>
-      <td>3.07</td>
-      <td>-0.04</td>
-      <td>-0.12</td>
-      <td>0.14</td>
-      <td>-5625.16</td>
+      <td>2.83</td>
+      <td>-0.02</td>
+      <td>-0.16</td>
+      <td>0.31</td>
+      <td>-5211.52</td>
       <td>False</td>
     </tr>
   </tbody>
@@ -11143,22 +11165,22 @@ That is the bar a candidate has to clear: **+0.17**.
 
 
 **The features fall into a few clusters that say the same thing twice:** vol level (VIX and VIX9D: 0.96), premium (credit and the
-condor's ratio: 0.89), trend (SPX vs SMA10 with SPX vs SMA5 and the 5-day return: 0.74-0.77), intraday path (range so far, below the
-intraday high, move since the open: 0.75-0.80). **VIX9D/VIX at entry stands on its own**: it measures the curve's shape, not its level.
-Correlation with P/L is small everywhere (credit +0.30, the ratio +0.26, SPX vs SMA20 +0.17, the rest within ±0.16).
+condor's ratio: 0.89), trend (SPX vs SMA10 with SPX vs SMA5 and the 5-day return: 0.75-0.77), intraday path (range so far, below the
+intraday high, move since the open: 0.75-0.79), and VIX1D with VIX1D/VIX30 (0.77). **VIX9D/VIX at entry stands on its own**: it measures the
+curve's shape, not its level. Correlation with P/L is small everywhere (credit +0.31, the ratio +0.26, the rest within ±0.19).
 
 | on top of the strategy | sessions | Sharpe | change | total P/L change | both halves |
 |---|---|---|---|---|---|
-| SMA5 > SMA9 | 164 | 2.55 | -0.04 | -\$5.6k | no (-0.12 in 2022-24, +0.14 in 2025-26) |
-| condor credit <= \$450 | 186 | 2.59 | -0.01 | -\$2.8k | no |
-| VVIX rank <= 35 | 166 | 2.53 | -0.07 | -\$5.8k | no |
-| SPX gap >= 0% | 111 | 1.78 | -0.81 | -\$36.5k | no |
+| SMA5 > SMA9 | 159 | 2.47 | -0.02 | -\$5.2k | no (-0.16 in 2022-24, +0.31 in 2025-26) |
+| condor credit <= \$450 | 181 | 2.49 | 0.00 | -\$1.9k | no |
+| VVIX rank <= 35 | 162 | 2.43 | -0.06 | -\$5.8k | no |
+| SPX gap >= 0% | 110 | 1.65 | -0.84 | -\$38.8k | no |
 
 **Nothing tested improves the finished strategy.**
 
 ## 13. A/B with everything on: above the 10-day SMA vs the 20-day
 
-No cascade here: **every other setting is on** (no Thursdays, max move 0%, VIX9D/VIX 0.87-1.02, the 7 tranches, ratio <= 4, held to
+No cascade here: **every other setting is on** (no Thursdays, max move 0%, VIX9D/VIX 0.87-1.02, the ratio cap, the 7 tranches, held to
 expiry), and only the trend rule changes: SPX at entry above its 10-day SMA (A, the strategy) against above its 20-day SMA (B), and above
 both. Both SMAs are measured the backtester's way (the prior N - 1 closes and the entry price). The Sharpe difference gets a paired session
 bootstrap, and two t-tests say how significant each difference is (below).
@@ -11183,124 +11205,124 @@ bootstrap, and two t-tests say how significant each difference is (below).
   <tbody>
     <tr>
       <th>trades</th>
-      <td>1450.00</td>
-      <td>1778.00</td>
-      <td>1320.00</td>
+      <td>1528.00</td>
+      <td>1886.00</td>
+      <td>1406.00</td>
     </tr>
     <tr>
       <th>sessions</th>
-      <td>187.00</td>
-      <td>212.00</td>
-      <td>170.00</td>
+      <td>182.00</td>
+      <td>208.00</td>
+      <td>166.00</td>
     </tr>
     <tr>
       <th>total_pl</th>
-      <td>112044.00</td>
-      <td>105672.68</td>
-      <td>102361.20</td>
+      <td>115481.68</td>
+      <td>108387.16</td>
+      <td>107331.36</td>
     </tr>
     <tr>
       <th>sharpe</th>
-      <td>2.60</td>
-      <td>1.97</td>
-      <td>2.38</td>
+      <td>2.49</td>
+      <td>1.84</td>
+      <td>2.33</td>
     </tr>
     <tr>
       <th>sharpe_to_2024</th>
-      <td>2.44</td>
-      <td>1.66</td>
-      <td>2.16</td>
+      <td>2.48</td>
+      <td>1.70</td>
+      <td>2.26</td>
     </tr>
     <tr>
       <th>sharpe_from_2025</th>
-      <td>2.92</td>
-      <td>2.70</td>
-      <td>2.83</td>
+      <td>2.51</td>
+      <td>2.23</td>
+      <td>2.48</td>
     </tr>
     <tr>
       <th>max_drawdown</th>
-      <td>-3808.68</td>
-      <td>-9093.40</td>
-      <td>-3808.68</td>
+      <td>-6501.16</td>
+      <td>-12131.52</td>
+      <td>-6453.52</td>
     </tr>
     <tr>
       <th>win_rate_trade</th>
-      <td>87.38</td>
-      <td>85.38</td>
-      <td>87.05</td>
+      <td>87.30</td>
+      <td>85.15</td>
+      <td>87.06</td>
     </tr>
     <tr>
       <th>win_rate_condor</th>
-      <td>80.97</td>
-      <td>76.60</td>
-      <td>80.45</td>
+      <td>81.02</td>
+      <td>76.46</td>
+      <td>80.65</td>
     </tr>
     <tr>
       <th>avg_pl_condor</th>
-      <td>154.54</td>
-      <td>118.87</td>
-      <td>155.09</td>
+      <td>151.15</td>
+      <td>114.94</td>
+      <td>152.68</td>
     </tr>
     <tr>
       <th>win_rate_spread</th>
-      <td>87.38</td>
-      <td>85.38</td>
-      <td>87.05</td>
+      <td>87.30</td>
+      <td>85.15</td>
+      <td>87.06</td>
     </tr>
     <tr>
       <th>sharpe_vs_A</th>
       <td>0.00</td>
-      <td>-0.63</td>
-      <td>-0.21</td>
+      <td>-0.65</td>
+      <td>-0.16</td>
     </tr>
     <tr>
       <th>ci_low</th>
       <td>NaN</td>
-      <td>-1.33</td>
-      <td>-0.47</td>
+      <td>-1.34</td>
+      <td>-0.41</td>
     </tr>
     <tr>
       <th>ci_high</th>
       <td>NaN</td>
       <td>0.07</td>
-      <td>0.03</td>
+      <td>0.07</td>
     </tr>
     <tr>
       <th>p_better_than_A</th>
       <td>NaN</td>
       <td>0.04</td>
-      <td>0.04</td>
+      <td>0.09</td>
     </tr>
     <tr>
       <th>t_daily_pl</th>
       <td>NaN</td>
-      <td>-0.54</td>
-      <td>-2.16</td>
+      <td>-0.55</td>
+      <td>-1.82</td>
     </tr>
     <tr>
       <th>p_daily_pl</th>
       <td>NaN</td>
-      <td>0.59</td>
-      <td>0.03</td>
+      <td>0.58</td>
+      <td>0.07</td>
     </tr>
     <tr>
       <th>t_sharpe</th>
       <td>NaN</td>
-      <td>-1.73</td>
-      <td>-1.65</td>
+      <td>-1.77</td>
+      <td>-1.31</td>
     </tr>
     <tr>
       <th>p_sharpe</th>
       <td>NaN</td>
       <td>0.08</td>
-      <td>0.10</td>
+      <td>0.19</td>
     </tr>
   </tbody>
 </table>
 </div>
 
 
-    trades only the SMA10 takes: 130 (P/L $10k); only the SMA20 takes: 458 (P/L $3k)
+    trades only the SMA10 takes: 122 (P/L $8k); only the SMA20 takes: 480 (P/L $1k)
     
 
 
@@ -11325,38 +11347,38 @@ bootstrap, and two t-tests say how significant each difference is (below).
   <tbody>
     <tr>
       <th>2022</th>
-      <td>2.91</td>
-      <td>1.81</td>
-      <td>21066.80</td>
-      <td>15234.68</td>
+      <td>2.92</td>
+      <td>1.92</td>
+      <td>21468.80</td>
+      <td>16059.04</td>
     </tr>
     <tr>
       <th>2023</th>
-      <td>2.48</td>
-      <td>2.36</td>
-      <td>26732.80</td>
-      <td>26941.76</td>
+      <td>2.51</td>
+      <td>2.28</td>
+      <td>29184.00</td>
+      <td>28950.44</td>
     </tr>
     <tr>
       <th>2024</th>
-      <td>2.08</td>
-      <td>1.18</td>
-      <td>24584.48</td>
-      <td>22361.84</td>
+      <td>2.18</td>
+      <td>1.29</td>
+      <td>27668.12</td>
+      <td>25891.20</td>
     </tr>
     <tr>
       <th>2025</th>
-      <td>2.69</td>
-      <td>2.46</td>
-      <td>27925.56</td>
-      <td>29453.16</td>
+      <td>2.19</td>
+      <td>1.90</td>
+      <td>25637.40</td>
+      <td>26016.24</td>
     </tr>
     <tr>
       <th>2026</th>
-      <td>3.59</td>
-      <td>3.57</td>
-      <td>11734.36</td>
-      <td>11681.24</td>
+      <td>3.62</td>
+      <td>3.58</td>
+      <td>11523.36</td>
+      <td>11470.24</td>
     </tr>
   </tbody>
 </table>
@@ -11382,19 +11404,19 @@ bootstrap, and two t-tests say how significant each difference is (below).
   <tbody>
     <tr>
       <th>B: above 20-day SMA</th>
-      <td>-0.628</td>
-      <td>-1.731</td>
-      <td>0.083</td>
-      <td>-0.543</td>
-      <td>0.587</td>
+      <td>-0.647</td>
+      <td>-1.769</td>
+      <td>0.077</td>
+      <td>-0.553</td>
+      <td>0.581</td>
     </tr>
     <tr>
       <th>above both</th>
-      <td>-0.213</td>
-      <td>-1.654</td>
-      <td>0.098</td>
-      <td>-2.160</td>
-      <td>0.031</td>
+      <td>-0.162</td>
+      <td>-1.309</td>
+      <td>0.191</td>
+      <td>-1.816</td>
+      <td>0.070</td>
     </tr>
   </tbody>
 </table>
@@ -11403,22 +11425,22 @@ bootstrap, and two t-tests say how significant each difference is (below).
 
 | everything on, trend rule | trades | total P/L | Sharpe | 2022-24 / 2025-26 | max drawdown | win per trade |
 |---|---|---|---|---|---|---|
-| **A: above the 10-day SMA (strategy)** | 1,450 | **\$112.0k** | **2.60** | **2.44 / 2.92** | **-\$3.8k** | **87.4%** |
-| B: above the 20-day SMA | 1,778 | \$105.7k | 1.97 | 1.66 / 2.70 | -\$9.1k | 85.4% |
-| above both | 1,320 | \$102.4k | 2.38 | 2.16 / 2.83 | -\$3.8k | 87.1% |
+| **A: above the 10-day SMA (strategy)** | 1,528 | **\$115.5k** | **2.49** | **2.48 / 2.51** | **-\$6.5k** | **87.3%** |
+| B: above the 20-day SMA | 1,886 | \$108.4k | 1.84 | 1.70 / 2.23 | -\$12.1k | 85.2% |
+| above both | 1,406 | \$107.3k | 2.33 | 2.26 / 2.48 | -\$6.5k | 87.1% |
 
 | year | Sharpe A (SMA10) / B (SMA20) | P/L A / B |
 |---|---|---|
-| 2022 (part) | **2.91** / 1.81 | **\$21.1k** / \$15.2k |
-| 2023 | **2.48** / 2.36 | \$26.7k / \$26.9k |
-| 2024 | **2.08** / 1.18 | **\$24.6k** / \$22.4k |
-| 2025 | **2.69** / 2.46 | \$27.9k / **\$29.5k** |
-| 2026 (part) | 3.59 / 3.57 | \$11.7k / \$11.7k |
+| 2022 (part) | **2.92** / 1.92 | **\$21.5k** / \$16.1k |
+| 2023 | **2.51** / 2.28 | \$29.2k / \$29.0k |
+| 2024 | **2.18** / 1.29 | **\$27.7k** / \$25.9k |
+| 2025 | **2.19** / 1.90 | \$25.6k / \$26.0k |
+| 2026 (part) | 3.62 / 3.58 | \$11.5k / \$11.5k |
 
-- **On the 7 tranches the 10-day wins on every measure:** higher Sharpe (2.60 against 1.97) in every year, \$6.4k more P/L, and well under half
-  the drawdown (-\$3.8k against -\$9.1k).
-- **The 20-day's extra trades don't pay:** the 458 trades only the 20-day takes earn \$3.3k; the 130 only the 10-day takes earn \$9.7k.
-- **The 10-day is better in 96% of resamples** (interval -1.33 to +0.07 for SMA20 minus SMA10), just short of a 95% bar.
+- **The 10-day wins on every measure:** higher Sharpe (2.49 against 1.84) in every year, \$7.1k more P/L, and about half the drawdown (-\$6.5k
+  against -\$12.1k).
+- **The 20-day's extra trades don't pay:** the 480 trades only the 20-day takes earn \$1.1k; the 122 only the 10-day takes earn \$8.2k.
+- **The 10-day is better in 96% of resamples** (interval -1.34 to +0.07 for SMA20 minus SMA10), just short of a 95% bar.
 
 **Statistical significance.** Two tests, each against the strategy's 10-day SMA on the same 998 sessions (a negative t means worse than the
 10-day):
@@ -11430,17 +11452,16 @@ bootstrap, and two t-tests say how significant each difference is (below).
 
 | against the 10-day SMA | Sharpe difference | t (Sharpe) | p (Sharpe) | t (daily P/L) | p (daily P/L) |
 |---|---|---|---|---|---|
-| B: above the 20-day SMA | -0.63 | **-1.73** | 0.08 | -0.54 | 0.59 |
-| above both | -0.21 | -1.65 | 0.10 | **-2.16** | **0.03** |
+| B: above the 20-day SMA | -0.65 | **-1.77** | 0.077 | -0.55 | 0.58 |
+| above both | -0.16 | -1.31 | 0.19 | -1.82 | 0.070 |
 
-- **SMA10 against SMA20: t = 1.73 on the Sharpe difference (p = 0.08 two-sided, about 0.04 one-sided).** Significant at 10% but not at
-  the usual 5% two-sided bar; it says the same as the bootstrap's 96%.
-- **The daily P/L barely differs** (t = 0.54, p = 0.59): the two rules make about the same money (\$112.0k against \$105.7k). **The 10-day's
-  edge is risk, not return:** the same money with fewer bad days, hence half the drawdown and the higher Sharpe.
-- **Adding the 20-day on top of the 10-day ("above both") makes significantly less money** (t = -2.16, p = 0.03): it drops the 130 trades
-  only the 10-day takes, which earn \$9.7k, and adds nothing.
+- **SMA10 against SMA20: t = 1.77 on the Sharpe difference (p = 0.08 two-sided, about 0.04 one-sided).** Significant at 10% but not at
+  the usual 5% two-sided bar.
+- **The daily P/L barely differs** (t = 0.55, p = 0.58): **the 10-day's edge is risk, not return.**
+- **Adding the 20-day on top of the 10-day ("above both")** makes less money (t = -1.82, p = 0.07): it drops the 122 trades only the 10-day
+  takes, which earn \$8.2k.
 
-**The same A/B on the tranches forward selection by drawdown picks** (Section 7: 10:53, 11:13, 11:33, 12:13, 13:53, 14:13, 14:53, 15:53),
+**The same A/B on the tranches forward selection by drawdown picks** (Section 8: 10:53, 11:13, 11:33, 12:13, 13:53, 14:13, 14:53, 15:53),
 every other setting on, to check the result doesn't depend on the strategy's own tranche set.
 
 
@@ -11646,19 +11667,20 @@ every other setting on, to check the result doesn't depend on the strategy's own
 | B: above the 20-day SMA | 1,800 | \$103.1k | 1.97 | 1.92 / 2.06 | -\$7.4k | -0.89 | 0.38 | +0.02 | 0.98 |
 | above both | 1,350 | \$95.8k | 2.18 | 2.20 / 2.15 | -\$2.6k | -0.65 | 0.52 | -1.40 | 0.16 |
 
-- **The 10-day still leads**, on Sharpe (2.29 against 1.97, ahead in four of five years) and above all on drawdown (-\$2.6k against -\$7.4k),
-  for exactly the same money (\$102.8k against \$103.1k).
-- **But on this tranche set the gap isn't significant** (t = 0.89, p = 0.38; the 10-day is better in 82% of resamples, against 96% on the
-  strategy's 7). The 10-day's edge is real in direction and in drawdown, but how big it looks depends on which tranches it's paired with.
+- **The 10-day still leads**, on Sharpe (2.29 against 1.97) and above all on drawdown (-\$2.6k against -\$7.4k), for the same money.
+- **But on this tranche set the gap isn't significant** (t = 0.89, p = 0.38): the 10-day's edge is real in direction and in drawdown, but how
+  big it looks depends on which tranches it's paired with.
 
 ## 14. The 2026 drawdown, in the backtester's own log
 
-Everything above is rebuilt from the 20-tranche export, which ends 2026-05-07. **The backtester's log of the live strategy** (the 7
-tranches, no Thursdays, held to expiry) runs to 2026-09-28, and it shows a drawdown the rest of this notebook can't see: from a peak on
+Everything above is rebuilt from the 20-tranche export, which ends 2026-05-07. **The backtester's log of the strategy** runs to
+2026-09-28. **It was run before the tranche change, with 14:53 instead of 13:33** (11:33, 11:53, 12:13, 13:13, 13:53, 14:13, 14:53; no
+Thursdays, held to expiry), so this section is about that set. It shows a drawdown the rest of this notebook can't see: from a peak on
 2026-05-11, **-\$13.4k by 2026-06-17**, three and a half times anything in the four years before, and **not recovered** by the end of the
-log.
+log. How the new set (with 13:33) would have fared in 2026 needs a new backtest.
 
-First, a check that the log and this notebook describe the same strategy, on the sessions both cover:
+First, a check that the log and this notebook describe the same strategy (the rebuild run on the log's own tranches), on the sessions both
+cover:
 
     sessions both cover: 2022-05-31 to 2026-05-07
     
@@ -11703,8 +11725,8 @@ First, a check that the log and this notebook describe the same strategy, on the
 | the backtester's log | 1,446 | \$111.3k | 2.51 | -\$3.8k |
 | this notebook's rebuild | 1,450 | \$112.0k | 2.53 | -\$3.8k |
 
-**The rebuild matches the backtester's log almost exactly** (4 trades and \$0.7k apart over four years), so the rest of the notebook is the
-live strategy. The difference is what came after 2026-05-07.
+**The rebuild matches the backtester's log almost exactly** (4 trades and \$0.7k apart over four years), so the rules in this notebook are
+the backtester's. The difference is what came after 2026-05-07.
 
 
     
@@ -12259,8 +12281,8 @@ live strategy. The difference is what came after 2026-05-07.
   Thursday analysis (Section 3) found the same pattern: the strategy's worst days are days the market moves more than VIX priced, often
   macro days. This data has no economic calendar, so this is a hypothesis: **an event-day filter (no trading on FOMC decision days, and
   possibly CPI days) is the change most worth backtesting.**
-- **The tranche study (Section 11) said the drawdowns were shallow:** on the rebuild they were (-\$3.8k). The log shows the tail those four
-  years didn't contain, and it is the number to size the strategy on.
+- **On the rebuild this set's drawdowns were shallow** (-\$3.8k at most in 2022-2026). The log shows the tail those four years didn't
+  contain, and it is the number to size the strategy on.
 
 ## 15. Summary
 
@@ -12273,32 +12295,30 @@ live strategy. The difference is what came after 2026-05-07.
 | + max move 0% | 14,416 | \$195.9k | 0.97 | enters on pullbacks, so an intraday rally doesn't run into the short call |
 | + above the 10-day SMA | 7,362 | \$205.6k | 1.50 | keeps calm markets, where SPX moves less after entry |
 | + VIX9D/VIX 0.87-1.02 | 4,630 | \$213.3k | 2.25 | keeps a curve that isn't bracing for a move; both tails lose on the put side |
-| + the 7 tranches | 1,582 | \$113.4k | 2.48 | keeps the late morning and early afternoon; drawdown -\$15.1k -> -\$4.9k |
-| **+ short/long <= 4** | **1,450** | **\$112.0k** | **2.60** | skips the richest condors the 7 still take |
+| + short/long <= 4 | 3,940 | \$211.4k | 2.40 | skips the richest, nearest-the-money condors |
+| **+ the 7 tranches** | **1,528** | **\$115.5k** | **2.49** | keeps 11:33-14:13 (with 13:33); drawdown -\$12.7k -> -\$6.5k |
 
-**The strategy: 1,450 trades, \$112.0k, Sharpe 2.60, -\$3.8k drawdown, 87.4% of trades winning**, held to expiry; +\$599 on an average trading
-day (76% of days positive), an average win of \$285 a condor against an average loss of \$399.
+**The strategy: 1,528 trades, \$115.5k, Sharpe 2.49, -\$6.5k drawdown, 87.3% of trades winning**, held to expiry; +\$635 on an average trading
+day (75% of days positive).
 
+- **The swap of 14:53 for 13:33 is a step back on this data:** +\$3.4k, but Sharpe 2.60 -> 2.49, the drawdown 70% deeper (-\$3.8k -> -\$6.5k)
+  and 2025-26 much weaker (2.92 -> 2.51). 13:33 earns more on its own (the 6th tranche by P/L, against 11th) but is the biggest single
+  loser in the deepest drawdown and the first tranche both cutting rules remove (Sections 8 and 11).
 - **No Thursdays isn't a VIX regime:** nothing known at entry differs on Thursdays, but they move more than VIX prices (the realized range
-  explains two-thirds of the loss), on a few big days every year; macro releases are the likely cause, untested here.
+  explains two-thirds of the loss on the raw book), on a few big days every year; macro releases are the likely cause, untested here.
 - **The settings work together.** The band is the worst entry filter on the raw book and adds the most at step 4; with everything on, every
-  threshold is at the top of its sweep.
-- **The 10-day SMA is the most important setting:** removing it costs 1.28 Sharpe and triples the drawdown. With everything on it beats the
-  20-day in every year (t = 1.73 on the Sharpe difference, p = 0.08: significant at 10%, not at 5%); the edge is lower risk, not more
-  money. On the drawdown-picked tranches it still leads (2.29 against 1.97, a third of the drawdown) but not significantly (p = 0.38).
-- **The band's exact edges aren't significant** (no cap from 0.98 to 1.08 is significantly worse than 1.02, p 0.07-0.55); the direction
-  is (caps of 0.97 and tighter and floors of 0.90 and higher are clearly worse) (Section 6).
-- **No stop:** on this strategy every call-stop level lowers Sharpe and P/L and none reduces the drawdown, and a put stop is worse still
-  (400%: Sharpe 1.91, -\$21.8k; 42% of the stopped puts would have expired winning) (Section 9). The cost is exposure to a day worse than any
-  in this sample.
-- **The 7 tranches are the smallest, steadiest set:** the smallest drawdown and the most P/L per \$ of drawdown of the sets tested. Adding
-  11:13 and 13:33 (forward selection's peak) scores a higher Sharpe (2.73) for \$29.8k more and a deeper drawdown; the previous 15, 2.69 for
-  \$68.4k more. None of the 7 should be cut: each made money every year and each one's removal lowers Sharpe.
+  threshold is at the top of its sweep, but **the band's exact edges aren't significant** (no cap from 0.98 to 1.08 is significantly worse
+  than 1.02); the direction is (caps of 0.97 and tighter and floors of 0.90 and higher are clearly worse).
+- **The 10-day SMA is the most important setting:** removing it costs 1.33 Sharpe and nearly doubles the drawdown. With everything on it
+  beats the 20-day in every year (t = 1.77, p = 0.08: significant at 10%, not at 5%); the edge is lower risk, not more money.
+- **No stop:** every call-stop level lowers Sharpe and P/L, and a put stop is worse still (400%: Sharpe 1.88, -\$21.8k; 42% of the stopped
+  puts would have expired winning) (Section 9).
+- **No candidate feature beats the noise bar** (+0.28, the best of 33 random features); the VIX1D features only looked bad because VIX1D
+  starts in April 2023 (Section 12).
+- **The backtester's log shows a 2026 drawdown the export doesn't reach** (on the previous 7, with 14:53): -\$13.4k from 2026-05-11 to 06-17,
+  not recovered by 2026-09-28, from three days on which all seven tranches lost a full wing (Section 14). Size the strategy on that tail, and
+  backtest an event-day (FOMC/CPI) filter and the new tranche set.
 
-- **The backtester's log shows a 2026 drawdown the export doesn't reach:** -\$13.4k from 2026-05-11 to 06-17, not recovered by 2026-09-28,
-  from three days on which all seven tranches lost a full wing (Section 14). The rebuild matches the log to 2026-05-07; size the strategy on
-  that tail, not on the -\$3.8k of 2022-2026, and backtest an event-day (FOMC/CPI) filter.
-
-**What this notebook doesn't establish:** out-of-sample performance (apart from the walk-forward checks); the backtester's totals on these
-settings (the rules were matched trade by trade against a backtest on earlier settings, with the 20-day SMA; the 10-day and the 7 tranches
-haven't been checked against a backtest log); the first sessions, which need SPX closes before the export; and a put stop, which is untested.
+**What this notebook doesn't establish:** out-of-sample performance (apart from the walk-forward checks); the backtester's totals on the
+new tranche set (the rebuild matches the backtester trade by trade on the previous 7; the set with 13:33 hasn't been backtested); the first
+sessions, which need SPX closes before the export.

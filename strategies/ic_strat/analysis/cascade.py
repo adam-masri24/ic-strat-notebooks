@@ -9,8 +9,8 @@ selected tranches (``final_version.SELECTED_TRANCHES``). The order that comes ou
 2. max SPX move up since the open 0%
 3. SPX at entry above its 10-day SMA
 4. VIX9D / VIX 0.87-1.02 at entry
-5. the 7 tranches (11:33, 11:53, 12:13, 13:13, 13:53, 14:13, 14:53)
-6. short/long ratio of the whole condor <= 4
+5. short/long ratio of the whole condor <= 4
+6. the 7 tranches (11:33, 11:53, 12:13, 13:13, 13:33, 13:53, 14:13)
 
 The strategy holds every condor to expiry; the call stop it no longer uses is studied on the finished
 strategy (``final_version.stop_scan``), not as a step.
@@ -51,7 +51,7 @@ SETTINGS = {
     "tranches": Step("tranches", f"{len(fv.SELECTED_TRANCHES)} forward-selected tranches", {"drop": fv.MORNING}),
 }
 # The greedy order (``greedy`` recomputes it and flags any difference).
-ORDER = ["thursday", "move", "sma10", "band", "tranches", "ratio"]
+ORDER = ["thursday", "move", "sma10", "band", "ratio", "tranches"]
 STEPS = [SETTINGS[k] for k in ORDER]
 KEYS = [s.key for s in STEPS]
 
@@ -687,7 +687,8 @@ def tranche_sets(panel: pd.DataFrame, cal: fv.Calendars, selection: pd.DataFrame
     sets = {f"the strategy's {len(fv.SELECTED_TRANCHES)}": fv.SELECTED_TRANCHES,
             f"forward selection's peak ({len(selection.attrs['best'])})": selection.attrs["best"],
             f"forward selection by drawdown ({len(selection_dd.attrs['best'])})": selection_dd.attrs["best"],
-            f"previous live set ({len(fv.PREVIOUS_TRANCHES)})": fv.PREVIOUS_TRANCHES, "all 20": fv.ALL_TRANCHES}
+            "previous 7 (with 14:53)": fv.PREVIOUS_SEVEN,
+            f"earlier live set ({len(fv.PREVIOUS_TRANCHES)})": fv.PREVIOUS_TRANCHES, "all 20": fv.ALL_TRANCHES}
     rows = {}
     for name, ts in sets.items():
         drop = tuple(f"{t}:00" for t in fv.ALL_TRANCHES if t not in ts)
@@ -703,18 +704,21 @@ def fig_tranches(tt: pd.DataFrame, note: str):
     with plt.rc_context(fv.STYLE):
         fig, ax = plt.subplots(figsize=(15, 4.4))
         x = np.arange(len(tt))
-        out = (tt["status"] == "dropped").to_numpy()
-        ax.bar(x, tt["avg_pl"], width=0.66, color=[fv.ORANGE if o else fv.BLUE for o in out],
-               hatch=["///" if o else "" for o in out], edgecolor="white", lw=0)
+        out = tt["status"].str.startswith("dropped").to_numpy()
+        colors = [fv.AQUA if s == "traded (swapped in)" else fv.RED if s == "dropped (swapped out)" else fv.ORANGE if o else fv.BLUE
+                  for s, o in zip(tt["status"], out)]
+        ax.bar(x, tt["avg_pl"], width=0.66, color=colors, hatch=["///" if o else "" for o in out], edgecolor="white", lw=0)
         ax.errorbar(x, tt["avg_pl"], yerr=[tt["avg_pl"] - tt["ci_low"], tt["ci_high"] - tt["avg_pl"]], fmt="none",
                     ecolor=fv.INK_2, lw=0.8, capsize=2)
         ax.axhline(0, color=fv.INK_2, lw=0.7)
         ax.set_xticks(x, tt.index, rotation=90)
         ax.set_ylabel("$ per condor")
         ax.set_title("Avg P/L per condor, by tranche (whiskers: 95% session-bootstrap CI)")
-        ax.legend([plt.Rectangle((0, 0), 1, 1, color=fv.BLUE),
-                   plt.Rectangle((0, 0), 1, 1, facecolor=fv.ORANGE, hatch="///", edgecolor="white")],
-                  ["picked by forward selection", "dropped"], loc="upper left", fontsize=8)
+        ax.legend([plt.Rectangle((0, 0), 1, 1, color=fv.BLUE), plt.Rectangle((0, 0), 1, 1, color=fv.AQUA),
+                   plt.Rectangle((0, 0), 1, 1, facecolor=fv.ORANGE, hatch="///", edgecolor="white"),
+                   plt.Rectangle((0, 0), 1, 1, facecolor=fv.RED, hatch="///", edgecolor="white")],
+                  ["traded", f"traded, swapped in ({', '.join(fv.SWAPPED_IN)})", "dropped",
+                   f"dropped, swapped out ({', '.join(fv.SWAPPED_OUT)})"], loc="upper left", fontsize=8)
         fig.suptitle(note, x=0.01, ha="left")
         fig.tight_layout()
     return fig

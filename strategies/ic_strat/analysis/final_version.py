@@ -56,9 +56,10 @@ STUDY_NAME = "SPX-IC-Final-Version-Study"
 LAST_TRANCHE = "15:53:00"
 ALL_TRANCHES = ["09:32", "09:52", "10:13", "10:33", "10:53", "11:13", "11:33", "11:53", "12:13", "12:33",
                 "12:53", "13:13", "13:33", "13:53", "14:13", "14:33", "14:53", "15:13", "15:33", "15:53"]
-# The tranches the strategy trades (live from 2026-10-18): the first seven forward selection adds at the
-# tranche step of the cascade (``cascade.tranche_selection``). Before: 10:53-15:53 without 12:33 (15).
-SELECTED_TRANCHES = ["11:33", "11:53", "12:13", "13:13", "13:53", "14:13", "14:53"]
+# The tranches the strategy trades (live from 2026-10-30): 13:33 in place of 14:53. Before: 11:33-14:53 with 14:53
+# (2026-10-18 to 10-30, the first seven forward selection adds), and 10:53-15:53 without 12:33 (15) before that.
+SELECTED_TRANCHES = ["11:33", "11:53", "12:13", "13:13", "13:33", "13:53", "14:13"]
+PREVIOUS_SEVEN = ["11:33", "11:53", "12:13", "13:13", "13:53", "14:13", "14:53"]
 PREVIOUS_TRANCHES = ["10:53", "11:13", "11:33", "11:53", "12:13", "12:53", "13:13", "13:33", "13:53", "14:13",
                      "14:33", "14:53", "15:13", "15:33", "15:53"]
 AB_DROPPED = [t for t in ALL_TRANCHES if t not in SELECTED_TRANCHES]   # the tranches the strategy doesn't trade
@@ -563,14 +564,25 @@ def tranche_table(panel: pd.DataFrame, cal: Calendars) -> pd.DataFrame:
     return pd.DataFrame(rows).set_index("entry_time")
 
 
+SWAPPED_IN = [t for t in SELECTED_TRANCHES if t not in PREVIOUS_SEVEN]    # 13:33
+SWAPPED_OUT = [t for t in PREVIOUS_SEVEN if t not in SELECTED_TRANCHES]   # 14:53
+
+
 def tranche_status(t: str) -> str:
-    """Whether the live strategy trades a tranche (``HH:MM``)."""
+    """Whether the live strategy trades a tranche (``HH:MM``), and whether it is the one swapped in or out."""
+    if t in SWAPPED_IN:
+        return "traded (swapped in)"
+    if t in SWAPPED_OUT:
+        return "dropped (swapped out)"
     return "dropped" if t in AB_DROPPED else "traded"
 
 
 def highlight_dropped(df: pd.DataFrame, digits: int = 2):
-    """A tranche table (index ``HH:MM``) with the tranches the live strategy no longer trades shaded."""
-    shade = {"dropped": "background-color: #fbe3d9; font-weight: bold"}
+    """A tranche table (index ``HH:MM``) with the dropped tranches shaded, and the tranche swapped in (green) and out
+    (orange) highlighted."""
+    shade = {"dropped": "background-color: #fbe3d9",
+             "traded (swapped in)": "background-color: #c9efdf; font-weight: bold",
+             "dropped (swapped out)": "background-color: #f7c6ae; font-weight: bold"}
 
     def row_style(row):
         return [shade.get(tranche_status(row.name), "")] * len(row)
@@ -1092,13 +1104,16 @@ def addon_scan(panel: pd.DataFrame, cal: Calendars, min_keep: float = 0.30) -> p
     rows = []
     for c in ADDON_FEATURES:
         x = book[c]
+        # A filter can't act on a day its feature doesn't exist (VIX1D starts 2023-04-24): those condors are kept, so a
+        # feature with a short history isn't scored on the days it throws out for lack of data.
+        na = x.isna()
         if c in ADDON_FLAGS:
-            candidates = [(f"{c} = 1", x == 1), (f"{c} = 0", x == 0)]
+            candidates = [(f"{c} = 1", (x == 1) | na), (f"{c} = 0", (x == 0) | na)]
         else:
             candidates = []
             for q in np.arange(0.1, 1.0, 0.1):
                 cut = x.quantile(q)
-                candidates += [(f"{c} >= {cut:.4g}", x >= cut), (f"{c} <= {cut:.4g}", x <= cut)]
+                candidates += [(f"{c} >= {cut:.4g}", (x >= cut) | na), (f"{c} <= {cut:.4g}", (x <= cut) | na)]
         best = None
         for label, k in candidates:
             if k.mean() < min_keep or k.all():
@@ -1113,7 +1128,8 @@ def addon_scan(panel: pd.DataFrame, cal: Calendars, min_keep: float = 0.30) -> p
                      "rule": label, "kept_pct": k.mean() * 100, "sharpe_gain": st["sharpe"] - base["sharpe"],
                      f"gain_to_{SPLIT_YEAR}": st[H1] - base[H1], f"gain_from_{SPLIT_YEAR + 1}": st[H2] - base[H2],
                      "total_pl_change": st["total_pl"] - base["total_pl"],
-                     "kept_avg_pl": book.loc[k, PL].mean(), "dropped_avg_pl": book.loc[~k, PL].mean()})
+                     "kept_avg_pl": book.loc[k, PL].mean(), "dropped_avg_pl": book.loc[~k, PL].mean(),
+                     "missing_pct": na.mean() * 100})
     out = pd.DataFrame(rows).set_index("feature").sort_values("sharpe_gain", ascending=False)
 
     rng = np.random.default_rng(SEED + 1)

@@ -60,7 +60,10 @@ def daily_matrix(log: pd.DataFrame) -> pd.DataFrame:
 
 def reconcile(log: pd.DataFrame, panel: pd.DataFrame) -> pd.DataFrame:
     """The log against the study's rebuild of the same strategy, on the sessions both cover."""
-    rb = panel[fv.version_mask(panel, **fv.STRATEGY)]
+    # Like for like: the rebuild on the tranches the log itself traded (the log may predate a tranche change).
+    traded = sorted(log["tranche"].unique())
+    drop = tuple(f"{t}:00" for t in fv.ALL_TRANCHES if t not in traded)
+    rb = panel[fv.version_mask(panel, **{**fv.STRATEGY, "drop": drop})]
     lo, hi = log["date"].min(), min(log["date"].max(), panel["date"].max())
     rows = {}
     for name, frame, col in (("backtester's log", log, "pl"), ("the study's rebuild", rb, fv.PL)):
@@ -73,6 +76,7 @@ def reconcile(log: pd.DataFrame, panel: pd.DataFrame) -> pd.DataFrame:
                       "max_drawdown": float((eq - np.maximum.accumulate(np.maximum(eq, 0))).min())}
     out = pd.DataFrame(rows).T
     out.attrs["window"] = (lo, hi)
+    out.attrs["tranches"] = traded
     return out
 
 

@@ -14,7 +14,7 @@ The `.ipynb` notebooks hold the same content plus the code:
 | [`correlation_mo.ipynb`](strategies/ic_strat/notebooks/correlation_mo.ipynb) | Why the IC strategy and two other condor books (MO1, MO2) are almost uncorrelated despite similar setups, and what running them together does. |
 
 **The strategy:** no Thursdays; SPX at or below its open at entry; SPX above its 10-day SMA; VIX9D/VIX between 0.87 and 1.02 at entry;
-entries at 11:33, 11:53, 12:13, 13:13, 13:53, 14:13 and 14:53; whole-condor short/long ratio at most 4; held to expiry.
+entries at 11:33, 11:53, 12:13, 13:13, 13:33, 13:53 and 14:13; whole-condor short/long ratio at most 4; held to expiry.
 
 ## Code
 
