@@ -959,19 +959,26 @@ Every feature on one Sharpe scale, against the finished strategy:
   at least 30% of condors). Dark orange means the gain holds in both halves;
 - **a noise feature (grey):** a random number per session put through the same search: **whatever it scores is what luck alone finds.**
 
-The red line is the strict noise bar: the 95th percentile of the same search on 200 random features. The candidates are price,
+The red line is the noise bar, corrected for testing many candidates: 200 random features go through the same search, and the
+bar is the 95th percentile of the **best** of 33 of them (as many as there are candidates). Picking the best of 33 features is
+itself a search, so a candidate has to beat what the luckiest of 33 random features would score. The candidates are price,
 volatility, curve and calendar features, including the 20-day SMA (now a candidate, not a setting) and the vol-regime feature library's
 findings (VIX9D gap, month end, rule W, ATR20, low VRP).""")
 
 code(r"""
 fv.fig_ranking(study.ranking); plt.show()
-print(f"the noise feature gains {study.addon_scan.loc['noise', 'sharpe_gain']:+.2f}; strict noise bar "
-      f"(95th pct of 200 noise features) {study.addon_scan.attrs['noise_p95']:+.2f}")
+a = study.addon_scan.attrs
+print(f"the noise feature (one random draw) gains {study.addon_scan.loc['noise', 'sharpe_gain']:+.2f}; "
+      f"200 random features: median {a['noise_p50']:+.2f}, 95th pct {a['noise_p95_single']:+.2f}; "
+      f"noise bar (95th pct of the best of {a['n_candidates']}) {a['noise_p95']:+.2f}")
 display(study.leave_one_out.round(2))
 display(study.ranking.round(2))
 """)
 
-md(r"""**The noise feature scores -0.11**, and the strict bar is **+0.01**.
+md(r"""**How to read the noise.** The noise feature scores **-0.11**: one random draw, close to the middle of what random features score
+(median -0.16 over 200 draws; most random cuts lower Sharpe, because with 187 trading days every idle day pays the 4% hurdle). One random
+feature beats +0.01 only 5% of the time, but **the best of 33 random features beats +0.17 5% of the time**, and typically scores +0.06.
+That is the bar a candidate has to clear: **+0.17**.
 
 | removed from the finished strategy | trades | Sharpe | change | total P/L change |
 |---|---|---|---|---|
@@ -985,7 +992,8 @@ md(r"""**The noise feature scores -0.11**, and the strict bar is **+0.01**.
 
 - **Every setting pays, in both halves.** The 10-day SMA is now the most important: without it Sharpe falls to 1.32, the book loses $11.2k
   and the drawdown triples (-$3.8k to -$11.8k).
-- **No candidate adds in both halves.** SPX's 5-day return (+0.10) clears the noise bar overall but only from 2025 (-0.03 in 2022-24).
+- **No candidate clears the noise bar, and none adds in both halves.** The best, SPX's 5-day return (+0.10), is what the luckiest of 33
+  random features would typically score, and it only works from 2025 (-0.03 in 2022-24).
   SMA5 > SMA9 loses (-0.04).""")
 
 code(r"""

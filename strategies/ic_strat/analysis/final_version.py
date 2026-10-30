@@ -1079,9 +1079,12 @@ def addon_scan(panel: pd.DataFrame, cal: Calendars, min_keep: float = 0.30) -> p
 
     Same search as ``feature_study.filter_scan`` (a min or max at each decile,
     or keep 1 / keep 0 for a flag, keeping at least ``min_keep`` of condors),
-    scored on all sessions and in each half. ``attrs["noise_p95"]`` is the strict
-    bar: the 95th percentile of ``N_NOISE`` random session-level features put
-    through the same search.
+    scored on all sessions and in each half. ``attrs["noise_p95"]`` is the noise
+    bar, corrected for testing many candidates: ``N_NOISE`` random session-level
+    features go through the same search, and the bar is the 95th percentile of
+    the **best** of as many random features as there are candidates (resampled
+    from those draws). ``noise_p95_single`` (one feature at a time) and
+    ``noise_p50`` describe a single random feature.
     """
     keep_book = version_mask(panel, **STRATEGY)
     book = panel[keep_book]
@@ -1126,8 +1129,13 @@ def addon_scan(panel: pd.DataFrame, cal: Calendars, min_keep: float = 0.30) -> p
                 if k.mean() >= min_keep:
                     top = max(top, br.sharpe(rs.daily_series(pl[k], d[k], cal.all)))
         gains.append(top - base["sharpe"])
-    out.attrs.update(base=base, noise_p95=float(np.percentile(gains, 95)),
-                     noise_p50=float(np.percentile(gains, 50)))
+    # Picking the best of many candidates is a search too: the bar is the 95th percentile of the best of
+    # n_candidates random features, not of one.
+    n_cand = int((out.index != "noise").sum())
+    best_of = np.random.default_rng(SEED + 2).choice(gains, size=(20000, n_cand), replace=True).max(axis=1)
+    out.attrs.update(base=base, noise_p95=float(np.percentile(best_of, 95)), noise_best_of_median=float(np.median(best_of)),
+                     noise_p95_single=float(np.percentile(gains, 95)), noise_p50=float(np.percentile(gains, 50)),
+                     n_candidates=n_cand, noise_gains=np.asarray(gains))
     out["beats_noise_p95"] = out["sharpe_gain"] > out.attrs["noise_p95"]
     out["better_in_both_halves"] = (out[f"gain_to_{SPLIT_YEAR}"] > 0) & (out[f"gain_from_{SPLIT_YEAR + 1}"] > 0)
     return out
@@ -1507,6 +1515,7 @@ def feature_ranking(loo: pd.DataFrame, scan: pd.DataFrame) -> pd.DataFrame:
     out.index = out.index + 1
     out.index.name = "rank"
     out.attrs["noise_p95"] = bar
+    out.attrs["n_candidates"] = scan.attrs.get("n_candidates")
     return out
 
 
@@ -1527,7 +1536,7 @@ def fig_ranking(rank: pd.DataFrame):
                 lab.set_color(INK)
         ax.axvline(0, color=INK_2, lw=0.7)
         ax.axvline(rank.attrs["noise_p95"], color=RED, ls="--", lw=1.4)
-        ax.text(rank.attrs["noise_p95"], 1.0, f" noise bar +{rank.attrs['noise_p95']:.2f}",
+        ax.text(rank.attrs["noise_p95"], 1.0, f" noise bar +{rank.attrs['noise_p95']:.2f} (best of {rank.attrs.get('n_candidates', '')} random features)",
                 transform=ax.get_xaxis_transform(), color=INK_2, fontsize=8, va="bottom")
         handles = [plt.Rectangle((0, 0), 1, 1, color=c) for c in (BLUE, ORANGE, "#f5b99f", GREY)]
         ax.legend(handles, ["ON in the strategy: Sharpe lost if removed (bold)",

@@ -74,17 +74,17 @@ so the export's first 9 sessions (to 2022-05-26) can't pass the SMA step.
 have with it. The highest (highlighted) is added, and the next row starts from that book.
 
 
-<table id="T_6d566">
+<table id="T_89e18">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_6d566_level0_col0" class="col_heading level0 col0" >picked</th>
-      <th id="T_6d566_level0_col1" class="col_heading level0 col1" >VIX9D/VIX 0.87-1.02 at entry</th>
-      <th id="T_6d566_level0_col2" class="col_heading level0 col2" >max move up 0%</th>
-      <th id="T_6d566_level0_col3" class="col_heading level0 col3" >above the 10-day SMA</th>
-      <th id="T_6d566_level0_col4" class="col_heading level0 col4" >short/long ratio <= 4</th>
-      <th id="T_6d566_level0_col5" class="col_heading level0 col5" >no Thursdays</th>
-      <th id="T_6d566_level0_col6" class="col_heading level0 col6" >7 forward-selected tranches</th>
+      <th id="T_89e18_level0_col0" class="col_heading level0 col0" >picked</th>
+      <th id="T_89e18_level0_col1" class="col_heading level0 col1" >VIX9D/VIX 0.87-1.02 at entry</th>
+      <th id="T_89e18_level0_col2" class="col_heading level0 col2" >max move up 0%</th>
+      <th id="T_89e18_level0_col3" class="col_heading level0 col3" >above the 10-day SMA</th>
+      <th id="T_89e18_level0_col4" class="col_heading level0 col4" >short/long ratio <= 4</th>
+      <th id="T_89e18_level0_col5" class="col_heading level0 col5" >no Thursdays</th>
+      <th id="T_89e18_level0_col6" class="col_heading level0 col6" >7 forward-selected tranches</th>
     </tr>
     <tr>
       <th class="index_name level0" >step</th>
@@ -99,64 +99,64 @@ have with it. The highest (highlighted) is added, and the next row starts from t
   </thead>
   <tbody>
     <tr>
-      <th id="T_6d566_level0_row0" class="row_heading level0 row0" >1</th>
-      <td id="T_6d566_row0_col0" class="data row0 col0" >no Thursdays</td>
-      <td id="T_6d566_row0_col1" class="data row0 col1" >-0.11</td>
-      <td id="T_6d566_row0_col2" class="data row0 col2" >0.37</td>
-      <td id="T_6d566_row0_col3" class="data row0 col3" >0.35</td>
-      <td id="T_6d566_row0_col4" class="data row0 col4" >-0.00</td>
-      <td id="T_6d566_row0_col5" class="data row0 col5" >0.44</td>
-      <td id="T_6d566_row0_col6" class="data row0 col6" >0.12</td>
+      <th id="T_89e18_level0_row0" class="row_heading level0 row0" >1</th>
+      <td id="T_89e18_row0_col0" class="data row0 col0" >no Thursdays</td>
+      <td id="T_89e18_row0_col1" class="data row0 col1" >-0.11</td>
+      <td id="T_89e18_row0_col2" class="data row0 col2" >0.37</td>
+      <td id="T_89e18_row0_col3" class="data row0 col3" >0.35</td>
+      <td id="T_89e18_row0_col4" class="data row0 col4" >-0.00</td>
+      <td id="T_89e18_row0_col5" class="data row0 col5" >0.44</td>
+      <td id="T_89e18_row0_col6" class="data row0 col6" >0.12</td>
     </tr>
     <tr>
-      <th id="T_6d566_level0_row1" class="row_heading level0 row1" >2</th>
-      <td id="T_6d566_row1_col0" class="data row1 col0" >max move up 0%</td>
-      <td id="T_6d566_row1_col1" class="data row1 col1" >0.66</td>
-      <td id="T_6d566_row1_col2" class="data row1 col2" >0.97</td>
-      <td id="T_6d566_row1_col3" class="data row1 col3" >0.71</td>
-      <td id="T_6d566_row1_col4" class="data row1 col4" >0.59</td>
-      <td id="T_6d566_row1_col5" class="data row1 col5" ></td>
-      <td id="T_6d566_row1_col6" class="data row1 col6" >0.56</td>
+      <th id="T_89e18_level0_row1" class="row_heading level0 row1" >2</th>
+      <td id="T_89e18_row1_col0" class="data row1 col0" >max move up 0%</td>
+      <td id="T_89e18_row1_col1" class="data row1 col1" >0.66</td>
+      <td id="T_89e18_row1_col2" class="data row1 col2" >0.97</td>
+      <td id="T_89e18_row1_col3" class="data row1 col3" >0.71</td>
+      <td id="T_89e18_row1_col4" class="data row1 col4" >0.59</td>
+      <td id="T_89e18_row1_col5" class="data row1 col5" ></td>
+      <td id="T_89e18_row1_col6" class="data row1 col6" >0.56</td>
     </tr>
     <tr>
-      <th id="T_6d566_level0_row2" class="row_heading level0 row2" >3</th>
-      <td id="T_6d566_row2_col0" class="data row2 col0" >above the 10-day SMA</td>
-      <td id="T_6d566_row2_col1" class="data row2 col1" >1.39</td>
-      <td id="T_6d566_row2_col2" class="data row2 col2" ></td>
-      <td id="T_6d566_row2_col3" class="data row2 col3" >1.50</td>
-      <td id="T_6d566_row2_col4" class="data row2 col4" >1.15</td>
-      <td id="T_6d566_row2_col5" class="data row2 col5" ></td>
-      <td id="T_6d566_row2_col6" class="data row2 col6" >1.03</td>
+      <th id="T_89e18_level0_row2" class="row_heading level0 row2" >3</th>
+      <td id="T_89e18_row2_col0" class="data row2 col0" >above the 10-day SMA</td>
+      <td id="T_89e18_row2_col1" class="data row2 col1" >1.39</td>
+      <td id="T_89e18_row2_col2" class="data row2 col2" ></td>
+      <td id="T_89e18_row2_col3" class="data row2 col3" >1.50</td>
+      <td id="T_89e18_row2_col4" class="data row2 col4" >1.15</td>
+      <td id="T_89e18_row2_col5" class="data row2 col5" ></td>
+      <td id="T_89e18_row2_col6" class="data row2 col6" >1.03</td>
     </tr>
     <tr>
-      <th id="T_6d566_level0_row3" class="row_heading level0 row3" >4</th>
-      <td id="T_6d566_row3_col0" class="data row3 col0" >VIX9D/VIX 0.87-1.02 at entry</td>
-      <td id="T_6d566_row3_col1" class="data row3 col1" >2.25</td>
-      <td id="T_6d566_row3_col2" class="data row3 col2" ></td>
-      <td id="T_6d566_row3_col3" class="data row3 col3" ></td>
-      <td id="T_6d566_row3_col4" class="data row3 col4" >1.74</td>
-      <td id="T_6d566_row3_col5" class="data row3 col5" ></td>
-      <td id="T_6d566_row3_col6" class="data row3 col6" >1.66</td>
+      <th id="T_89e18_level0_row3" class="row_heading level0 row3" >4</th>
+      <td id="T_89e18_row3_col0" class="data row3 col0" >VIX9D/VIX 0.87-1.02 at entry</td>
+      <td id="T_89e18_row3_col1" class="data row3 col1" >2.25</td>
+      <td id="T_89e18_row3_col2" class="data row3 col2" ></td>
+      <td id="T_89e18_row3_col3" class="data row3 col3" ></td>
+      <td id="T_89e18_row3_col4" class="data row3 col4" >1.74</td>
+      <td id="T_89e18_row3_col5" class="data row3 col5" ></td>
+      <td id="T_89e18_row3_col6" class="data row3 col6" >1.66</td>
     </tr>
     <tr>
-      <th id="T_6d566_level0_row4" class="row_heading level0 row4" >5</th>
-      <td id="T_6d566_row4_col0" class="data row4 col0" >7 forward-selected tranches</td>
-      <td id="T_6d566_row4_col1" class="data row4 col1" ></td>
-      <td id="T_6d566_row4_col2" class="data row4 col2" ></td>
-      <td id="T_6d566_row4_col3" class="data row4 col3" ></td>
-      <td id="T_6d566_row4_col4" class="data row4 col4" >2.40</td>
-      <td id="T_6d566_row4_col5" class="data row4 col5" ></td>
-      <td id="T_6d566_row4_col6" class="data row4 col6" >2.48</td>
+      <th id="T_89e18_level0_row4" class="row_heading level0 row4" >5</th>
+      <td id="T_89e18_row4_col0" class="data row4 col0" >7 forward-selected tranches</td>
+      <td id="T_89e18_row4_col1" class="data row4 col1" ></td>
+      <td id="T_89e18_row4_col2" class="data row4 col2" ></td>
+      <td id="T_89e18_row4_col3" class="data row4 col3" ></td>
+      <td id="T_89e18_row4_col4" class="data row4 col4" >2.40</td>
+      <td id="T_89e18_row4_col5" class="data row4 col5" ></td>
+      <td id="T_89e18_row4_col6" class="data row4 col6" >2.48</td>
     </tr>
     <tr>
-      <th id="T_6d566_level0_row5" class="row_heading level0 row5" >6</th>
-      <td id="T_6d566_row5_col0" class="data row5 col0" >short/long ratio <= 4</td>
-      <td id="T_6d566_row5_col1" class="data row5 col1" ></td>
-      <td id="T_6d566_row5_col2" class="data row5 col2" ></td>
-      <td id="T_6d566_row5_col3" class="data row5 col3" ></td>
-      <td id="T_6d566_row5_col4" class="data row5 col4" >2.60</td>
-      <td id="T_6d566_row5_col5" class="data row5 col5" ></td>
-      <td id="T_6d566_row5_col6" class="data row5 col6" ></td>
+      <th id="T_89e18_level0_row5" class="row_heading level0 row5" >6</th>
+      <td id="T_89e18_row5_col0" class="data row5 col0" >short/long ratio <= 4</td>
+      <td id="T_89e18_row5_col1" class="data row5 col1" ></td>
+      <td id="T_89e18_row5_col2" class="data row5 col2" ></td>
+      <td id="T_89e18_row5_col3" class="data row5 col3" ></td>
+      <td id="T_89e18_row5_col4" class="data row5 col4" >2.60</td>
+      <td id="T_89e18_row5_col5" class="data row5 col5" ></td>
+      <td id="T_89e18_row5_col6" class="data row5 col6" ></td>
     </tr>
   </tbody>
 </table>
@@ -4057,18 +4057,18 @@ correlated they are.
 
 
 
-<table id="T_4f6e0">
+<table id="T_ed40d">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_4f6e0_level0_col0" class="col_heading level0 col0" >condors</th>
-      <th id="T_4f6e0_level0_col1" class="col_heading level0 col1" >trades</th>
-      <th id="T_4f6e0_level0_col2" class="col_heading level0 col2" >avg_pl</th>
-      <th id="T_4f6e0_level0_col3" class="col_heading level0 col3" >ci_low</th>
-      <th id="T_4f6e0_level0_col4" class="col_heading level0 col4" >ci_high</th>
-      <th id="T_4f6e0_level0_col5" class="col_heading level0 col5" >total_pl</th>
-      <th id="T_4f6e0_level0_col6" class="col_heading level0 col6" >sharpe_if_dropped</th>
-      <th id="T_4f6e0_level0_col7" class="col_heading level0 col7" >status</th>
+      <th id="T_ed40d_level0_col0" class="col_heading level0 col0" >condors</th>
+      <th id="T_ed40d_level0_col1" class="col_heading level0 col1" >trades</th>
+      <th id="T_ed40d_level0_col2" class="col_heading level0 col2" >avg_pl</th>
+      <th id="T_ed40d_level0_col3" class="col_heading level0 col3" >ci_low</th>
+      <th id="T_ed40d_level0_col4" class="col_heading level0 col4" >ci_high</th>
+      <th id="T_ed40d_level0_col5" class="col_heading level0 col5" >total_pl</th>
+      <th id="T_ed40d_level0_col6" class="col_heading level0 col6" >sharpe_if_dropped</th>
+      <th id="T_ed40d_level0_col7" class="col_heading level0 col7" >status</th>
     </tr>
     <tr>
       <th class="index_name level0" >entry_time</th>
@@ -4084,224 +4084,224 @@ correlated they are.
   </thead>
   <tbody>
     <tr>
-      <th id="T_4f6e0_level0_row0" class="row_heading level0 row0" >09:32</th>
-      <td id="T_4f6e0_row0_col0" class="data row0 col0" >139</td>
-      <td id="T_4f6e0_row0_col1" class="data row0 col1" >278</td>
-      <td id="T_4f6e0_row0_col2" class="data row0 col2" >31.85</td>
-      <td id="T_4f6e0_row0_col3" class="data row0 col3" >-31.26</td>
-      <td id="T_4f6e0_row0_col4" class="data row0 col4" >96.27</td>
-      <td id="T_4f6e0_row0_col5" class="data row0 col5" >4427.68</td>
-      <td id="T_4f6e0_row0_col6" class="data row0 col6" >0.04</td>
-      <td id="T_4f6e0_row0_col7" class="data row0 col7" >dropped</td>
+      <th id="T_ed40d_level0_row0" class="row_heading level0 row0" >09:32</th>
+      <td id="T_ed40d_row0_col0" class="data row0 col0" >139</td>
+      <td id="T_ed40d_row0_col1" class="data row0 col1" >278</td>
+      <td id="T_ed40d_row0_col2" class="data row0 col2" >31.85</td>
+      <td id="T_ed40d_row0_col3" class="data row0 col3" >-31.26</td>
+      <td id="T_ed40d_row0_col4" class="data row0 col4" >96.27</td>
+      <td id="T_ed40d_row0_col5" class="data row0 col5" >4427.68</td>
+      <td id="T_ed40d_row0_col6" class="data row0 col6" >0.04</td>
+      <td id="T_ed40d_row0_col7" class="data row0 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row1" class="row_heading level0 row1" >09:52</th>
-      <td id="T_4f6e0_row1_col0" class="data row1 col0" >131</td>
-      <td id="T_4f6e0_row1_col1" class="data row1 col1" >262</td>
-      <td id="T_4f6e0_row1_col2" class="data row1 col2" >34.85</td>
-      <td id="T_4f6e0_row1_col3" class="data row1 col3" >-31.65</td>
-      <td id="T_4f6e0_row1_col4" class="data row1 col4" >95.74</td>
-      <td id="T_4f6e0_row1_col5" class="data row1 col5" >4565.72</td>
-      <td id="T_4f6e0_row1_col6" class="data row1 col6" >0.04</td>
-      <td id="T_4f6e0_row1_col7" class="data row1 col7" >dropped</td>
+      <th id="T_ed40d_level0_row1" class="row_heading level0 row1" >09:52</th>
+      <td id="T_ed40d_row1_col0" class="data row1 col0" >131</td>
+      <td id="T_ed40d_row1_col1" class="data row1 col1" >262</td>
+      <td id="T_ed40d_row1_col2" class="data row1 col2" >34.85</td>
+      <td id="T_ed40d_row1_col3" class="data row1 col3" >-31.65</td>
+      <td id="T_ed40d_row1_col4" class="data row1 col4" >95.74</td>
+      <td id="T_ed40d_row1_col5" class="data row1 col5" >4565.72</td>
+      <td id="T_ed40d_row1_col6" class="data row1 col6" >0.04</td>
+      <td id="T_ed40d_row1_col7" class="data row1 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row2" class="row_heading level0 row2" >10:13</th>
-      <td id="T_4f6e0_row2_col0" class="data row2 col0" >112</td>
-      <td id="T_4f6e0_row2_col1" class="data row2 col1" >224</td>
-      <td id="T_4f6e0_row2_col2" class="data row2 col2" >43.86</td>
-      <td id="T_4f6e0_row2_col3" class="data row2 col3" >-26.94</td>
-      <td id="T_4f6e0_row2_col4" class="data row2 col4" >108.33</td>
-      <td id="T_4f6e0_row2_col5" class="data row2 col5" >4912.44</td>
-      <td id="T_4f6e0_row2_col6" class="data row2 col6" >0.05</td>
-      <td id="T_4f6e0_row2_col7" class="data row2 col7" >dropped</td>
+      <th id="T_ed40d_level0_row2" class="row_heading level0 row2" >10:13</th>
+      <td id="T_ed40d_row2_col0" class="data row2 col0" >112</td>
+      <td id="T_ed40d_row2_col1" class="data row2 col1" >224</td>
+      <td id="T_ed40d_row2_col2" class="data row2 col2" >43.86</td>
+      <td id="T_ed40d_row2_col3" class="data row2 col3" >-26.94</td>
+      <td id="T_ed40d_row2_col4" class="data row2 col4" >108.33</td>
+      <td id="T_ed40d_row2_col5" class="data row2 col5" >4912.44</td>
+      <td id="T_ed40d_row2_col6" class="data row2 col6" >0.05</td>
+      <td id="T_ed40d_row2_col7" class="data row2 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row3" class="row_heading level0 row3" >10:33</th>
-      <td id="T_4f6e0_row3_col0" class="data row3 col0" >122</td>
-      <td id="T_4f6e0_row3_col1" class="data row3 col1" >244</td>
-      <td id="T_4f6e0_row3_col2" class="data row3 col2" >43.01</td>
-      <td id="T_4f6e0_row3_col3" class="data row3 col3" >-29.20</td>
-      <td id="T_4f6e0_row3_col4" class="data row3 col4" >109.34</td>
-      <td id="T_4f6e0_row3_col5" class="data row3 col5" >5246.64</td>
-      <td id="T_4f6e0_row3_col6" class="data row3 col6" >0.07</td>
-      <td id="T_4f6e0_row3_col7" class="data row3 col7" >dropped</td>
+      <th id="T_ed40d_level0_row3" class="row_heading level0 row3" >10:33</th>
+      <td id="T_ed40d_row3_col0" class="data row3 col0" >122</td>
+      <td id="T_ed40d_row3_col1" class="data row3 col1" >244</td>
+      <td id="T_ed40d_row3_col2" class="data row3 col2" >43.01</td>
+      <td id="T_ed40d_row3_col3" class="data row3 col3" >-29.20</td>
+      <td id="T_ed40d_row3_col4" class="data row3 col4" >109.34</td>
+      <td id="T_ed40d_row3_col5" class="data row3 col5" >5246.64</td>
+      <td id="T_ed40d_row3_col6" class="data row3 col6" >0.07</td>
+      <td id="T_ed40d_row3_col7" class="data row3 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row4" class="row_heading level0 row4" >10:53</th>
-      <td id="T_4f6e0_row4_col0" class="data row4 col0" >131</td>
-      <td id="T_4f6e0_row4_col1" class="data row4 col1" >262</td>
-      <td id="T_4f6e0_row4_col2" class="data row4 col2" >78.01</td>
-      <td id="T_4f6e0_row4_col3" class="data row4 col3" >16.48</td>
-      <td id="T_4f6e0_row4_col4" class="data row4 col4" >136.45</td>
-      <td id="T_4f6e0_row4_col5" class="data row4 col5" >10218.72</td>
-      <td id="T_4f6e0_row4_col6" class="data row4 col6" >0.00</td>
-      <td id="T_4f6e0_row4_col7" class="data row4 col7" >dropped</td>
+      <th id="T_ed40d_level0_row4" class="row_heading level0 row4" >10:53</th>
+      <td id="T_ed40d_row4_col0" class="data row4 col0" >131</td>
+      <td id="T_ed40d_row4_col1" class="data row4 col1" >262</td>
+      <td id="T_ed40d_row4_col2" class="data row4 col2" >78.01</td>
+      <td id="T_ed40d_row4_col3" class="data row4 col3" >16.48</td>
+      <td id="T_ed40d_row4_col4" class="data row4 col4" >136.45</td>
+      <td id="T_ed40d_row4_col5" class="data row4 col5" >10218.72</td>
+      <td id="T_ed40d_row4_col6" class="data row4 col6" >0.00</td>
+      <td id="T_ed40d_row4_col7" class="data row4 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row5" class="row_heading level0 row5" >11:13</th>
-      <td id="T_4f6e0_row5_col0" class="data row5 col0" >115</td>
-      <td id="T_4f6e0_row5_col1" class="data row5 col1" >230</td>
-      <td id="T_4f6e0_row5_col2" class="data row5 col2" >128.06</td>
-      <td id="T_4f6e0_row5_col3" class="data row5 col3" >65.88</td>
-      <td id="T_4f6e0_row5_col4" class="data row5 col4" >183.16</td>
-      <td id="T_4f6e0_row5_col5" class="data row5 col5" >14726.80</td>
-      <td id="T_4f6e0_row5_col6" class="data row5 col6" >-0.06</td>
-      <td id="T_4f6e0_row5_col7" class="data row5 col7" >dropped</td>
+      <th id="T_ed40d_level0_row5" class="row_heading level0 row5" >11:13</th>
+      <td id="T_ed40d_row5_col0" class="data row5 col0" >115</td>
+      <td id="T_ed40d_row5_col1" class="data row5 col1" >230</td>
+      <td id="T_ed40d_row5_col2" class="data row5 col2" >128.06</td>
+      <td id="T_ed40d_row5_col3" class="data row5 col3" >65.88</td>
+      <td id="T_ed40d_row5_col4" class="data row5 col4" >183.16</td>
+      <td id="T_ed40d_row5_col5" class="data row5 col5" >14726.80</td>
+      <td id="T_ed40d_row5_col6" class="data row5 col6" >-0.06</td>
+      <td id="T_ed40d_row5_col7" class="data row5 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row6" class="row_heading level0 row6" >11:33</th>
-      <td id="T_4f6e0_row6_col0" class="data row6 col0" >122</td>
-      <td id="T_4f6e0_row6_col1" class="data row6 col1" >244</td>
-      <td id="T_4f6e0_row6_col2" class="data row6 col2" >133.44</td>
-      <td id="T_4f6e0_row6_col3" class="data row6 col3" >77.09</td>
-      <td id="T_4f6e0_row6_col4" class="data row6 col4" >188.55</td>
-      <td id="T_4f6e0_row6_col5" class="data row6 col5" >16279.64</td>
-      <td id="T_4f6e0_row6_col6" class="data row6 col6" >-0.09</td>
-      <td id="T_4f6e0_row6_col7" class="data row6 col7" >traded</td>
+      <th id="T_ed40d_level0_row6" class="row_heading level0 row6" >11:33</th>
+      <td id="T_ed40d_row6_col0" class="data row6 col0" >122</td>
+      <td id="T_ed40d_row6_col1" class="data row6 col1" >244</td>
+      <td id="T_ed40d_row6_col2" class="data row6 col2" >133.44</td>
+      <td id="T_ed40d_row6_col3" class="data row6 col3" >77.09</td>
+      <td id="T_ed40d_row6_col4" class="data row6 col4" >188.55</td>
+      <td id="T_ed40d_row6_col5" class="data row6 col5" >16279.64</td>
+      <td id="T_ed40d_row6_col6" class="data row6 col6" >-0.09</td>
+      <td id="T_ed40d_row6_col7" class="data row6 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row7" class="row_heading level0 row7" >11:53</th>
-      <td id="T_4f6e0_row7_col0" class="data row7 col0" >119</td>
-      <td id="T_4f6e0_row7_col1" class="data row7 col1" >238</td>
-      <td id="T_4f6e0_row7_col2" class="data row7 col2" >151.93</td>
-      <td id="T_4f6e0_row7_col3" class="data row7 col3" >99.79</td>
-      <td id="T_4f6e0_row7_col4" class="data row7 col4" >202.39</td>
-      <td id="T_4f6e0_row7_col5" class="data row7 col5" >18079.28</td>
-      <td id="T_4f6e0_row7_col6" class="data row7 col6" >-0.10</td>
-      <td id="T_4f6e0_row7_col7" class="data row7 col7" >traded</td>
+      <th id="T_ed40d_level0_row7" class="row_heading level0 row7" >11:53</th>
+      <td id="T_ed40d_row7_col0" class="data row7 col0" >119</td>
+      <td id="T_ed40d_row7_col1" class="data row7 col1" >238</td>
+      <td id="T_ed40d_row7_col2" class="data row7 col2" >151.93</td>
+      <td id="T_ed40d_row7_col3" class="data row7 col3" >99.79</td>
+      <td id="T_ed40d_row7_col4" class="data row7 col4" >202.39</td>
+      <td id="T_ed40d_row7_col5" class="data row7 col5" >18079.28</td>
+      <td id="T_ed40d_row7_col6" class="data row7 col6" >-0.10</td>
+      <td id="T_ed40d_row7_col7" class="data row7 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row8" class="row_heading level0 row8" >12:13</th>
-      <td id="T_4f6e0_row8_col0" class="data row8 col0" >110</td>
-      <td id="T_4f6e0_row8_col1" class="data row8 col1" >220</td>
-      <td id="T_4f6e0_row8_col2" class="data row8 col2" >156.40</td>
-      <td id="T_4f6e0_row8_col3" class="data row8 col3" >103.37</td>
-      <td id="T_4f6e0_row8_col4" class="data row8 col4" >203.10</td>
-      <td id="T_4f6e0_row8_col5" class="data row8 col5" >17204.20</td>
-      <td id="T_4f6e0_row8_col6" class="data row8 col6" >-0.09</td>
-      <td id="T_4f6e0_row8_col7" class="data row8 col7" >traded</td>
+      <th id="T_ed40d_level0_row8" class="row_heading level0 row8" >12:13</th>
+      <td id="T_ed40d_row8_col0" class="data row8 col0" >110</td>
+      <td id="T_ed40d_row8_col1" class="data row8 col1" >220</td>
+      <td id="T_ed40d_row8_col2" class="data row8 col2" >156.40</td>
+      <td id="T_ed40d_row8_col3" class="data row8 col3" >103.37</td>
+      <td id="T_ed40d_row8_col4" class="data row8 col4" >203.10</td>
+      <td id="T_ed40d_row8_col5" class="data row8 col5" >17204.20</td>
+      <td id="T_ed40d_row8_col6" class="data row8 col6" >-0.09</td>
+      <td id="T_ed40d_row8_col7" class="data row8 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row9" class="row_heading level0 row9" >12:33</th>
-      <td id="T_4f6e0_row9_col0" class="data row9 col0" >115</td>
-      <td id="T_4f6e0_row9_col1" class="data row9 col1" >230</td>
-      <td id="T_4f6e0_row9_col2" class="data row9 col2" >101.97</td>
-      <td id="T_4f6e0_row9_col3" class="data row9 col3" >37.67</td>
-      <td id="T_4f6e0_row9_col4" class="data row9 col4" >161.83</td>
-      <td id="T_4f6e0_row9_col5" class="data row9 col5" >11726.80</td>
-      <td id="T_4f6e0_row9_col6" class="data row9 col6" >-0.01</td>
-      <td id="T_4f6e0_row9_col7" class="data row9 col7" >dropped</td>
+      <th id="T_ed40d_level0_row9" class="row_heading level0 row9" >12:33</th>
+      <td id="T_ed40d_row9_col0" class="data row9 col0" >115</td>
+      <td id="T_ed40d_row9_col1" class="data row9 col1" >230</td>
+      <td id="T_ed40d_row9_col2" class="data row9 col2" >101.97</td>
+      <td id="T_ed40d_row9_col3" class="data row9 col3" >37.67</td>
+      <td id="T_ed40d_row9_col4" class="data row9 col4" >161.83</td>
+      <td id="T_ed40d_row9_col5" class="data row9 col5" >11726.80</td>
+      <td id="T_ed40d_row9_col6" class="data row9 col6" >-0.01</td>
+      <td id="T_ed40d_row9_col7" class="data row9 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row10" class="row_heading level0 row10" >12:53</th>
-      <td id="T_4f6e0_row10_col0" class="data row10 col0" >119</td>
-      <td id="T_4f6e0_row10_col1" class="data row10 col1" >238</td>
-      <td id="T_4f6e0_row10_col2" class="data row10 col2" >122.09</td>
-      <td id="T_4f6e0_row10_col3" class="data row10 col3" >59.76</td>
-      <td id="T_4f6e0_row10_col4" class="data row10 col4" >180.05</td>
-      <td id="T_4f6e0_row10_col5" class="data row10 col5" >14529.28</td>
-      <td id="T_4f6e0_row10_col6" class="data row10 col6" >-0.03</td>
-      <td id="T_4f6e0_row10_col7" class="data row10 col7" >dropped</td>
+      <th id="T_ed40d_level0_row10" class="row_heading level0 row10" >12:53</th>
+      <td id="T_ed40d_row10_col0" class="data row10 col0" >119</td>
+      <td id="T_ed40d_row10_col1" class="data row10 col1" >238</td>
+      <td id="T_ed40d_row10_col2" class="data row10 col2" >122.09</td>
+      <td id="T_ed40d_row10_col3" class="data row10 col3" >59.76</td>
+      <td id="T_ed40d_row10_col4" class="data row10 col4" >180.05</td>
+      <td id="T_ed40d_row10_col5" class="data row10 col5" >14529.28</td>
+      <td id="T_ed40d_row10_col6" class="data row10 col6" >-0.03</td>
+      <td id="T_ed40d_row10_col7" class="data row10 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row11" class="row_heading level0 row11" >13:13</th>
-      <td id="T_4f6e0_row11_col0" class="data row11 col0" >115</td>
-      <td id="T_4f6e0_row11_col1" class="data row11 col1" >230</td>
-      <td id="T_4f6e0_row11_col2" class="data row11 col2" >142.34</td>
-      <td id="T_4f6e0_row11_col3" class="data row11 col3" >84.21</td>
-      <td id="T_4f6e0_row11_col4" class="data row11 col4" >199.19</td>
-      <td id="T_4f6e0_row11_col5" class="data row11 col5" >16368.80</td>
-      <td id="T_4f6e0_row11_col6" class="data row11 col6" >-0.08</td>
-      <td id="T_4f6e0_row11_col7" class="data row11 col7" >traded</td>
+      <th id="T_ed40d_level0_row11" class="row_heading level0 row11" >13:13</th>
+      <td id="T_ed40d_row11_col0" class="data row11 col0" >115</td>
+      <td id="T_ed40d_row11_col1" class="data row11 col1" >230</td>
+      <td id="T_ed40d_row11_col2" class="data row11 col2" >142.34</td>
+      <td id="T_ed40d_row11_col3" class="data row11 col3" >84.21</td>
+      <td id="T_ed40d_row11_col4" class="data row11 col4" >199.19</td>
+      <td id="T_ed40d_row11_col5" class="data row11 col5" >16368.80</td>
+      <td id="T_ed40d_row11_col6" class="data row11 col6" >-0.08</td>
+      <td id="T_ed40d_row11_col7" class="data row11 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row12" class="row_heading level0 row12" >13:33</th>
-      <td id="T_4f6e0_row12_col0" class="data row12 col0" >110</td>
-      <td id="T_4f6e0_row12_col1" class="data row12 col1" >220</td>
-      <td id="T_4f6e0_row12_col2" class="data row12 col2" >125.69</td>
-      <td id="T_4f6e0_row12_col3" class="data row12 col3" >56.78</td>
-      <td id="T_4f6e0_row12_col4" class="data row12 col4" >188.97</td>
-      <td id="T_4f6e0_row12_col5" class="data row12 col5" >13826.20</td>
-      <td id="T_4f6e0_row12_col6" class="data row12 col6" >-0.05</td>
-      <td id="T_4f6e0_row12_col7" class="data row12 col7" >dropped</td>
+      <th id="T_ed40d_level0_row12" class="row_heading level0 row12" >13:33</th>
+      <td id="T_ed40d_row12_col0" class="data row12 col0" >110</td>
+      <td id="T_ed40d_row12_col1" class="data row12 col1" >220</td>
+      <td id="T_ed40d_row12_col2" class="data row12 col2" >125.69</td>
+      <td id="T_ed40d_row12_col3" class="data row12 col3" >56.78</td>
+      <td id="T_ed40d_row12_col4" class="data row12 col4" >188.97</td>
+      <td id="T_ed40d_row12_col5" class="data row12 col5" >13826.20</td>
+      <td id="T_ed40d_row12_col6" class="data row12 col6" >-0.05</td>
+      <td id="T_ed40d_row12_col7" class="data row12 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row13" class="row_heading level0 row13" >13:53</th>
-      <td id="T_4f6e0_row13_col0" class="data row13 col0" >107</td>
-      <td id="T_4f6e0_row13_col1" class="data row13 col1" >214</td>
-      <td id="T_4f6e0_row13_col2" class="data row13 col2" >165.76</td>
-      <td id="T_4f6e0_row13_col3" class="data row13 col3" >108.62</td>
-      <td id="T_4f6e0_row13_col4" class="data row13 col4" >224.09</td>
-      <td id="T_4f6e0_row13_col5" class="data row13 col5" >17735.84</td>
-      <td id="T_4f6e0_row13_col6" class="data row13 col6" >-0.12</td>
-      <td id="T_4f6e0_row13_col7" class="data row13 col7" >traded</td>
+      <th id="T_ed40d_level0_row13" class="row_heading level0 row13" >13:53</th>
+      <td id="T_ed40d_row13_col0" class="data row13 col0" >107</td>
+      <td id="T_ed40d_row13_col1" class="data row13 col1" >214</td>
+      <td id="T_ed40d_row13_col2" class="data row13 col2" >165.76</td>
+      <td id="T_ed40d_row13_col3" class="data row13 col3" >108.62</td>
+      <td id="T_ed40d_row13_col4" class="data row13 col4" >224.09</td>
+      <td id="T_ed40d_row13_col5" class="data row13 col5" >17735.84</td>
+      <td id="T_ed40d_row13_col6" class="data row13 col6" >-0.12</td>
+      <td id="T_ed40d_row13_col7" class="data row13 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row14" class="row_heading level0 row14" >14:13</th>
-      <td id="T_4f6e0_row14_col0" class="data row14 col0" >111</td>
-      <td id="T_4f6e0_row14_col1" class="data row14 col1" >222</td>
-      <td id="T_4f6e0_row14_col2" class="data row14 col2" >139.41</td>
-      <td id="T_4f6e0_row14_col3" class="data row14 col3" >78.27</td>
-      <td id="T_4f6e0_row14_col4" class="data row14 col4" >193.31</td>
-      <td id="T_4f6e0_row14_col5" class="data row14 col5" >15474.32</td>
-      <td id="T_4f6e0_row14_col6" class="data row14 col6" >-0.10</td>
-      <td id="T_4f6e0_row14_col7" class="data row14 col7" >traded</td>
+      <th id="T_ed40d_level0_row14" class="row_heading level0 row14" >14:13</th>
+      <td id="T_ed40d_row14_col0" class="data row14 col0" >111</td>
+      <td id="T_ed40d_row14_col1" class="data row14 col1" >222</td>
+      <td id="T_ed40d_row14_col2" class="data row14 col2" >139.41</td>
+      <td id="T_ed40d_row14_col3" class="data row14 col3" >78.27</td>
+      <td id="T_ed40d_row14_col4" class="data row14 col4" >193.31</td>
+      <td id="T_ed40d_row14_col5" class="data row14 col5" >15474.32</td>
+      <td id="T_ed40d_row14_col6" class="data row14 col6" >-0.10</td>
+      <td id="T_ed40d_row14_col7" class="data row14 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row15" class="row_heading level0 row15" >14:33</th>
-      <td id="T_4f6e0_row15_col0" class="data row15 col0" >111</td>
-      <td id="T_4f6e0_row15_col1" class="data row15 col1" >222</td>
-      <td id="T_4f6e0_row15_col2" class="data row15 col2" >74.84</td>
-      <td id="T_4f6e0_row15_col3" class="data row15 col3" >9.37</td>
-      <td id="T_4f6e0_row15_col4" class="data row15 col4" >140.85</td>
-      <td id="T_4f6e0_row15_col5" class="data row15 col5" >8307.32</td>
-      <td id="T_4f6e0_row15_col6" class="data row15 col6" >-0.01</td>
-      <td id="T_4f6e0_row15_col7" class="data row15 col7" >dropped</td>
+      <th id="T_ed40d_level0_row15" class="row_heading level0 row15" >14:33</th>
+      <td id="T_ed40d_row15_col0" class="data row15 col0" >111</td>
+      <td id="T_ed40d_row15_col1" class="data row15 col1" >222</td>
+      <td id="T_ed40d_row15_col2" class="data row15 col2" >74.84</td>
+      <td id="T_ed40d_row15_col3" class="data row15 col3" >9.37</td>
+      <td id="T_ed40d_row15_col4" class="data row15 col4" >140.85</td>
+      <td id="T_ed40d_row15_col5" class="data row15 col5" >8307.32</td>
+      <td id="T_ed40d_row15_col6" class="data row15 col6" >-0.01</td>
+      <td id="T_ed40d_row15_col7" class="data row15 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row16" class="row_heading level0 row16" >14:53</th>
-      <td id="T_4f6e0_row16_col0" class="data row16 col0" >107</td>
-      <td id="T_4f6e0_row16_col1" class="data row16 col1" >214</td>
-      <td id="T_4f6e0_row16_col2" class="data row16 col2" >114.29</td>
-      <td id="T_4f6e0_row16_col3" class="data row16 col3" >52.78</td>
-      <td id="T_4f6e0_row16_col4" class="data row16 col4" >169.79</td>
-      <td id="T_4f6e0_row16_col5" class="data row16 col5" >12228.84</td>
-      <td id="T_4f6e0_row16_col6" class="data row16 col6" >-0.07</td>
-      <td id="T_4f6e0_row16_col7" class="data row16 col7" >traded</td>
+      <th id="T_ed40d_level0_row16" class="row_heading level0 row16" >14:53</th>
+      <td id="T_ed40d_row16_col0" class="data row16 col0" >107</td>
+      <td id="T_ed40d_row16_col1" class="data row16 col1" >214</td>
+      <td id="T_ed40d_row16_col2" class="data row16 col2" >114.29</td>
+      <td id="T_ed40d_row16_col3" class="data row16 col3" >52.78</td>
+      <td id="T_ed40d_row16_col4" class="data row16 col4" >169.79</td>
+      <td id="T_ed40d_row16_col5" class="data row16 col5" >12228.84</td>
+      <td id="T_ed40d_row16_col6" class="data row16 col6" >-0.07</td>
+      <td id="T_ed40d_row16_col7" class="data row16 col7" >traded</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row17" class="row_heading level0 row17" >15:13</th>
-      <td id="T_4f6e0_row17_col0" class="data row17 col0" >105</td>
-      <td id="T_4f6e0_row17_col1" class="data row17 col1" >210</td>
-      <td id="T_4f6e0_row17_col2" class="data row17 col2" >70.82</td>
-      <td id="T_4f6e0_row17_col3" class="data row17 col3" >7.06</td>
-      <td id="T_4f6e0_row17_col4" class="data row17 col4" >137.75</td>
-      <td id="T_4f6e0_row17_col5" class="data row17 col5" >7436.60</td>
-      <td id="T_4f6e0_row17_col6" class="data row17 col6" >-0.01</td>
-      <td id="T_4f6e0_row17_col7" class="data row17 col7" >dropped</td>
+      <th id="T_ed40d_level0_row17" class="row_heading level0 row17" >15:13</th>
+      <td id="T_ed40d_row17_col0" class="data row17 col0" >105</td>
+      <td id="T_ed40d_row17_col1" class="data row17 col1" >210</td>
+      <td id="T_ed40d_row17_col2" class="data row17 col2" >70.82</td>
+      <td id="T_ed40d_row17_col3" class="data row17 col3" >7.06</td>
+      <td id="T_ed40d_row17_col4" class="data row17 col4" >137.75</td>
+      <td id="T_ed40d_row17_col5" class="data row17 col5" >7436.60</td>
+      <td id="T_ed40d_row17_col6" class="data row17 col6" >-0.01</td>
+      <td id="T_ed40d_row17_col7" class="data row17 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row18" class="row_heading level0 row18" >15:33</th>
-      <td id="T_4f6e0_row18_col0" class="data row18 col0" >101</td>
-      <td id="T_4f6e0_row18_col1" class="data row18 col1" >202</td>
-      <td id="T_4f6e0_row18_col2" class="data row18 col2" >23.16</td>
-      <td id="T_4f6e0_row18_col3" class="data row18 col3" >-42.84</td>
-      <td id="T_4f6e0_row18_col4" class="data row18 col4" >84.47</td>
-      <td id="T_4f6e0_row18_col5" class="data row18 col5" >2339.12</td>
-      <td id="T_4f6e0_row18_col6" class="data row18 col6" >0.02</td>
-      <td id="T_4f6e0_row18_col7" class="data row18 col7" >dropped</td>
+      <th id="T_ed40d_level0_row18" class="row_heading level0 row18" >15:33</th>
+      <td id="T_ed40d_row18_col0" class="data row18 col0" >101</td>
+      <td id="T_ed40d_row18_col1" class="data row18 col1" >202</td>
+      <td id="T_ed40d_row18_col2" class="data row18 col2" >23.16</td>
+      <td id="T_ed40d_row18_col3" class="data row18 col3" >-42.84</td>
+      <td id="T_ed40d_row18_col4" class="data row18 col4" >84.47</td>
+      <td id="T_ed40d_row18_col5" class="data row18 col5" >2339.12</td>
+      <td id="T_ed40d_row18_col6" class="data row18 col6" >0.02</td>
+      <td id="T_ed40d_row18_col7" class="data row18 col7" >dropped</td>
     </tr>
     <tr>
-      <th id="T_4f6e0_level0_row19" class="row_heading level0 row19" >15:53</th>
-      <td id="T_4f6e0_row19_col0" class="data row19 col0" >113</td>
-      <td id="T_4f6e0_row19_col1" class="data row19 col1" >226</td>
-      <td id="T_4f6e0_row19_col2" class="data row19 col2" >-20.84</td>
-      <td id="T_4f6e0_row19_col3" class="data row19 col3" >-71.71</td>
-      <td id="T_4f6e0_row19_col4" class="data row19 col4" >28.55</td>
-      <td id="T_4f6e0_row19_col5" class="data row19 col5" >-2355.44</td>
-      <td id="T_4f6e0_row19_col6" class="data row19 col6" >0.05</td>
-      <td id="T_4f6e0_row19_col7" class="data row19 col7" >dropped</td>
+      <th id="T_ed40d_level0_row19" class="row_heading level0 row19" >15:53</th>
+      <td id="T_ed40d_row19_col0" class="data row19 col0" >113</td>
+      <td id="T_ed40d_row19_col1" class="data row19 col1" >226</td>
+      <td id="T_ed40d_row19_col2" class="data row19 col2" >-20.84</td>
+      <td id="T_ed40d_row19_col3" class="data row19 col3" >-71.71</td>
+      <td id="T_ed40d_row19_col4" class="data row19 col4" >28.55</td>
+      <td id="T_ed40d_row19_col5" class="data row19 col5" >-2355.44</td>
+      <td id="T_ed40d_row19_col6" class="data row19 col6" >0.05</td>
+      <td id="T_ed40d_row19_col7" class="data row19 col7" >dropped</td>
     </tr>
   </tbody>
 </table>
@@ -4600,31 +4600,31 @@ mostly the first and the last hour, the weakest tranches.
     
 
 
-<table id="T_82bf2">
+<table id="T_0e20b">
   <thead>
     <tr>
       <th class="blank level0" >&nbsp;</th>
-      <th id="T_82bf2_level0_col0" class="col_heading level0 col0" >picked</th>
-      <th id="T_82bf2_level0_col1" class="col_heading level0 col1" >09:32</th>
-      <th id="T_82bf2_level0_col2" class="col_heading level0 col2" >09:52</th>
-      <th id="T_82bf2_level0_col3" class="col_heading level0 col3" >10:13</th>
-      <th id="T_82bf2_level0_col4" class="col_heading level0 col4" >10:33</th>
-      <th id="T_82bf2_level0_col5" class="col_heading level0 col5" >10:53</th>
-      <th id="T_82bf2_level0_col6" class="col_heading level0 col6" >11:13</th>
-      <th id="T_82bf2_level0_col7" class="col_heading level0 col7" >11:33</th>
-      <th id="T_82bf2_level0_col8" class="col_heading level0 col8" >11:53</th>
-      <th id="T_82bf2_level0_col9" class="col_heading level0 col9" >12:13</th>
-      <th id="T_82bf2_level0_col10" class="col_heading level0 col10" >12:33</th>
-      <th id="T_82bf2_level0_col11" class="col_heading level0 col11" >12:53</th>
-      <th id="T_82bf2_level0_col12" class="col_heading level0 col12" >13:13</th>
-      <th id="T_82bf2_level0_col13" class="col_heading level0 col13" >13:33</th>
-      <th id="T_82bf2_level0_col14" class="col_heading level0 col14" >13:53</th>
-      <th id="T_82bf2_level0_col15" class="col_heading level0 col15" >14:13</th>
-      <th id="T_82bf2_level0_col16" class="col_heading level0 col16" >14:33</th>
-      <th id="T_82bf2_level0_col17" class="col_heading level0 col17" >14:53</th>
-      <th id="T_82bf2_level0_col18" class="col_heading level0 col18" >15:13</th>
-      <th id="T_82bf2_level0_col19" class="col_heading level0 col19" >15:33</th>
-      <th id="T_82bf2_level0_col20" class="col_heading level0 col20" >15:53</th>
+      <th id="T_0e20b_level0_col0" class="col_heading level0 col0" >picked</th>
+      <th id="T_0e20b_level0_col1" class="col_heading level0 col1" >09:32</th>
+      <th id="T_0e20b_level0_col2" class="col_heading level0 col2" >09:52</th>
+      <th id="T_0e20b_level0_col3" class="col_heading level0 col3" >10:13</th>
+      <th id="T_0e20b_level0_col4" class="col_heading level0 col4" >10:33</th>
+      <th id="T_0e20b_level0_col5" class="col_heading level0 col5" >10:53</th>
+      <th id="T_0e20b_level0_col6" class="col_heading level0 col6" >11:13</th>
+      <th id="T_0e20b_level0_col7" class="col_heading level0 col7" >11:33</th>
+      <th id="T_0e20b_level0_col8" class="col_heading level0 col8" >11:53</th>
+      <th id="T_0e20b_level0_col9" class="col_heading level0 col9" >12:13</th>
+      <th id="T_0e20b_level0_col10" class="col_heading level0 col10" >12:33</th>
+      <th id="T_0e20b_level0_col11" class="col_heading level0 col11" >12:53</th>
+      <th id="T_0e20b_level0_col12" class="col_heading level0 col12" >13:13</th>
+      <th id="T_0e20b_level0_col13" class="col_heading level0 col13" >13:33</th>
+      <th id="T_0e20b_level0_col14" class="col_heading level0 col14" >13:53</th>
+      <th id="T_0e20b_level0_col15" class="col_heading level0 col15" >14:13</th>
+      <th id="T_0e20b_level0_col16" class="col_heading level0 col16" >14:33</th>
+      <th id="T_0e20b_level0_col17" class="col_heading level0 col17" >14:53</th>
+      <th id="T_0e20b_level0_col18" class="col_heading level0 col18" >15:13</th>
+      <th id="T_0e20b_level0_col19" class="col_heading level0 col19" >15:33</th>
+      <th id="T_0e20b_level0_col20" class="col_heading level0 col20" >15:53</th>
     </tr>
     <tr>
       <th class="index_name level0" >step</th>
@@ -4653,484 +4653,484 @@ mostly the first and the last hour, the weakest tranches.
   </thead>
   <tbody>
     <tr>
-      <th id="T_82bf2_level0_row0" class="row_heading level0 row0" >1</th>
-      <td id="T_82bf2_row0_col0" class="data row0 col0" >11:53</td>
-      <td id="T_82bf2_row0_col1" class="data row0 col1" >-2.98</td>
-      <td id="T_82bf2_row0_col2" class="data row0 col2" >-3.15</td>
-      <td id="T_82bf2_row0_col3" class="data row0 col3" >-3.44</td>
-      <td id="T_82bf2_row0_col4" class="data row0 col4" >-3.15</td>
-      <td id="T_82bf2_row0_col5" class="data row0 col5" >-2.60</td>
-      <td id="T_82bf2_row0_col6" class="data row0 col6" >-2.32</td>
-      <td id="T_82bf2_row0_col7" class="data row0 col7" >-2.03</td>
-      <td id="T_82bf2_row0_col8" class="data row0 col8" >-1.93</td>
-      <td id="T_82bf2_row0_col9" class="data row0 col9" >-2.24</td>
-      <td id="T_82bf2_row0_col10" class="data row0 col10" >-2.71</td>
-      <td id="T_82bf2_row0_col11" class="data row0 col11" >-2.19</td>
-      <td id="T_82bf2_row0_col12" class="data row0 col12" >-2.10</td>
-      <td id="T_82bf2_row0_col13" class="data row0 col13" >-2.30</td>
-      <td id="T_82bf2_row0_col14" class="data row0 col14" >-2.02</td>
-      <td id="T_82bf2_row0_col15" class="data row0 col15" >-2.27</td>
-      <td id="T_82bf2_row0_col16" class="data row0 col16" >-3.05</td>
-      <td id="T_82bf2_row0_col17" class="data row0 col17" >-2.82</td>
-      <td id="T_82bf2_row0_col18" class="data row0 col18" >-3.35</td>
-      <td id="T_82bf2_row0_col19" class="data row0 col19" >-4.39</td>
-      <td id="T_82bf2_row0_col20" class="data row0 col20" >-5.91</td>
+      <th id="T_0e20b_level0_row0" class="row_heading level0 row0" >1</th>
+      <td id="T_0e20b_row0_col0" class="data row0 col0" >11:53</td>
+      <td id="T_0e20b_row0_col1" class="data row0 col1" >-2.98</td>
+      <td id="T_0e20b_row0_col2" class="data row0 col2" >-3.15</td>
+      <td id="T_0e20b_row0_col3" class="data row0 col3" >-3.44</td>
+      <td id="T_0e20b_row0_col4" class="data row0 col4" >-3.15</td>
+      <td id="T_0e20b_row0_col5" class="data row0 col5" >-2.60</td>
+      <td id="T_0e20b_row0_col6" class="data row0 col6" >-2.32</td>
+      <td id="T_0e20b_row0_col7" class="data row0 col7" >-2.03</td>
+      <td id="T_0e20b_row0_col8" class="data row0 col8" >-1.93</td>
+      <td id="T_0e20b_row0_col9" class="data row0 col9" >-2.24</td>
+      <td id="T_0e20b_row0_col10" class="data row0 col10" >-2.71</td>
+      <td id="T_0e20b_row0_col11" class="data row0 col11" >-2.19</td>
+      <td id="T_0e20b_row0_col12" class="data row0 col12" >-2.10</td>
+      <td id="T_0e20b_row0_col13" class="data row0 col13" >-2.30</td>
+      <td id="T_0e20b_row0_col14" class="data row0 col14" >-2.02</td>
+      <td id="T_0e20b_row0_col15" class="data row0 col15" >-2.27</td>
+      <td id="T_0e20b_row0_col16" class="data row0 col16" >-3.05</td>
+      <td id="T_0e20b_row0_col17" class="data row0 col17" >-2.82</td>
+      <td id="T_0e20b_row0_col18" class="data row0 col18" >-3.35</td>
+      <td id="T_0e20b_row0_col19" class="data row0 col19" >-4.39</td>
+      <td id="T_0e20b_row0_col20" class="data row0 col20" >-5.91</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row1" class="row_heading level0 row1" >2</th>
-      <td id="T_82bf2_row1_col0" class="data row1 col0" >13:53</td>
-      <td id="T_82bf2_row1_col1" class="data row1 col1" >-0.73</td>
-      <td id="T_82bf2_row1_col2" class="data row1 col2" >-0.74</td>
-      <td id="T_82bf2_row1_col3" class="data row1 col3" >-0.72</td>
-      <td id="T_82bf2_row1_col4" class="data row1 col4" >-0.64</td>
-      <td id="T_82bf2_row1_col5" class="data row1 col5" >-0.26</td>
-      <td id="T_82bf2_row1_col6" class="data row1 col6" >0.09</td>
-      <td id="T_82bf2_row1_col7" class="data row1 col7" >0.20</td>
-      <td id="T_82bf2_row1_col8" class="data row1 col8" ></td>
-      <td id="T_82bf2_row1_col9" class="data row1 col9" >0.29</td>
-      <td id="T_82bf2_row1_col10" class="data row1 col10" >-0.15</td>
-      <td id="T_82bf2_row1_col11" class="data row1 col11" >0.07</td>
-      <td id="T_82bf2_row1_col12" class="data row1 col12" >0.23</td>
-      <td id="T_82bf2_row1_col13" class="data row1 col13" >0.02</td>
-      <td id="T_82bf2_row1_col14" class="data row1 col14" >0.37</td>
-      <td id="T_82bf2_row1_col15" class="data row1 col15" >0.17</td>
-      <td id="T_82bf2_row1_col16" class="data row1 col16" >-0.48</td>
-      <td id="T_82bf2_row1_col17" class="data row1 col17" >-0.13</td>
-      <td id="T_82bf2_row1_col18" class="data row1 col18" >-0.58</td>
-      <td id="T_82bf2_row1_col19" class="data row1 col19" >-1.13</td>
-      <td id="T_82bf2_row1_col20" class="data row1 col20" >-1.76</td>
+      <th id="T_0e20b_level0_row1" class="row_heading level0 row1" >2</th>
+      <td id="T_0e20b_row1_col0" class="data row1 col0" >13:53</td>
+      <td id="T_0e20b_row1_col1" class="data row1 col1" >-0.73</td>
+      <td id="T_0e20b_row1_col2" class="data row1 col2" >-0.74</td>
+      <td id="T_0e20b_row1_col3" class="data row1 col3" >-0.72</td>
+      <td id="T_0e20b_row1_col4" class="data row1 col4" >-0.64</td>
+      <td id="T_0e20b_row1_col5" class="data row1 col5" >-0.26</td>
+      <td id="T_0e20b_row1_col6" class="data row1 col6" >0.09</td>
+      <td id="T_0e20b_row1_col7" class="data row1 col7" >0.20</td>
+      <td id="T_0e20b_row1_col8" class="data row1 col8" ></td>
+      <td id="T_0e20b_row1_col9" class="data row1 col9" >0.29</td>
+      <td id="T_0e20b_row1_col10" class="data row1 col10" >-0.15</td>
+      <td id="T_0e20b_row1_col11" class="data row1 col11" >0.07</td>
+      <td id="T_0e20b_row1_col12" class="data row1 col12" >0.23</td>
+      <td id="T_0e20b_row1_col13" class="data row1 col13" >0.02</td>
+      <td id="T_0e20b_row1_col14" class="data row1 col14" >0.37</td>
+      <td id="T_0e20b_row1_col15" class="data row1 col15" >0.17</td>
+      <td id="T_0e20b_row1_col16" class="data row1 col16" >-0.48</td>
+      <td id="T_0e20b_row1_col17" class="data row1 col17" >-0.13</td>
+      <td id="T_0e20b_row1_col18" class="data row1 col18" >-0.58</td>
+      <td id="T_0e20b_row1_col19" class="data row1 col19" >-1.13</td>
+      <td id="T_0e20b_row1_col20" class="data row1 col20" >-1.76</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row2" class="row_heading level0 row2" >3</th>
-      <td id="T_82bf2_row2_col0" class="data row2 col0" >12:13</td>
-      <td id="T_82bf2_row2_col1" class="data row2 col1" >0.54</td>
-      <td id="T_82bf2_row2_col2" class="data row2 col2" >0.56</td>
-      <td id="T_82bf2_row2_col3" class="data row2 col3" >0.59</td>
-      <td id="T_82bf2_row2_col4" class="data row2 col4" >0.58</td>
-      <td id="T_82bf2_row2_col5" class="data row2 col5" >0.88</td>
-      <td id="T_82bf2_row2_col6" class="data row2 col6" >1.15</td>
-      <td id="T_82bf2_row2_col7" class="data row2 col7" >1.24</td>
-      <td id="T_82bf2_row2_col8" class="data row2 col8" ></td>
-      <td id="T_82bf2_row2_col9" class="data row2 col9" >1.32</td>
-      <td id="T_82bf2_row2_col10" class="data row2 col10" >0.97</td>
-      <td id="T_82bf2_row2_col11" class="data row2 col11" >1.09</td>
-      <td id="T_82bf2_row2_col12" class="data row2 col12" >1.25</td>
-      <td id="T_82bf2_row2_col13" class="data row2 col13" >1.05</td>
-      <td id="T_82bf2_row2_col14" class="data row2 col14" ></td>
-      <td id="T_82bf2_row2_col15" class="data row2 col15" >1.20</td>
-      <td id="T_82bf2_row2_col16" class="data row2 col16" >0.81</td>
-      <td id="T_82bf2_row2_col17" class="data row2 col17" >1.12</td>
-      <td id="T_82bf2_row2_col18" class="data row2 col18" >0.79</td>
-      <td id="T_82bf2_row2_col19" class="data row2 col19" >0.47</td>
-      <td id="T_82bf2_row2_col20" class="data row2 col20" >0.14</td>
+      <th id="T_0e20b_level0_row2" class="row_heading level0 row2" >3</th>
+      <td id="T_0e20b_row2_col0" class="data row2 col0" >12:13</td>
+      <td id="T_0e20b_row2_col1" class="data row2 col1" >0.54</td>
+      <td id="T_0e20b_row2_col2" class="data row2 col2" >0.56</td>
+      <td id="T_0e20b_row2_col3" class="data row2 col3" >0.59</td>
+      <td id="T_0e20b_row2_col4" class="data row2 col4" >0.58</td>
+      <td id="T_0e20b_row2_col5" class="data row2 col5" >0.88</td>
+      <td id="T_0e20b_row2_col6" class="data row2 col6" >1.15</td>
+      <td id="T_0e20b_row2_col7" class="data row2 col7" >1.24</td>
+      <td id="T_0e20b_row2_col8" class="data row2 col8" ></td>
+      <td id="T_0e20b_row2_col9" class="data row2 col9" >1.32</td>
+      <td id="T_0e20b_row2_col10" class="data row2 col10" >0.97</td>
+      <td id="T_0e20b_row2_col11" class="data row2 col11" >1.09</td>
+      <td id="T_0e20b_row2_col12" class="data row2 col12" >1.25</td>
+      <td id="T_0e20b_row2_col13" class="data row2 col13" >1.05</td>
+      <td id="T_0e20b_row2_col14" class="data row2 col14" ></td>
+      <td id="T_0e20b_row2_col15" class="data row2 col15" >1.20</td>
+      <td id="T_0e20b_row2_col16" class="data row2 col16" >0.81</td>
+      <td id="T_0e20b_row2_col17" class="data row2 col17" >1.12</td>
+      <td id="T_0e20b_row2_col18" class="data row2 col18" >0.79</td>
+      <td id="T_0e20b_row2_col19" class="data row2 col19" >0.47</td>
+      <td id="T_0e20b_row2_col20" class="data row2 col20" >0.14</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row3" class="row_heading level0 row3" >4</th>
-      <td id="T_82bf2_row3_col0" class="data row3 col0" >14:13</td>
-      <td id="T_82bf2_row3_col1" class="data row3 col1" >1.28</td>
-      <td id="T_82bf2_row3_col2" class="data row3 col2" >1.30</td>
-      <td id="T_82bf2_row3_col3" class="data row3 col3" >1.31</td>
-      <td id="T_82bf2_row3_col4" class="data row3 col4" >1.26</td>
-      <td id="T_82bf2_row3_col5" class="data row3 col5" >1.50</td>
-      <td id="T_82bf2_row3_col6" class="data row3 col6" >1.70</td>
-      <td id="T_82bf2_row3_col7" class="data row3 col7" >1.76</td>
-      <td id="T_82bf2_row3_col8" class="data row3 col8" ></td>
-      <td id="T_82bf2_row3_col9" class="data row3 col9" ></td>
-      <td id="T_82bf2_row3_col10" class="data row3 col10" >1.53</td>
-      <td id="T_82bf2_row3_col11" class="data row3 col11" >1.62</td>
-      <td id="T_82bf2_row3_col12" class="data row3 col12" >1.78</td>
-      <td id="T_82bf2_row3_col13" class="data row3 col13" >1.61</td>
-      <td id="T_82bf2_row3_col14" class="data row3 col14" ></td>
-      <td id="T_82bf2_row3_col15" class="data row3 col15" >1.78</td>
-      <td id="T_82bf2_row3_col16" class="data row3 col16" >1.49</td>
-      <td id="T_82bf2_row3_col17" class="data row3 col17" >1.74</td>
-      <td id="T_82bf2_row3_col18" class="data row3 col18" >1.51</td>
-      <td id="T_82bf2_row3_col19" class="data row3 col19" >1.30</td>
-      <td id="T_82bf2_row3_col20" class="data row3 col20" >1.10</td>
+      <th id="T_0e20b_level0_row3" class="row_heading level0 row3" >4</th>
+      <td id="T_0e20b_row3_col0" class="data row3 col0" >14:13</td>
+      <td id="T_0e20b_row3_col1" class="data row3 col1" >1.28</td>
+      <td id="T_0e20b_row3_col2" class="data row3 col2" >1.30</td>
+      <td id="T_0e20b_row3_col3" class="data row3 col3" >1.31</td>
+      <td id="T_0e20b_row3_col4" class="data row3 col4" >1.26</td>
+      <td id="T_0e20b_row3_col5" class="data row3 col5" >1.50</td>
+      <td id="T_0e20b_row3_col6" class="data row3 col6" >1.70</td>
+      <td id="T_0e20b_row3_col7" class="data row3 col7" >1.76</td>
+      <td id="T_0e20b_row3_col8" class="data row3 col8" ></td>
+      <td id="T_0e20b_row3_col9" class="data row3 col9" ></td>
+      <td id="T_0e20b_row3_col10" class="data row3 col10" >1.53</td>
+      <td id="T_0e20b_row3_col11" class="data row3 col11" >1.62</td>
+      <td id="T_0e20b_row3_col12" class="data row3 col12" >1.78</td>
+      <td id="T_0e20b_row3_col13" class="data row3 col13" >1.61</td>
+      <td id="T_0e20b_row3_col14" class="data row3 col14" ></td>
+      <td id="T_0e20b_row3_col15" class="data row3 col15" >1.78</td>
+      <td id="T_0e20b_row3_col16" class="data row3 col16" >1.49</td>
+      <td id="T_0e20b_row3_col17" class="data row3 col17" >1.74</td>
+      <td id="T_0e20b_row3_col18" class="data row3 col18" >1.51</td>
+      <td id="T_0e20b_row3_col19" class="data row3 col19" >1.30</td>
+      <td id="T_0e20b_row3_col20" class="data row3 col20" >1.10</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row4" class="row_heading level0 row4" >5</th>
-      <td id="T_82bf2_row4_col0" class="data row4 col0" >11:33</td>
-      <td id="T_82bf2_row4_col1" class="data row4 col1" >1.72</td>
-      <td id="T_82bf2_row4_col2" class="data row4 col2" >1.73</td>
-      <td id="T_82bf2_row4_col3" class="data row4 col3" >1.75</td>
-      <td id="T_82bf2_row4_col4" class="data row4 col4" >1.70</td>
-      <td id="T_82bf2_row4_col5" class="data row4 col5" >1.90</td>
-      <td id="T_82bf2_row4_col6" class="data row4 col6" >2.05</td>
-      <td id="T_82bf2_row4_col7" class="data row4 col7" >2.11</td>
-      <td id="T_82bf2_row4_col8" class="data row4 col8" ></td>
-      <td id="T_82bf2_row4_col9" class="data row4 col9" ></td>
-      <td id="T_82bf2_row4_col10" class="data row4 col10" >1.89</td>
-      <td id="T_82bf2_row4_col11" class="data row4 col11" >1.95</td>
-      <td id="T_82bf2_row4_col12" class="data row4 col12" >2.08</td>
-      <td id="T_82bf2_row4_col13" class="data row4 col13" >1.93</td>
-      <td id="T_82bf2_row4_col14" class="data row4 col14" ></td>
-      <td id="T_82bf2_row4_col15" class="data row4 col15" ></td>
-      <td id="T_82bf2_row4_col16" class="data row4 col16" >1.81</td>
-      <td id="T_82bf2_row4_col17" class="data row4 col17" >2.03</td>
-      <td id="T_82bf2_row4_col18" class="data row4 col18" >1.86</td>
-      <td id="T_82bf2_row4_col19" class="data row4 col19" >1.71</td>
-      <td id="T_82bf2_row4_col20" class="data row4 col20" >1.59</td>
+      <th id="T_0e20b_level0_row4" class="row_heading level0 row4" >5</th>
+      <td id="T_0e20b_row4_col0" class="data row4 col0" >11:33</td>
+      <td id="T_0e20b_row4_col1" class="data row4 col1" >1.72</td>
+      <td id="T_0e20b_row4_col2" class="data row4 col2" >1.73</td>
+      <td id="T_0e20b_row4_col3" class="data row4 col3" >1.75</td>
+      <td id="T_0e20b_row4_col4" class="data row4 col4" >1.70</td>
+      <td id="T_0e20b_row4_col5" class="data row4 col5" >1.90</td>
+      <td id="T_0e20b_row4_col6" class="data row4 col6" >2.05</td>
+      <td id="T_0e20b_row4_col7" class="data row4 col7" >2.11</td>
+      <td id="T_0e20b_row4_col8" class="data row4 col8" ></td>
+      <td id="T_0e20b_row4_col9" class="data row4 col9" ></td>
+      <td id="T_0e20b_row4_col10" class="data row4 col10" >1.89</td>
+      <td id="T_0e20b_row4_col11" class="data row4 col11" >1.95</td>
+      <td id="T_0e20b_row4_col12" class="data row4 col12" >2.08</td>
+      <td id="T_0e20b_row4_col13" class="data row4 col13" >1.93</td>
+      <td id="T_0e20b_row4_col14" class="data row4 col14" ></td>
+      <td id="T_0e20b_row4_col15" class="data row4 col15" ></td>
+      <td id="T_0e20b_row4_col16" class="data row4 col16" >1.81</td>
+      <td id="T_0e20b_row4_col17" class="data row4 col17" >2.03</td>
+      <td id="T_0e20b_row4_col18" class="data row4 col18" >1.86</td>
+      <td id="T_0e20b_row4_col19" class="data row4 col19" >1.71</td>
+      <td id="T_0e20b_row4_col20" class="data row4 col20" >1.59</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row5" class="row_heading level0 row5" >6</th>
-      <td id="T_82bf2_row5_col0" class="data row5 col0" >13:13</td>
-      <td id="T_82bf2_row5_col1" class="data row5 col1" >2.03</td>
-      <td id="T_82bf2_row5_col2" class="data row5 col2" >2.03</td>
-      <td id="T_82bf2_row5_col3" class="data row5 col3" >2.04</td>
-      <td id="T_82bf2_row5_col4" class="data row5 col4" >1.97</td>
-      <td id="T_82bf2_row5_col5" class="data row5 col5" >2.13</td>
-      <td id="T_82bf2_row5_col6" class="data row5 col6" >2.25</td>
-      <td id="T_82bf2_row5_col7" class="data row5 col7" ></td>
-      <td id="T_82bf2_row5_col8" class="data row5 col8" ></td>
-      <td id="T_82bf2_row5_col9" class="data row5 col9" ></td>
-      <td id="T_82bf2_row5_col10" class="data row5 col10" >2.15</td>
-      <td id="T_82bf2_row5_col11" class="data row5 col11" >2.19</td>
-      <td id="T_82bf2_row5_col12" class="data row5 col12" >2.33</td>
-      <td id="T_82bf2_row5_col13" class="data row5 col13" >2.20</td>
-      <td id="T_82bf2_row5_col14" class="data row5 col14" ></td>
-      <td id="T_82bf2_row5_col15" class="data row5 col15" ></td>
-      <td id="T_82bf2_row5_col16" class="data row5 col16" >2.12</td>
-      <td id="T_82bf2_row5_col17" class="data row5 col17" >2.31</td>
-      <td id="T_82bf2_row5_col18" class="data row5 col18" >2.17</td>
-      <td id="T_82bf2_row5_col19" class="data row5 col19" >2.05</td>
-      <td id="T_82bf2_row5_col20" class="data row5 col20" >1.95</td>
+      <th id="T_0e20b_level0_row5" class="row_heading level0 row5" >6</th>
+      <td id="T_0e20b_row5_col0" class="data row5 col0" >13:13</td>
+      <td id="T_0e20b_row5_col1" class="data row5 col1" >2.03</td>
+      <td id="T_0e20b_row5_col2" class="data row5 col2" >2.03</td>
+      <td id="T_0e20b_row5_col3" class="data row5 col3" >2.04</td>
+      <td id="T_0e20b_row5_col4" class="data row5 col4" >1.97</td>
+      <td id="T_0e20b_row5_col5" class="data row5 col5" >2.13</td>
+      <td id="T_0e20b_row5_col6" class="data row5 col6" >2.25</td>
+      <td id="T_0e20b_row5_col7" class="data row5 col7" ></td>
+      <td id="T_0e20b_row5_col8" class="data row5 col8" ></td>
+      <td id="T_0e20b_row5_col9" class="data row5 col9" ></td>
+      <td id="T_0e20b_row5_col10" class="data row5 col10" >2.15</td>
+      <td id="T_0e20b_row5_col11" class="data row5 col11" >2.19</td>
+      <td id="T_0e20b_row5_col12" class="data row5 col12" >2.33</td>
+      <td id="T_0e20b_row5_col13" class="data row5 col13" >2.20</td>
+      <td id="T_0e20b_row5_col14" class="data row5 col14" ></td>
+      <td id="T_0e20b_row5_col15" class="data row5 col15" ></td>
+      <td id="T_0e20b_row5_col16" class="data row5 col16" >2.12</td>
+      <td id="T_0e20b_row5_col17" class="data row5 col17" >2.31</td>
+      <td id="T_0e20b_row5_col18" class="data row5 col18" >2.17</td>
+      <td id="T_0e20b_row5_col19" class="data row5 col19" >2.05</td>
+      <td id="T_0e20b_row5_col20" class="data row5 col20" >1.95</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row6" class="row_heading level0 row6" >7</th>
-      <td id="T_82bf2_row6_col0" class="data row6 col0" >14:53</td>
-      <td id="T_82bf2_row6_col1" class="data row6 col1" >2.24</td>
-      <td id="T_82bf2_row6_col2" class="data row6 col2" >2.25</td>
-      <td id="T_82bf2_row6_col3" class="data row6 col3" >2.25</td>
-      <td id="T_82bf2_row6_col4" class="data row6 col4" >2.19</td>
-      <td id="T_82bf2_row6_col5" class="data row6 col5" >2.34</td>
-      <td id="T_82bf2_row6_col6" class="data row6 col6" >2.43</td>
-      <td id="T_82bf2_row6_col7" class="data row6 col7" ></td>
-      <td id="T_82bf2_row6_col8" class="data row6 col8" ></td>
-      <td id="T_82bf2_row6_col9" class="data row6 col9" ></td>
-      <td id="T_82bf2_row6_col10" class="data row6 col10" >2.32</td>
-      <td id="T_82bf2_row6_col11" class="data row6 col11" >2.35</td>
-      <td id="T_82bf2_row6_col12" class="data row6 col12" ></td>
-      <td id="T_82bf2_row6_col13" class="data row6 col13" >2.35</td>
-      <td id="T_82bf2_row6_col14" class="data row6 col14" ></td>
-      <td id="T_82bf2_row6_col15" class="data row6 col15" ></td>
-      <td id="T_82bf2_row6_col16" class="data row6 col16" >2.32</td>
-      <td id="T_82bf2_row6_col17" class="data row6 col17" >2.48</td>
-      <td id="T_82bf2_row6_col18" class="data row6 col18" >2.36</td>
-      <td id="T_82bf2_row6_col19" class="data row6 col19" >2.27</td>
-      <td id="T_82bf2_row6_col20" class="data row6 col20" >2.20</td>
+      <th id="T_0e20b_level0_row6" class="row_heading level0 row6" >7</th>
+      <td id="T_0e20b_row6_col0" class="data row6 col0" >14:53</td>
+      <td id="T_0e20b_row6_col1" class="data row6 col1" >2.24</td>
+      <td id="T_0e20b_row6_col2" class="data row6 col2" >2.25</td>
+      <td id="T_0e20b_row6_col3" class="data row6 col3" >2.25</td>
+      <td id="T_0e20b_row6_col4" class="data row6 col4" >2.19</td>
+      <td id="T_0e20b_row6_col5" class="data row6 col5" >2.34</td>
+      <td id="T_0e20b_row6_col6" class="data row6 col6" >2.43</td>
+      <td id="T_0e20b_row6_col7" class="data row6 col7" ></td>
+      <td id="T_0e20b_row6_col8" class="data row6 col8" ></td>
+      <td id="T_0e20b_row6_col9" class="data row6 col9" ></td>
+      <td id="T_0e20b_row6_col10" class="data row6 col10" >2.32</td>
+      <td id="T_0e20b_row6_col11" class="data row6 col11" >2.35</td>
+      <td id="T_0e20b_row6_col12" class="data row6 col12" ></td>
+      <td id="T_0e20b_row6_col13" class="data row6 col13" >2.35</td>
+      <td id="T_0e20b_row6_col14" class="data row6 col14" ></td>
+      <td id="T_0e20b_row6_col15" class="data row6 col15" ></td>
+      <td id="T_0e20b_row6_col16" class="data row6 col16" >2.32</td>
+      <td id="T_0e20b_row6_col17" class="data row6 col17" >2.48</td>
+      <td id="T_0e20b_row6_col18" class="data row6 col18" >2.36</td>
+      <td id="T_0e20b_row6_col19" class="data row6 col19" >2.27</td>
+      <td id="T_0e20b_row6_col20" class="data row6 col20" >2.20</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row7" class="row_heading level0 row7" >8</th>
-      <td id="T_82bf2_row7_col0" class="data row7 col0" >11:13</td>
-      <td id="T_82bf2_row7_col1" class="data row7 col1" >2.39</td>
-      <td id="T_82bf2_row7_col2" class="data row7 col2" >2.40</td>
-      <td id="T_82bf2_row7_col3" class="data row7 col3" >2.40</td>
-      <td id="T_82bf2_row7_col4" class="data row7 col4" >2.36</td>
-      <td id="T_82bf2_row7_col5" class="data row7 col5" >2.48</td>
-      <td id="T_82bf2_row7_col6" class="data row7 col6" >2.56</td>
-      <td id="T_82bf2_row7_col7" class="data row7 col7" ></td>
-      <td id="T_82bf2_row7_col8" class="data row7 col8" ></td>
-      <td id="T_82bf2_row7_col9" class="data row7 col9" ></td>
-      <td id="T_82bf2_row7_col10" class="data row7 col10" >2.46</td>
-      <td id="T_82bf2_row7_col11" class="data row7 col11" >2.49</td>
-      <td id="T_82bf2_row7_col12" class="data row7 col12" ></td>
-      <td id="T_82bf2_row7_col13" class="data row7 col13" >2.49</td>
-      <td id="T_82bf2_row7_col14" class="data row7 col14" ></td>
-      <td id="T_82bf2_row7_col15" class="data row7 col15" ></td>
-      <td id="T_82bf2_row7_col16" class="data row7 col16" >2.41</td>
-      <td id="T_82bf2_row7_col17" class="data row7 col17" ></td>
-      <td id="T_82bf2_row7_col18" class="data row7 col18" >2.45</td>
-      <td id="T_82bf2_row7_col19" class="data row7 col19" >2.40</td>
-      <td id="T_82bf2_row7_col20" class="data row7 col20" >2.35</td>
+      <th id="T_0e20b_level0_row7" class="row_heading level0 row7" >8</th>
+      <td id="T_0e20b_row7_col0" class="data row7 col0" >11:13</td>
+      <td id="T_0e20b_row7_col1" class="data row7 col1" >2.39</td>
+      <td id="T_0e20b_row7_col2" class="data row7 col2" >2.40</td>
+      <td id="T_0e20b_row7_col3" class="data row7 col3" >2.40</td>
+      <td id="T_0e20b_row7_col4" class="data row7 col4" >2.36</td>
+      <td id="T_0e20b_row7_col5" class="data row7 col5" >2.48</td>
+      <td id="T_0e20b_row7_col6" class="data row7 col6" >2.56</td>
+      <td id="T_0e20b_row7_col7" class="data row7 col7" ></td>
+      <td id="T_0e20b_row7_col8" class="data row7 col8" ></td>
+      <td id="T_0e20b_row7_col9" class="data row7 col9" ></td>
+      <td id="T_0e20b_row7_col10" class="data row7 col10" >2.46</td>
+      <td id="T_0e20b_row7_col11" class="data row7 col11" >2.49</td>
+      <td id="T_0e20b_row7_col12" class="data row7 col12" ></td>
+      <td id="T_0e20b_row7_col13" class="data row7 col13" >2.49</td>
+      <td id="T_0e20b_row7_col14" class="data row7 col14" ></td>
+      <td id="T_0e20b_row7_col15" class="data row7 col15" ></td>
+      <td id="T_0e20b_row7_col16" class="data row7 col16" >2.41</td>
+      <td id="T_0e20b_row7_col17" class="data row7 col17" ></td>
+      <td id="T_0e20b_row7_col18" class="data row7 col18" >2.45</td>
+      <td id="T_0e20b_row7_col19" class="data row7 col19" >2.40</td>
+      <td id="T_0e20b_row7_col20" class="data row7 col20" >2.35</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row8" class="row_heading level0 row8" >9</th>
-      <td id="T_82bf2_row8_col0" class="data row8 col0" >13:33</td>
-      <td id="T_82bf2_row8_col1" class="data row8 col1" >2.48</td>
-      <td id="T_82bf2_row8_col2" class="data row8 col2" >2.50</td>
-      <td id="T_82bf2_row8_col3" class="data row8 col3" >2.48</td>
-      <td id="T_82bf2_row8_col4" class="data row8 col4" >2.43</td>
-      <td id="T_82bf2_row8_col5" class="data row8 col5" >2.53</td>
-      <td id="T_82bf2_row8_col6" class="data row8 col6" ></td>
-      <td id="T_82bf2_row8_col7" class="data row8 col7" ></td>
-      <td id="T_82bf2_row8_col8" class="data row8 col8" ></td>
-      <td id="T_82bf2_row8_col9" class="data row8 col9" ></td>
-      <td id="T_82bf2_row8_col10" class="data row8 col10" >2.53</td>
-      <td id="T_82bf2_row8_col11" class="data row8 col11" >2.56</td>
-      <td id="T_82bf2_row8_col12" class="data row8 col12" ></td>
-      <td id="T_82bf2_row8_col13" class="data row8 col13" >2.58</td>
-      <td id="T_82bf2_row8_col14" class="data row8 col14" ></td>
-      <td id="T_82bf2_row8_col15" class="data row8 col15" ></td>
-      <td id="T_82bf2_row8_col16" class="data row8 col16" >2.51</td>
-      <td id="T_82bf2_row8_col17" class="data row8 col17" ></td>
-      <td id="T_82bf2_row8_col18" class="data row8 col18" >2.55</td>
-      <td id="T_82bf2_row8_col19" class="data row8 col19" >2.51</td>
-      <td id="T_82bf2_row8_col20" class="data row8 col20" >2.46</td>
+      <th id="T_0e20b_level0_row8" class="row_heading level0 row8" >9</th>
+      <td id="T_0e20b_row8_col0" class="data row8 col0" >13:33</td>
+      <td id="T_0e20b_row8_col1" class="data row8 col1" >2.48</td>
+      <td id="T_0e20b_row8_col2" class="data row8 col2" >2.50</td>
+      <td id="T_0e20b_row8_col3" class="data row8 col3" >2.48</td>
+      <td id="T_0e20b_row8_col4" class="data row8 col4" >2.43</td>
+      <td id="T_0e20b_row8_col5" class="data row8 col5" >2.53</td>
+      <td id="T_0e20b_row8_col6" class="data row8 col6" ></td>
+      <td id="T_0e20b_row8_col7" class="data row8 col7" ></td>
+      <td id="T_0e20b_row8_col8" class="data row8 col8" ></td>
+      <td id="T_0e20b_row8_col9" class="data row8 col9" ></td>
+      <td id="T_0e20b_row8_col10" class="data row8 col10" >2.53</td>
+      <td id="T_0e20b_row8_col11" class="data row8 col11" >2.56</td>
+      <td id="T_0e20b_row8_col12" class="data row8 col12" ></td>
+      <td id="T_0e20b_row8_col13" class="data row8 col13" >2.58</td>
+      <td id="T_0e20b_row8_col14" class="data row8 col14" ></td>
+      <td id="T_0e20b_row8_col15" class="data row8 col15" ></td>
+      <td id="T_0e20b_row8_col16" class="data row8 col16" >2.51</td>
+      <td id="T_0e20b_row8_col17" class="data row8 col17" ></td>
+      <td id="T_0e20b_row8_col18" class="data row8 col18" >2.55</td>
+      <td id="T_0e20b_row8_col19" class="data row8 col19" >2.51</td>
+      <td id="T_0e20b_row8_col20" class="data row8 col20" >2.46</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row9" class="row_heading level0 row9" >10</th>
-      <td id="T_82bf2_row9_col0" class="data row9 col0" >12:53</td>
-      <td id="T_82bf2_row9_col1" class="data row9 col1" >2.51</td>
-      <td id="T_82bf2_row9_col2" class="data row9 col2" >2.52</td>
-      <td id="T_82bf2_row9_col3" class="data row9 col3" >2.51</td>
-      <td id="T_82bf2_row9_col4" class="data row9 col4" >2.47</td>
-      <td id="T_82bf2_row9_col5" class="data row9 col5" >2.56</td>
-      <td id="T_82bf2_row9_col6" class="data row9 col6" ></td>
-      <td id="T_82bf2_row9_col7" class="data row9 col7" ></td>
-      <td id="T_82bf2_row9_col8" class="data row9 col8" ></td>
-      <td id="T_82bf2_row9_col9" class="data row9 col9" ></td>
-      <td id="T_82bf2_row9_col10" class="data row9 col10" >2.55</td>
-      <td id="T_82bf2_row9_col11" class="data row9 col11" >2.57</td>
-      <td id="T_82bf2_row9_col12" class="data row9 col12" ></td>
-      <td id="T_82bf2_row9_col13" class="data row9 col13" ></td>
-      <td id="T_82bf2_row9_col14" class="data row9 col14" ></td>
-      <td id="T_82bf2_row9_col15" class="data row9 col15" ></td>
-      <td id="T_82bf2_row9_col16" class="data row9 col16" >2.54</td>
-      <td id="T_82bf2_row9_col17" class="data row9 col17" ></td>
-      <td id="T_82bf2_row9_col18" class="data row9 col18" >2.57</td>
-      <td id="T_82bf2_row9_col19" class="data row9 col19" >2.54</td>
-      <td id="T_82bf2_row9_col20" class="data row9 col20" >2.49</td>
+      <th id="T_0e20b_level0_row9" class="row_heading level0 row9" >10</th>
+      <td id="T_0e20b_row9_col0" class="data row9 col0" >12:53</td>
+      <td id="T_0e20b_row9_col1" class="data row9 col1" >2.51</td>
+      <td id="T_0e20b_row9_col2" class="data row9 col2" >2.52</td>
+      <td id="T_0e20b_row9_col3" class="data row9 col3" >2.51</td>
+      <td id="T_0e20b_row9_col4" class="data row9 col4" >2.47</td>
+      <td id="T_0e20b_row9_col5" class="data row9 col5" >2.56</td>
+      <td id="T_0e20b_row9_col6" class="data row9 col6" ></td>
+      <td id="T_0e20b_row9_col7" class="data row9 col7" ></td>
+      <td id="T_0e20b_row9_col8" class="data row9 col8" ></td>
+      <td id="T_0e20b_row9_col9" class="data row9 col9" ></td>
+      <td id="T_0e20b_row9_col10" class="data row9 col10" >2.55</td>
+      <td id="T_0e20b_row9_col11" class="data row9 col11" >2.57</td>
+      <td id="T_0e20b_row9_col12" class="data row9 col12" ></td>
+      <td id="T_0e20b_row9_col13" class="data row9 col13" ></td>
+      <td id="T_0e20b_row9_col14" class="data row9 col14" ></td>
+      <td id="T_0e20b_row9_col15" class="data row9 col15" ></td>
+      <td id="T_0e20b_row9_col16" class="data row9 col16" >2.54</td>
+      <td id="T_0e20b_row9_col17" class="data row9 col17" ></td>
+      <td id="T_0e20b_row9_col18" class="data row9 col18" >2.57</td>
+      <td id="T_0e20b_row9_col19" class="data row9 col19" >2.54</td>
+      <td id="T_0e20b_row9_col20" class="data row9 col20" >2.49</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row10" class="row_heading level0 row10" >11</th>
-      <td id="T_82bf2_row10_col0" class="data row10 col0" >15:13</td>
-      <td id="T_82bf2_row10_col1" class="data row10 col1" >2.52</td>
-      <td id="T_82bf2_row10_col2" class="data row10 col2" >2.53</td>
-      <td id="T_82bf2_row10_col3" class="data row10 col3" >2.52</td>
-      <td id="T_82bf2_row10_col4" class="data row10 col4" >2.48</td>
-      <td id="T_82bf2_row10_col5" class="data row10 col5" >2.56</td>
-      <td id="T_82bf2_row10_col6" class="data row10 col6" ></td>
-      <td id="T_82bf2_row10_col7" class="data row10 col7" ></td>
-      <td id="T_82bf2_row10_col8" class="data row10 col8" ></td>
-      <td id="T_82bf2_row10_col9" class="data row10 col9" ></td>
-      <td id="T_82bf2_row10_col10" class="data row10 col10" >2.54</td>
-      <td id="T_82bf2_row10_col11" class="data row10 col11" ></td>
-      <td id="T_82bf2_row10_col12" class="data row10 col12" ></td>
-      <td id="T_82bf2_row10_col13" class="data row10 col13" ></td>
-      <td id="T_82bf2_row10_col14" class="data row10 col14" ></td>
-      <td id="T_82bf2_row10_col15" class="data row10 col15" ></td>
-      <td id="T_82bf2_row10_col16" class="data row10 col16" >2.55</td>
-      <td id="T_82bf2_row10_col17" class="data row10 col17" ></td>
-      <td id="T_82bf2_row10_col18" class="data row10 col18" >2.57</td>
-      <td id="T_82bf2_row10_col19" class="data row10 col19" >2.54</td>
-      <td id="T_82bf2_row10_col20" class="data row10 col20" >2.49</td>
+      <th id="T_0e20b_level0_row10" class="row_heading level0 row10" >11</th>
+      <td id="T_0e20b_row10_col0" class="data row10 col0" >15:13</td>
+      <td id="T_0e20b_row10_col1" class="data row10 col1" >2.52</td>
+      <td id="T_0e20b_row10_col2" class="data row10 col2" >2.53</td>
+      <td id="T_0e20b_row10_col3" class="data row10 col3" >2.52</td>
+      <td id="T_0e20b_row10_col4" class="data row10 col4" >2.48</td>
+      <td id="T_0e20b_row10_col5" class="data row10 col5" >2.56</td>
+      <td id="T_0e20b_row10_col6" class="data row10 col6" ></td>
+      <td id="T_0e20b_row10_col7" class="data row10 col7" ></td>
+      <td id="T_0e20b_row10_col8" class="data row10 col8" ></td>
+      <td id="T_0e20b_row10_col9" class="data row10 col9" ></td>
+      <td id="T_0e20b_row10_col10" class="data row10 col10" >2.54</td>
+      <td id="T_0e20b_row10_col11" class="data row10 col11" ></td>
+      <td id="T_0e20b_row10_col12" class="data row10 col12" ></td>
+      <td id="T_0e20b_row10_col13" class="data row10 col13" ></td>
+      <td id="T_0e20b_row10_col14" class="data row10 col14" ></td>
+      <td id="T_0e20b_row10_col15" class="data row10 col15" ></td>
+      <td id="T_0e20b_row10_col16" class="data row10 col16" >2.55</td>
+      <td id="T_0e20b_row10_col17" class="data row10 col17" ></td>
+      <td id="T_0e20b_row10_col18" class="data row10 col18" >2.57</td>
+      <td id="T_0e20b_row10_col19" class="data row10 col19" >2.54</td>
+      <td id="T_0e20b_row10_col20" class="data row10 col20" >2.49</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row11" class="row_heading level0 row11" >12</th>
-      <td id="T_82bf2_row11_col0" class="data row11 col0" >10:53</td>
-      <td id="T_82bf2_row11_col1" class="data row11 col1" >2.52</td>
-      <td id="T_82bf2_row11_col2" class="data row11 col2" >2.53</td>
-      <td id="T_82bf2_row11_col3" class="data row11 col3" >2.52</td>
-      <td id="T_82bf2_row11_col4" class="data row11 col4" >2.49</td>
-      <td id="T_82bf2_row11_col5" class="data row11 col5" >2.57</td>
-      <td id="T_82bf2_row11_col6" class="data row11 col6" ></td>
-      <td id="T_82bf2_row11_col7" class="data row11 col7" ></td>
-      <td id="T_82bf2_row11_col8" class="data row11 col8" ></td>
-      <td id="T_82bf2_row11_col9" class="data row11 col9" ></td>
-      <td id="T_82bf2_row11_col10" class="data row11 col10" >2.54</td>
-      <td id="T_82bf2_row11_col11" class="data row11 col11" ></td>
-      <td id="T_82bf2_row11_col12" class="data row11 col12" ></td>
-      <td id="T_82bf2_row11_col13" class="data row11 col13" ></td>
-      <td id="T_82bf2_row11_col14" class="data row11 col14" ></td>
-      <td id="T_82bf2_row11_col15" class="data row11 col15" ></td>
-      <td id="T_82bf2_row11_col16" class="data row11 col16" >2.53</td>
-      <td id="T_82bf2_row11_col17" class="data row11 col17" ></td>
-      <td id="T_82bf2_row11_col18" class="data row11 col18" ></td>
-      <td id="T_82bf2_row11_col19" class="data row11 col19" >2.53</td>
-      <td id="T_82bf2_row11_col20" class="data row11 col20" >2.49</td>
+      <th id="T_0e20b_level0_row11" class="row_heading level0 row11" >12</th>
+      <td id="T_0e20b_row11_col0" class="data row11 col0" >10:53</td>
+      <td id="T_0e20b_row11_col1" class="data row11 col1" >2.52</td>
+      <td id="T_0e20b_row11_col2" class="data row11 col2" >2.53</td>
+      <td id="T_0e20b_row11_col3" class="data row11 col3" >2.52</td>
+      <td id="T_0e20b_row11_col4" class="data row11 col4" >2.49</td>
+      <td id="T_0e20b_row11_col5" class="data row11 col5" >2.57</td>
+      <td id="T_0e20b_row11_col6" class="data row11 col6" ></td>
+      <td id="T_0e20b_row11_col7" class="data row11 col7" ></td>
+      <td id="T_0e20b_row11_col8" class="data row11 col8" ></td>
+      <td id="T_0e20b_row11_col9" class="data row11 col9" ></td>
+      <td id="T_0e20b_row11_col10" class="data row11 col10" >2.54</td>
+      <td id="T_0e20b_row11_col11" class="data row11 col11" ></td>
+      <td id="T_0e20b_row11_col12" class="data row11 col12" ></td>
+      <td id="T_0e20b_row11_col13" class="data row11 col13" ></td>
+      <td id="T_0e20b_row11_col14" class="data row11 col14" ></td>
+      <td id="T_0e20b_row11_col15" class="data row11 col15" ></td>
+      <td id="T_0e20b_row11_col16" class="data row11 col16" >2.53</td>
+      <td id="T_0e20b_row11_col17" class="data row11 col17" ></td>
+      <td id="T_0e20b_row11_col18" class="data row11 col18" ></td>
+      <td id="T_0e20b_row11_col19" class="data row11 col19" >2.53</td>
+      <td id="T_0e20b_row11_col20" class="data row11 col20" >2.49</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row12" class="row_heading level0 row12" >13</th>
-      <td id="T_82bf2_row12_col0" class="data row12 col0" >12:33</td>
-      <td id="T_82bf2_row12_col1" class="data row12 col1" >2.51</td>
-      <td id="T_82bf2_row12_col2" class="data row12 col2" >2.52</td>
-      <td id="T_82bf2_row12_col3" class="data row12 col3" >2.51</td>
-      <td id="T_82bf2_row12_col4" class="data row12 col4" >2.47</td>
-      <td id="T_82bf2_row12_col5" class="data row12 col5" ></td>
-      <td id="T_82bf2_row12_col6" class="data row12 col6" ></td>
-      <td id="T_82bf2_row12_col7" class="data row12 col7" ></td>
-      <td id="T_82bf2_row12_col8" class="data row12 col8" ></td>
-      <td id="T_82bf2_row12_col9" class="data row12 col9" ></td>
-      <td id="T_82bf2_row12_col10" class="data row12 col10" >2.54</td>
-      <td id="T_82bf2_row12_col11" class="data row12 col11" ></td>
-      <td id="T_82bf2_row12_col12" class="data row12 col12" ></td>
-      <td id="T_82bf2_row12_col13" class="data row12 col13" ></td>
-      <td id="T_82bf2_row12_col14" class="data row12 col14" ></td>
-      <td id="T_82bf2_row12_col15" class="data row12 col15" ></td>
-      <td id="T_82bf2_row12_col16" class="data row12 col16" >2.54</td>
-      <td id="T_82bf2_row12_col17" class="data row12 col17" ></td>
-      <td id="T_82bf2_row12_col18" class="data row12 col18" ></td>
-      <td id="T_82bf2_row12_col19" class="data row12 col19" >2.53</td>
-      <td id="T_82bf2_row12_col20" class="data row12 col20" >2.49</td>
+      <th id="T_0e20b_level0_row12" class="row_heading level0 row12" >13</th>
+      <td id="T_0e20b_row12_col0" class="data row12 col0" >12:33</td>
+      <td id="T_0e20b_row12_col1" class="data row12 col1" >2.51</td>
+      <td id="T_0e20b_row12_col2" class="data row12 col2" >2.52</td>
+      <td id="T_0e20b_row12_col3" class="data row12 col3" >2.51</td>
+      <td id="T_0e20b_row12_col4" class="data row12 col4" >2.47</td>
+      <td id="T_0e20b_row12_col5" class="data row12 col5" ></td>
+      <td id="T_0e20b_row12_col6" class="data row12 col6" ></td>
+      <td id="T_0e20b_row12_col7" class="data row12 col7" ></td>
+      <td id="T_0e20b_row12_col8" class="data row12 col8" ></td>
+      <td id="T_0e20b_row12_col9" class="data row12 col9" ></td>
+      <td id="T_0e20b_row12_col10" class="data row12 col10" >2.54</td>
+      <td id="T_0e20b_row12_col11" class="data row12 col11" ></td>
+      <td id="T_0e20b_row12_col12" class="data row12 col12" ></td>
+      <td id="T_0e20b_row12_col13" class="data row12 col13" ></td>
+      <td id="T_0e20b_row12_col14" class="data row12 col14" ></td>
+      <td id="T_0e20b_row12_col15" class="data row12 col15" ></td>
+      <td id="T_0e20b_row12_col16" class="data row12 col16" >2.54</td>
+      <td id="T_0e20b_row12_col17" class="data row12 col17" ></td>
+      <td id="T_0e20b_row12_col18" class="data row12 col18" ></td>
+      <td id="T_0e20b_row12_col19" class="data row12 col19" >2.53</td>
+      <td id="T_0e20b_row12_col20" class="data row12 col20" >2.49</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row13" class="row_heading level0 row13" >14</th>
-      <td id="T_82bf2_row13_col0" class="data row13 col0" >14:33</td>
-      <td id="T_82bf2_row13_col1" class="data row13 col1" >2.49</td>
-      <td id="T_82bf2_row13_col2" class="data row13 col2" >2.50</td>
-      <td id="T_82bf2_row13_col3" class="data row13 col3" >2.49</td>
-      <td id="T_82bf2_row13_col4" class="data row13 col4" >2.45</td>
-      <td id="T_82bf2_row13_col5" class="data row13 col5" ></td>
-      <td id="T_82bf2_row13_col6" class="data row13 col6" ></td>
-      <td id="T_82bf2_row13_col7" class="data row13 col7" ></td>
-      <td id="T_82bf2_row13_col8" class="data row13 col8" ></td>
-      <td id="T_82bf2_row13_col9" class="data row13 col9" ></td>
-      <td id="T_82bf2_row13_col10" class="data row13 col10" ></td>
-      <td id="T_82bf2_row13_col11" class="data row13 col11" ></td>
-      <td id="T_82bf2_row13_col12" class="data row13 col12" ></td>
-      <td id="T_82bf2_row13_col13" class="data row13 col13" ></td>
-      <td id="T_82bf2_row13_col14" class="data row13 col14" ></td>
-      <td id="T_82bf2_row13_col15" class="data row13 col15" ></td>
-      <td id="T_82bf2_row13_col16" class="data row13 col16" >2.52</td>
-      <td id="T_82bf2_row13_col17" class="data row13 col17" ></td>
-      <td id="T_82bf2_row13_col18" class="data row13 col18" ></td>
-      <td id="T_82bf2_row13_col19" class="data row13 col19" >2.51</td>
-      <td id="T_82bf2_row13_col20" class="data row13 col20" >2.47</td>
+      <th id="T_0e20b_level0_row13" class="row_heading level0 row13" >14</th>
+      <td id="T_0e20b_row13_col0" class="data row13 col0" >14:33</td>
+      <td id="T_0e20b_row13_col1" class="data row13 col1" >2.49</td>
+      <td id="T_0e20b_row13_col2" class="data row13 col2" >2.50</td>
+      <td id="T_0e20b_row13_col3" class="data row13 col3" >2.49</td>
+      <td id="T_0e20b_row13_col4" class="data row13 col4" >2.45</td>
+      <td id="T_0e20b_row13_col5" class="data row13 col5" ></td>
+      <td id="T_0e20b_row13_col6" class="data row13 col6" ></td>
+      <td id="T_0e20b_row13_col7" class="data row13 col7" ></td>
+      <td id="T_0e20b_row13_col8" class="data row13 col8" ></td>
+      <td id="T_0e20b_row13_col9" class="data row13 col9" ></td>
+      <td id="T_0e20b_row13_col10" class="data row13 col10" ></td>
+      <td id="T_0e20b_row13_col11" class="data row13 col11" ></td>
+      <td id="T_0e20b_row13_col12" class="data row13 col12" ></td>
+      <td id="T_0e20b_row13_col13" class="data row13 col13" ></td>
+      <td id="T_0e20b_row13_col14" class="data row13 col14" ></td>
+      <td id="T_0e20b_row13_col15" class="data row13 col15" ></td>
+      <td id="T_0e20b_row13_col16" class="data row13 col16" >2.52</td>
+      <td id="T_0e20b_row13_col17" class="data row13 col17" ></td>
+      <td id="T_0e20b_row13_col18" class="data row13 col18" ></td>
+      <td id="T_0e20b_row13_col19" class="data row13 col19" >2.51</td>
+      <td id="T_0e20b_row13_col20" class="data row13 col20" >2.47</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row14" class="row_heading level0 row14" >15</th>
-      <td id="T_82bf2_row14_col0" class="data row14 col0" >09:52</td>
-      <td id="T_82bf2_row14_col1" class="data row14 col1" >2.48</td>
-      <td id="T_82bf2_row14_col2" class="data row14 col2" >2.49</td>
-      <td id="T_82bf2_row14_col3" class="data row14 col3" >2.48</td>
-      <td id="T_82bf2_row14_col4" class="data row14 col4" >2.45</td>
-      <td id="T_82bf2_row14_col5" class="data row14 col5" ></td>
-      <td id="T_82bf2_row14_col6" class="data row14 col6" ></td>
-      <td id="T_82bf2_row14_col7" class="data row14 col7" ></td>
-      <td id="T_82bf2_row14_col8" class="data row14 col8" ></td>
-      <td id="T_82bf2_row14_col9" class="data row14 col9" ></td>
-      <td id="T_82bf2_row14_col10" class="data row14 col10" ></td>
-      <td id="T_82bf2_row14_col11" class="data row14 col11" ></td>
-      <td id="T_82bf2_row14_col12" class="data row14 col12" ></td>
-      <td id="T_82bf2_row14_col13" class="data row14 col13" ></td>
-      <td id="T_82bf2_row14_col14" class="data row14 col14" ></td>
-      <td id="T_82bf2_row14_col15" class="data row14 col15" ></td>
-      <td id="T_82bf2_row14_col16" class="data row14 col16" ></td>
-      <td id="T_82bf2_row14_col17" class="data row14 col17" ></td>
-      <td id="T_82bf2_row14_col18" class="data row14 col18" ></td>
-      <td id="T_82bf2_row14_col19" class="data row14 col19" >2.48</td>
-      <td id="T_82bf2_row14_col20" class="data row14 col20" >2.45</td>
+      <th id="T_0e20b_level0_row14" class="row_heading level0 row14" >15</th>
+      <td id="T_0e20b_row14_col0" class="data row14 col0" >09:52</td>
+      <td id="T_0e20b_row14_col1" class="data row14 col1" >2.48</td>
+      <td id="T_0e20b_row14_col2" class="data row14 col2" >2.49</td>
+      <td id="T_0e20b_row14_col3" class="data row14 col3" >2.48</td>
+      <td id="T_0e20b_row14_col4" class="data row14 col4" >2.45</td>
+      <td id="T_0e20b_row14_col5" class="data row14 col5" ></td>
+      <td id="T_0e20b_row14_col6" class="data row14 col6" ></td>
+      <td id="T_0e20b_row14_col7" class="data row14 col7" ></td>
+      <td id="T_0e20b_row14_col8" class="data row14 col8" ></td>
+      <td id="T_0e20b_row14_col9" class="data row14 col9" ></td>
+      <td id="T_0e20b_row14_col10" class="data row14 col10" ></td>
+      <td id="T_0e20b_row14_col11" class="data row14 col11" ></td>
+      <td id="T_0e20b_row14_col12" class="data row14 col12" ></td>
+      <td id="T_0e20b_row14_col13" class="data row14 col13" ></td>
+      <td id="T_0e20b_row14_col14" class="data row14 col14" ></td>
+      <td id="T_0e20b_row14_col15" class="data row14 col15" ></td>
+      <td id="T_0e20b_row14_col16" class="data row14 col16" ></td>
+      <td id="T_0e20b_row14_col17" class="data row14 col17" ></td>
+      <td id="T_0e20b_row14_col18" class="data row14 col18" ></td>
+      <td id="T_0e20b_row14_col19" class="data row14 col19" >2.48</td>
+      <td id="T_0e20b_row14_col20" class="data row14 col20" >2.45</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row15" class="row_heading level0 row15" >16</th>
-      <td id="T_82bf2_row15_col0" class="data row15 col0" >15:33</td>
-      <td id="T_82bf2_row15_col1" class="data row15 col1" >2.44</td>
-      <td id="T_82bf2_row15_col2" class="data row15 col2" ></td>
-      <td id="T_82bf2_row15_col3" class="data row15 col3" >2.44</td>
-      <td id="T_82bf2_row15_col4" class="data row15 col4" >2.41</td>
-      <td id="T_82bf2_row15_col5" class="data row15 col5" ></td>
-      <td id="T_82bf2_row15_col6" class="data row15 col6" ></td>
-      <td id="T_82bf2_row15_col7" class="data row15 col7" ></td>
-      <td id="T_82bf2_row15_col8" class="data row15 col8" ></td>
-      <td id="T_82bf2_row15_col9" class="data row15 col9" ></td>
-      <td id="T_82bf2_row15_col10" class="data row15 col10" ></td>
-      <td id="T_82bf2_row15_col11" class="data row15 col11" ></td>
-      <td id="T_82bf2_row15_col12" class="data row15 col12" ></td>
-      <td id="T_82bf2_row15_col13" class="data row15 col13" ></td>
-      <td id="T_82bf2_row15_col14" class="data row15 col14" ></td>
-      <td id="T_82bf2_row15_col15" class="data row15 col15" ></td>
-      <td id="T_82bf2_row15_col16" class="data row15 col16" ></td>
-      <td id="T_82bf2_row15_col17" class="data row15 col17" ></td>
-      <td id="T_82bf2_row15_col18" class="data row15 col18" ></td>
-      <td id="T_82bf2_row15_col19" class="data row15 col19" >2.46</td>
-      <td id="T_82bf2_row15_col20" class="data row15 col20" >2.43</td>
+      <th id="T_0e20b_level0_row15" class="row_heading level0 row15" >16</th>
+      <td id="T_0e20b_row15_col0" class="data row15 col0" >15:33</td>
+      <td id="T_0e20b_row15_col1" class="data row15 col1" >2.44</td>
+      <td id="T_0e20b_row15_col2" class="data row15 col2" ></td>
+      <td id="T_0e20b_row15_col3" class="data row15 col3" >2.44</td>
+      <td id="T_0e20b_row15_col4" class="data row15 col4" >2.41</td>
+      <td id="T_0e20b_row15_col5" class="data row15 col5" ></td>
+      <td id="T_0e20b_row15_col6" class="data row15 col6" ></td>
+      <td id="T_0e20b_row15_col7" class="data row15 col7" ></td>
+      <td id="T_0e20b_row15_col8" class="data row15 col8" ></td>
+      <td id="T_0e20b_row15_col9" class="data row15 col9" ></td>
+      <td id="T_0e20b_row15_col10" class="data row15 col10" ></td>
+      <td id="T_0e20b_row15_col11" class="data row15 col11" ></td>
+      <td id="T_0e20b_row15_col12" class="data row15 col12" ></td>
+      <td id="T_0e20b_row15_col13" class="data row15 col13" ></td>
+      <td id="T_0e20b_row15_col14" class="data row15 col14" ></td>
+      <td id="T_0e20b_row15_col15" class="data row15 col15" ></td>
+      <td id="T_0e20b_row15_col16" class="data row15 col16" ></td>
+      <td id="T_0e20b_row15_col17" class="data row15 col17" ></td>
+      <td id="T_0e20b_row15_col18" class="data row15 col18" ></td>
+      <td id="T_0e20b_row15_col19" class="data row15 col19" >2.46</td>
+      <td id="T_0e20b_row15_col20" class="data row15 col20" >2.43</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row16" class="row_heading level0 row16" >17</th>
-      <td id="T_82bf2_row16_col0" class="data row16 col0" >09:32</td>
-      <td id="T_82bf2_row16_col1" class="data row16 col1" >2.42</td>
-      <td id="T_82bf2_row16_col2" class="data row16 col2" ></td>
-      <td id="T_82bf2_row16_col3" class="data row16 col3" >2.42</td>
-      <td id="T_82bf2_row16_col4" class="data row16 col4" >2.39</td>
-      <td id="T_82bf2_row16_col5" class="data row16 col5" ></td>
-      <td id="T_82bf2_row16_col6" class="data row16 col6" ></td>
-      <td id="T_82bf2_row16_col7" class="data row16 col7" ></td>
-      <td id="T_82bf2_row16_col8" class="data row16 col8" ></td>
-      <td id="T_82bf2_row16_col9" class="data row16 col9" ></td>
-      <td id="T_82bf2_row16_col10" class="data row16 col10" ></td>
-      <td id="T_82bf2_row16_col11" class="data row16 col11" ></td>
-      <td id="T_82bf2_row16_col12" class="data row16 col12" ></td>
-      <td id="T_82bf2_row16_col13" class="data row16 col13" ></td>
-      <td id="T_82bf2_row16_col14" class="data row16 col14" ></td>
-      <td id="T_82bf2_row16_col15" class="data row16 col15" ></td>
-      <td id="T_82bf2_row16_col16" class="data row16 col16" ></td>
-      <td id="T_82bf2_row16_col17" class="data row16 col17" ></td>
-      <td id="T_82bf2_row16_col18" class="data row16 col18" ></td>
-      <td id="T_82bf2_row16_col19" class="data row16 col19" ></td>
-      <td id="T_82bf2_row16_col20" class="data row16 col20" >2.40</td>
+      <th id="T_0e20b_level0_row16" class="row_heading level0 row16" >17</th>
+      <td id="T_0e20b_row16_col0" class="data row16 col0" >09:32</td>
+      <td id="T_0e20b_row16_col1" class="data row16 col1" >2.42</td>
+      <td id="T_0e20b_row16_col2" class="data row16 col2" ></td>
+      <td id="T_0e20b_row16_col3" class="data row16 col3" >2.42</td>
+      <td id="T_0e20b_row16_col4" class="data row16 col4" >2.39</td>
+      <td id="T_0e20b_row16_col5" class="data row16 col5" ></td>
+      <td id="T_0e20b_row16_col6" class="data row16 col6" ></td>
+      <td id="T_0e20b_row16_col7" class="data row16 col7" ></td>
+      <td id="T_0e20b_row16_col8" class="data row16 col8" ></td>
+      <td id="T_0e20b_row16_col9" class="data row16 col9" ></td>
+      <td id="T_0e20b_row16_col10" class="data row16 col10" ></td>
+      <td id="T_0e20b_row16_col11" class="data row16 col11" ></td>
+      <td id="T_0e20b_row16_col12" class="data row16 col12" ></td>
+      <td id="T_0e20b_row16_col13" class="data row16 col13" ></td>
+      <td id="T_0e20b_row16_col14" class="data row16 col14" ></td>
+      <td id="T_0e20b_row16_col15" class="data row16 col15" ></td>
+      <td id="T_0e20b_row16_col16" class="data row16 col16" ></td>
+      <td id="T_0e20b_row16_col17" class="data row16 col17" ></td>
+      <td id="T_0e20b_row16_col18" class="data row16 col18" ></td>
+      <td id="T_0e20b_row16_col19" class="data row16 col19" ></td>
+      <td id="T_0e20b_row16_col20" class="data row16 col20" >2.40</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row17" class="row_heading level0 row17" >18</th>
-      <td id="T_82bf2_row17_col0" class="data row17 col0" >10:13</td>
-      <td id="T_82bf2_row17_col1" class="data row17 col1" ></td>
-      <td id="T_82bf2_row17_col2" class="data row17 col2" ></td>
-      <td id="T_82bf2_row17_col3" class="data row17 col3" >2.37</td>
-      <td id="T_82bf2_row17_col4" class="data row17 col4" >2.35</td>
-      <td id="T_82bf2_row17_col5" class="data row17 col5" ></td>
-      <td id="T_82bf2_row17_col6" class="data row17 col6" ></td>
-      <td id="T_82bf2_row17_col7" class="data row17 col7" ></td>
-      <td id="T_82bf2_row17_col8" class="data row17 col8" ></td>
-      <td id="T_82bf2_row17_col9" class="data row17 col9" ></td>
-      <td id="T_82bf2_row17_col10" class="data row17 col10" ></td>
-      <td id="T_82bf2_row17_col11" class="data row17 col11" ></td>
-      <td id="T_82bf2_row17_col12" class="data row17 col12" ></td>
-      <td id="T_82bf2_row17_col13" class="data row17 col13" ></td>
-      <td id="T_82bf2_row17_col14" class="data row17 col14" ></td>
-      <td id="T_82bf2_row17_col15" class="data row17 col15" ></td>
-      <td id="T_82bf2_row17_col16" class="data row17 col16" ></td>
-      <td id="T_82bf2_row17_col17" class="data row17 col17" ></td>
-      <td id="T_82bf2_row17_col18" class="data row17 col18" ></td>
-      <td id="T_82bf2_row17_col19" class="data row17 col19" ></td>
-      <td id="T_82bf2_row17_col20" class="data row17 col20" >2.36</td>
+      <th id="T_0e20b_level0_row17" class="row_heading level0 row17" >18</th>
+      <td id="T_0e20b_row17_col0" class="data row17 col0" >10:13</td>
+      <td id="T_0e20b_row17_col1" class="data row17 col1" ></td>
+      <td id="T_0e20b_row17_col2" class="data row17 col2" ></td>
+      <td id="T_0e20b_row17_col3" class="data row17 col3" >2.37</td>
+      <td id="T_0e20b_row17_col4" class="data row17 col4" >2.35</td>
+      <td id="T_0e20b_row17_col5" class="data row17 col5" ></td>
+      <td id="T_0e20b_row17_col6" class="data row17 col6" ></td>
+      <td id="T_0e20b_row17_col7" class="data row17 col7" ></td>
+      <td id="T_0e20b_row17_col8" class="data row17 col8" ></td>
+      <td id="T_0e20b_row17_col9" class="data row17 col9" ></td>
+      <td id="T_0e20b_row17_col10" class="data row17 col10" ></td>
+      <td id="T_0e20b_row17_col11" class="data row17 col11" ></td>
+      <td id="T_0e20b_row17_col12" class="data row17 col12" ></td>
+      <td id="T_0e20b_row17_col13" class="data row17 col13" ></td>
+      <td id="T_0e20b_row17_col14" class="data row17 col14" ></td>
+      <td id="T_0e20b_row17_col15" class="data row17 col15" ></td>
+      <td id="T_0e20b_row17_col16" class="data row17 col16" ></td>
+      <td id="T_0e20b_row17_col17" class="data row17 col17" ></td>
+      <td id="T_0e20b_row17_col18" class="data row17 col18" ></td>
+      <td id="T_0e20b_row17_col19" class="data row17 col19" ></td>
+      <td id="T_0e20b_row17_col20" class="data row17 col20" >2.36</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row18" class="row_heading level0 row18" >19</th>
-      <td id="T_82bf2_row18_col0" class="data row18 col0" >15:53</td>
-      <td id="T_82bf2_row18_col1" class="data row18 col1" ></td>
-      <td id="T_82bf2_row18_col2" class="data row18 col2" ></td>
-      <td id="T_82bf2_row18_col3" class="data row18 col3" ></td>
-      <td id="T_82bf2_row18_col4" class="data row18 col4" >2.30</td>
-      <td id="T_82bf2_row18_col5" class="data row18 col5" ></td>
-      <td id="T_82bf2_row18_col6" class="data row18 col6" ></td>
-      <td id="T_82bf2_row18_col7" class="data row18 col7" ></td>
-      <td id="T_82bf2_row18_col8" class="data row18 col8" ></td>
-      <td id="T_82bf2_row18_col9" class="data row18 col9" ></td>
-      <td id="T_82bf2_row18_col10" class="data row18 col10" ></td>
-      <td id="T_82bf2_row18_col11" class="data row18 col11" ></td>
-      <td id="T_82bf2_row18_col12" class="data row18 col12" ></td>
-      <td id="T_82bf2_row18_col13" class="data row18 col13" ></td>
-      <td id="T_82bf2_row18_col14" class="data row18 col14" ></td>
-      <td id="T_82bf2_row18_col15" class="data row18 col15" ></td>
-      <td id="T_82bf2_row18_col16" class="data row18 col16" ></td>
-      <td id="T_82bf2_row18_col17" class="data row18 col17" ></td>
-      <td id="T_82bf2_row18_col18" class="data row18 col18" ></td>
-      <td id="T_82bf2_row18_col19" class="data row18 col19" ></td>
-      <td id="T_82bf2_row18_col20" class="data row18 col20" >2.31</td>
+      <th id="T_0e20b_level0_row18" class="row_heading level0 row18" >19</th>
+      <td id="T_0e20b_row18_col0" class="data row18 col0" >15:53</td>
+      <td id="T_0e20b_row18_col1" class="data row18 col1" ></td>
+      <td id="T_0e20b_row18_col2" class="data row18 col2" ></td>
+      <td id="T_0e20b_row18_col3" class="data row18 col3" ></td>
+      <td id="T_0e20b_row18_col4" class="data row18 col4" >2.30</td>
+      <td id="T_0e20b_row18_col5" class="data row18 col5" ></td>
+      <td id="T_0e20b_row18_col6" class="data row18 col6" ></td>
+      <td id="T_0e20b_row18_col7" class="data row18 col7" ></td>
+      <td id="T_0e20b_row18_col8" class="data row18 col8" ></td>
+      <td id="T_0e20b_row18_col9" class="data row18 col9" ></td>
+      <td id="T_0e20b_row18_col10" class="data row18 col10" ></td>
+      <td id="T_0e20b_row18_col11" class="data row18 col11" ></td>
+      <td id="T_0e20b_row18_col12" class="data row18 col12" ></td>
+      <td id="T_0e20b_row18_col13" class="data row18 col13" ></td>
+      <td id="T_0e20b_row18_col14" class="data row18 col14" ></td>
+      <td id="T_0e20b_row18_col15" class="data row18 col15" ></td>
+      <td id="T_0e20b_row18_col16" class="data row18 col16" ></td>
+      <td id="T_0e20b_row18_col17" class="data row18 col17" ></td>
+      <td id="T_0e20b_row18_col18" class="data row18 col18" ></td>
+      <td id="T_0e20b_row18_col19" class="data row18 col19" ></td>
+      <td id="T_0e20b_row18_col20" class="data row18 col20" >2.31</td>
     </tr>
     <tr>
-      <th id="T_82bf2_level0_row19" class="row_heading level0 row19" >20</th>
-      <td id="T_82bf2_row19_col0" class="data row19 col0" >10:33</td>
-      <td id="T_82bf2_row19_col1" class="data row19 col1" ></td>
-      <td id="T_82bf2_row19_col2" class="data row19 col2" ></td>
-      <td id="T_82bf2_row19_col3" class="data row19 col3" ></td>
-      <td id="T_82bf2_row19_col4" class="data row19 col4" >2.25</td>
-      <td id="T_82bf2_row19_col5" class="data row19 col5" ></td>
-      <td id="T_82bf2_row19_col6" class="data row19 col6" ></td>
-      <td id="T_82bf2_row19_col7" class="data row19 col7" ></td>
-      <td id="T_82bf2_row19_col8" class="data row19 col8" ></td>
-      <td id="T_82bf2_row19_col9" class="data row19 col9" ></td>
-      <td id="T_82bf2_row19_col10" class="data row19 col10" ></td>
-      <td id="T_82bf2_row19_col11" class="data row19 col11" ></td>
-      <td id="T_82bf2_row19_col12" class="data row19 col12" ></td>
-      <td id="T_82bf2_row19_col13" class="data row19 col13" ></td>
-      <td id="T_82bf2_row19_col14" class="data row19 col14" ></td>
-      <td id="T_82bf2_row19_col15" class="data row19 col15" ></td>
-      <td id="T_82bf2_row19_col16" class="data row19 col16" ></td>
-      <td id="T_82bf2_row19_col17" class="data row19 col17" ></td>
-      <td id="T_82bf2_row19_col18" class="data row19 col18" ></td>
-      <td id="T_82bf2_row19_col19" class="data row19 col19" ></td>
-      <td id="T_82bf2_row19_col20" class="data row19 col20" ></td>
+      <th id="T_0e20b_level0_row19" class="row_heading level0 row19" >20</th>
+      <td id="T_0e20b_row19_col0" class="data row19 col0" >10:33</td>
+      <td id="T_0e20b_row19_col1" class="data row19 col1" ></td>
+      <td id="T_0e20b_row19_col2" class="data row19 col2" ></td>
+      <td id="T_0e20b_row19_col3" class="data row19 col3" ></td>
+      <td id="T_0e20b_row19_col4" class="data row19 col4" >2.25</td>
+      <td id="T_0e20b_row19_col5" class="data row19 col5" ></td>
+      <td id="T_0e20b_row19_col6" class="data row19 col6" ></td>
+      <td id="T_0e20b_row19_col7" class="data row19 col7" ></td>
+      <td id="T_0e20b_row19_col8" class="data row19 col8" ></td>
+      <td id="T_0e20b_row19_col9" class="data row19 col9" ></td>
+      <td id="T_0e20b_row19_col10" class="data row19 col10" ></td>
+      <td id="T_0e20b_row19_col11" class="data row19 col11" ></td>
+      <td id="T_0e20b_row19_col12" class="data row19 col12" ></td>
+      <td id="T_0e20b_row19_col13" class="data row19 col13" ></td>
+      <td id="T_0e20b_row19_col14" class="data row19 col14" ></td>
+      <td id="T_0e20b_row19_col15" class="data row19 col15" ></td>
+      <td id="T_0e20b_row19_col16" class="data row19 col16" ></td>
+      <td id="T_0e20b_row19_col17" class="data row19 col17" ></td>
+      <td id="T_0e20b_row19_col18" class="data row19 col18" ></td>
+      <td id="T_0e20b_row19_col19" class="data row19 col19" ></td>
+      <td id="T_0e20b_row19_col20" class="data row19 col20" ></td>
     </tr>
   </tbody>
 </table>
@@ -9079,7 +9079,9 @@ Every feature on one Sharpe scale, against the finished strategy:
   at least 30% of condors). Dark orange means the gain holds in both halves;
 - **a noise feature (grey):** a random number per session put through the same search: **whatever it scores is what luck alone finds.**
 
-The red line is the strict noise bar: the 95th percentile of the same search on 200 random features. The candidates are price,
+The red line is the noise bar, corrected for testing many candidates: 200 random features go through the same search, and the
+bar is the 95th percentile of the **best** of 33 of them (as many as there are candidates). Picking the best of 33 features is
+itself a search, so a candidate has to beat what the luckiest of 33 random features would score. The candidates are price,
 volatility, curve and calendar features, including the 20-day SMA (now a candidate, not a setting) and the vol-regime feature library's
 findings (VIX9D gap, month end, rule W, ATR20, low VRP).
 
@@ -9089,7 +9091,7 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
     
 
 
-    the noise feature gains -0.11; strict noise bar (95th pct of 200 noise features) +0.01
+    the noise feature (one random draw) gains -0.11; 200 random features: median -0.16, 95th pct +0.01; noise bar (95th pct of the best of 33) +0.17
     
 
 
@@ -9744,7 +9746,10 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
 </div>
 
 
-**The noise feature scores -0.11**, and the strict bar is **+0.01**.
+**How to read the noise.** The noise feature scores **-0.11**: one random draw, close to the middle of what random features score
+(median -0.16 over 200 draws; most random cuts lower Sharpe, because with 187 trading days every idle day pays the 4% hurdle). One random
+feature beats +0.01 only 5% of the time, but **the best of 33 random features beats +0.17 5% of the time**, and typically scores +0.06.
+That is the bar a candidate has to clear: **+0.17**.
 
 | removed from the finished strategy | trades | Sharpe | change | total P/L change |
 |---|---|---|---|---|
@@ -9758,7 +9763,8 @@ findings (VIX9D gap, month end, rule W, ATR20, low VRP).
 
 - **Every setting pays, in both halves.** The 10-day SMA is now the most important: without it Sharpe falls to 1.32, the book loses \$11.2k
   and the drawdown triples (-\$3.8k to -\$11.8k).
-- **No candidate adds in both halves.** SPX's 5-day return (+0.10) clears the noise bar overall but only from 2025 (-0.03 in 2022-24).
+- **No candidate clears the noise bar, and none adds in both halves.** The best, SPX's 5-day return (+0.10), is what the luckiest of 33
+  random features would typically score, and it only works from 2025 (-0.03 in 2022-24).
   SMA5 > SMA9 loses (-0.04).
 
 
