@@ -578,11 +578,9 @@ def tranche_status(t: str) -> str:
 
 
 def highlight_dropped(df: pd.DataFrame, digits: int = 2):
-    """A tranche table (index ``HH:MM``) with the dropped tranches shaded, and the tranche swapped in (green) and out
-    (orange) highlighted."""
-    shade = {"dropped": "background-color: #fbe3d9",
-             "traded (swapped in)": "background-color: #c9efdf; font-weight: bold",
-             "dropped (swapped out)": "background-color: #f7c6ae; font-weight: bold"}
+    """A tranche table (index ``HH:MM``) with the tranches the strategy trades shaded blue."""
+    shade = {"traded": "background-color: #d6e6f9; font-weight: bold",
+             "traded (swapped in)": "background-color: #d6e6f9; font-weight: bold"}
 
     def row_style(row):
         return [shade.get(tranche_status(row.name), "")] * len(row)

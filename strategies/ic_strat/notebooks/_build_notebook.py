@@ -645,7 +645,7 @@ spot, +0.92 with the credit).
 md(r"""## 8. Step 6: the tranches, on the book after steps 1-5
 
 The book so far trades all 20 entry times with the ratio cap on. This step keeps the strategy's **7 tranches: 11:33, 11:53, 12:13, 13:13,
-13:33, 13:53 and 14:13**. **13:33 replaced 14:53 in the live strategy** (green and red in the tables and charts below). First, each
+13:33, 13:53 and 14:13** (blue in the tables and charts below). **13:33 replaced 14:53 in the live strategy.** First, each
 tranche on this book and how correlated they are.""")
 
 code(r"""
@@ -961,7 +961,7 @@ md(r"""| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD | P/L pe
 - **Cutting by drawdown from 20 picks a different book** (it also stops at 11, Sharpe 2.24, drawdown -$3.9k).
 
 **Pareto: how the profit is spread across the tranches.** Each tranche's total P/L with every other setting on, largest first (blue: the
-strategy's 7; green: 13:33, swapped in; red: 14:53, swapped out), and the cumulative share of the profit (right axis):""")
+strategy's 7), and the cumulative share of the profit (right axis):""")
 
 code(r"""
 td.fig_pareto(tdd.pareto); plt.show()

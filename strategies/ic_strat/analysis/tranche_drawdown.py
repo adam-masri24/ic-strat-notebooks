@@ -350,12 +350,7 @@ def fig_pareto(par: pd.DataFrame):
     with plt.rc_context(fv.STYLE):
         fig, ax = plt.subplots(figsize=(15, 4.8))
         x = np.arange(len(par))
-        palette = {"traded": fv.BLUE, "traded (swapped in)": fv.AQUA, "dropped (swapped out)": fv.RED, "dropped": fv.GREY}
-        ax.bar(x, par["total_pl"], width=0.66, color=[palette[s] for s in par["status"]])
-        for xi, s in zip(x, par["status"]):
-            if "swapped" in s:
-                ax.text(xi, par["total_pl"].iloc[xi], s.split("(")[1].rstrip(")"), ha="center", va="bottom", fontsize=7.5,
-                        color=fv.INK, rotation=90)
+        ax.bar(x, par["total_pl"], width=0.66, color=[fv.BLUE if t else fv.GREY for t in par["in_strategy"]])
         ax.axhline(0, color=fv.INK_2, lw=0.7)
         ax.set_xticks(x, par.index, rotation=90)
         ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: fv._k(v)))
@@ -370,11 +365,9 @@ def fig_pareto(par: pd.DataFrame):
         n80 = int((par["cumulative_pct"] < 80).sum()) + 1
         ax2.annotate(f"80% of the profit: top {n80} tranches", (n80 - 1, par["cumulative_pct"].iloc[n80 - 1]),
                      xytext=(10, -22), textcoords="offset points", fontsize=8.5, color=fv.INK)
-        ax.legend([plt.Rectangle((0, 0), 1, 1, color=c) for c in (fv.BLUE, fv.AQUA, fv.RED, fv.GREY)]
-                  + [plt.Line2D([], [], color=fv.ORANGE, marker="o")],
-                  ["in the strategy", f"in the strategy, swapped in ({', '.join(fv.SWAPPED_IN)})",
-                   f"swapped out ({', '.join(fv.SWAPPED_OUT)})", "not traded", "cumulative share (right axis)"],
-                  loc="center right")
+        ax.legend([plt.Rectangle((0, 0), 1, 1, color=fv.BLUE), plt.Rectangle((0, 0), 1, 1, color=fv.GREY),
+                   plt.Line2D([], [], color=fv.ORANGE, marker="o")],
+                  ["in the strategy", "not traded", "cumulative share (right axis)"], loc="center right")
         ax.set_title("Pareto: the 20 tranches by P/L, largest first, with every other setting of the strategy on")
         fig.tight_layout()
     return fig
