@@ -311,8 +311,16 @@ def fig_tranche_underwater(daily: pd.DataFrame):
     return fig
 
 
-def fig_elimination(paths: dict[str, pd.DataFrame]):
-    """Backward elimination from the strategy's set: Sharpe, P/L and max drawdown by the number of tranches kept."""
+def daily_matrix_all(panel: pd.DataFrame, cal: fv.Calendars) -> pd.DataFrame:
+    """Session x tranche P/L with every other setting of the strategy on and all 20 tranches allowed."""
+    book = panel[fv.version_mask(panel, **{**fv.STRATEGY, "drop": ()})].copy()
+    book["tranche"] = book["entry_time"].str[:5]
+    return book.pivot_table(index="date", columns="tranche", values=fv.PL, aggfunc="sum").reindex(
+        cal.all).reindex(columns=fv.ALL_TRANCHES).fillna(0.0)
+
+
+def fig_elimination(paths: dict[str, pd.DataFrame], heading: str | None = None):
+    """Backward elimination: Sharpe, P/L and max drawdown by the number of tranches kept (dotted: the strategy's set)."""
     colors = {"sharpe": fv.BLUE, "drawdown": fv.ORANGE}
     markers = {"sharpe": "o", "drawdown": "s"}
     with plt.rc_context(fv.STYLE):
@@ -326,7 +334,7 @@ def fig_elimination(paths: dict[str, pd.DataFrame]):
                 ax.scatter([b], [p.loc[b, col]], s=120, facecolor="none", edgecolor=fv.INK, lw=1.2, zorder=4)
         for ax, title in zip(axes, ("Sharpe", "Total P/L", "Max drawdown")):
             ax.set_title(title)
-            ax.set_xticks(range(1, len(fv.SELECTED_TRANCHES) + 1))
+            ax.set_xticks(range(1, max(len(p) for p in paths.values()) + 1))
             ax.set_xlabel("tranches kept")
             ax.invert_xaxis()
             ax.axvline(len(fv.SELECTED_TRANCHES), color=fv.INK_2, ls=":", lw=1)
@@ -336,8 +344,8 @@ def fig_elimination(paths: dict[str, pd.DataFrame]):
         axes[0].set_ylim(-1, top + 0.3)
         axes[0].set_title("Sharpe (below -1 off the chart)")
         axes[0].legend(loc="lower left")
-        n = len(fv.SELECTED_TRANCHES)
-        fig.suptitle(f"Cutting the {n} one tranche at a time (dotted: the strategy's {n}; circled: where each rule stops)",
+        n, start = len(fv.SELECTED_TRANCHES), max(len(p) for p in paths.values())
+        fig.suptitle(heading or f"Cutting the {start} one tranche at a time (dotted: the strategy's {n}; circled: where each rule stops)",
                      x=0.01, ha="left")
         fig.tight_layout()
     return fig
@@ -354,6 +362,7 @@ class TrancheDrawdowns:
     table: pd.DataFrame
     by_year: pd.DataFrame
     paths: dict[str, pd.DataFrame]
+    paths20: dict[str, pd.DataFrame]
     walk_forward: dict[str, pd.DataFrame]
 
 
@@ -366,5 +375,6 @@ def compute(panel: pd.DataFrame) -> TrancheDrawdowns:
         daily=daily, episodes=eps, contrib=episode_contrib(daily, eps),
         table=tranche_drawdown_table(book, daily, eps), by_year=by_year(daily),
         paths={c: backward_elimination(daily, c) for c in CRITERIA},
+        paths20={c: backward_elimination(daily_matrix_all(panel, cal), c) for c in CRITERIA},
         walk_forward={c: elimination_walk_forward(daily, c) for c in CRITERIA},
     )

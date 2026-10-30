@@ -535,7 +535,32 @@ md(r"""| floor | trades | Sharpe | | cap | trades | Sharpe |
 
 - **Both edges are at the top of their sweeps** at this step: 0.87 and 1.02.
 - **In 2025-26 a slightly wider cap scores higher** (1.04: 2.58 against 2.48), and so does a 0.89 floor (2.88): the band's edges are
-  sharpest in 2022-24.""")
+  sharpest in 2022-24.
+
+**Why 1.02 and 0.87: the band's edges 0.01 at a time, with every other setting on** (the finished strategy):""")
+
+code(r"""
+cs.fig_band_reading(casc.band_fine); plt.show()
+display(pd.concat(casc.band_fine, axis=1).round(2))
+""")
+
+md(r"""| cap (VIX9D/VIX <=) | 0.99 | 1.00 | 1.01 | **1.02** | 1.03 | 1.04 | 1.05 |
+|---|---|---|---|---|---|---|---|
+| Sharpe | 2.32 | 2.35 | 2.45 | **2.60** | 2.38 | 2.49 | 2.47 |
+
+| floor (VIX9D/VIX >=) | 0.84 | 0.85 | 0.86 | **0.87** | 0.88 | 0.89 | 0.90 |
+|---|---|---|---|---|---|---|---|
+| Sharpe | 2.17 | 2.27 | 2.43 | **2.60** | 2.47 | 2.31 | 2.02 |
+
+**The economic reading:** 1.00 is where the curve inverts (VIX9D = VIX: the next week priced as more stressed than the next month). A cap
+of 1.02 says **flat or barely inverted is fine, clearly inverted is not**. A 2% tolerance on a one-minute reading of two noisy indices is
+reasonable on its own. The 0.87 floor shows the same pattern (2.60 against 2.27 at 0.85 and 2.31 at 0.89): below it the curve is so
+calm that a move breaks it (Section 6's profile: the short put breached on 42% of condors under 0.80).
+
+- **Both edges are single-point peaks:** one step either way costs 0.13-0.22 Sharpe. Part of that height is the noise of fitting a threshold
+  on the same data; the robust reading is the zone around each edge, not the exact number.
+- **The zone holds up:** every cap from 1.01 to 1.05 scores 2.38-2.60, and every floor from 0.86 to 0.88 scores 2.43-2.60. Past 1.06 on
+  the cap (clearly inverted) and past 0.90 on the floor, Sharpe falls away, in both halves.""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 7. Step 5: the tranches, on the book after steps 1-4
@@ -876,6 +901,36 @@ md(r"""| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD | cut by
 - **By Sharpe there is nothing to cut:** every removal lowers it, so the rule keeps all 7.
 - **By drawdown every cut shrinks the drawdown, and the P/L with it:** at 4 tranches the drawdown is -$1.4k but the book makes $60.4k at
   Sharpe 1.63.
+
+**The same cut, starting from all 20 tranches** (every other setting on), to see how the curve goes and where the 7 sit on it:""")
+
+code(r"""
+td.fig_elimination(tdd.paths20, heading="Cutting from all 20 tranches one at a time (dotted: the strategy's 7; circled: where each rule stops)"); plt.show()
+for crit, p20 in tdd.paths20.items():
+    k7 = p20.loc[7, "tranches"].split(", ")
+    print(f"{td.CRITERIA[crit]}: stops at {p20.attrs['best']} tranches; the 7 it keeps: {', '.join(sorted(k7))} "
+          f"(the strategy's 7: {sorted(k7) == sorted(fv.SELECTED_TRANCHES)})")
+    display(p20.drop(columns="tranches").round(2))
+""")
+
+md(r"""| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD |
+|---|---|---|---|---|
+| 20 | | 2.40 | $211.4k | -$12.7k |
+| 16 | 10:33, 09:32, 10:13, 09:52 | 2.66 | $192.1k | -$7.8k |
+| 15 | 12:33 | 2.69 | $180.4k | -$6.5k |
+| 12 | 15:33, 10:53, 12:53 | **2.75** | $155.9k | -$6.0k |
+| 10 | 15:13, 15:53 | **2.75** | $150.5k | -$5.8k |
+| 9 | 14:33 | 2.73 | $141.9k | -$6.0k |
+| 8 | 11:13 | 2.66 | $127.1k | -$5.6k |
+| **7** | **13:33** | **2.60** | **$112.0k** | **-$3.8k** |
+| 6 | 13:13 | 2.43 | $95.7k | -$3.0k |
+
+- **Cutting by Sharpe from all 20 lands exactly on the strategy's 7:** it drops the first hour first, then 12:33, then the late tranches
+  (15:33, 15:13, 15:53) and 10:53, 12:53, 14:33, 11:13 and 13:33. The seven left are 11:33, 11:53, 12:13, 13:13, 13:53, 14:13 and 14:53.
+- **The Sharpe curve is a plateau from 10 to 12 tranches (2.75)**; going down to 7 costs 0.15 Sharpe and $38k but takes the drawdown from
+  -$5.6k to -$3.8k at the last step alone (cutting 13:33).
+- **Cutting by drawdown from 20 picks a different book** (it also stops at 11, Sharpe 2.24, drawdown -$3.9k), and its 7 aren't the
+  strategy's: the drawdown rule keeps weaker, rarely-traded tranches that smooth the curve.
 
 **Do the cuts hold out of sample?** The same rules re-run for each year on the earlier years only:""")
 

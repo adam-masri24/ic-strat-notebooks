@@ -580,6 +580,49 @@ def tranche_walk_forward(panel: pd.DataFrame, cal: fv.Calendars) -> pd.DataFrame
     return out
 
 
+BAND_FINE = {"ts_high": np.round(np.arange(0.96, 1.081, 0.01), 2), "ts_low": np.round(np.arange(0.80, 0.951, 0.01), 2)}
+
+
+def band_fine(panel: pd.DataFrame, cal: fv.Calendars) -> dict[str, pd.DataFrame]:
+    """The band's cap and floor moved 0.01 at a time with every other setting of the strategy on."""
+    out = {}
+    for name, values in BAND_FINE.items():
+        rows = {f"{v:.2f}": fv.score(panel, fv.version_mask(panel, **{**fv.STRATEGY, name: float(v)}), cal) for v in values}
+        t = pd.DataFrame(rows).T[["trades", "total_pl", "sharpe", fv.H1, fv.H2, "max_drawdown"]]
+        t.index.name = name
+        out[name] = t
+    return out
+
+
+def fig_band_reading(fine: dict[str, pd.DataFrame]):
+    """Sharpe as the cap and the floor move 0.01 at a time (everything else on), with the curve's inversion at 1.00."""
+    with plt.rc_context(fv.STYLE):
+        fig, axes = plt.subplots(1, 2, figsize=(16, 4.6))
+        for ax, name, title, mine in ((axes[0], "ts_high", "Cap: VIX9D/VIX at entry <= x", 1.02),
+                                      (axes[1], "ts_low", "Floor: VIX9D/VIX at entry >= x", 0.87)):
+            t = fine[name]
+            x = t.index.astype(float).to_numpy()
+            ax.plot(x, t["sharpe"].astype(float), color=fv.BLUE, marker="o", ms=5.5, label="all sessions")
+            for h, style in fv.HALF_STYLE.items():
+                ax.plot(x, t[h].astype(float), **style)
+            ax.axvline(mine, color=fv.INK_2, ls=":", lw=1.2)
+            ax.annotate(f"strategy {mine:.2f}: {float(t.loc[f'{mine:.2f}', 'sharpe']):.2f}", (mine, float(t.loc[f"{mine:.2f}", "sharpe"])),
+                        xytext=(8, 6), textcoords="offset points", fontsize=8, color=fv.INK)
+            ax.set_title(title)
+            ax.set_xlabel("x")
+        ax = axes[0]
+        ax.axvspan(1.00, 1.02, color=fv.ORANGE, alpha=0.10, lw=0)
+        ax.axvline(1.00, color=fv.ORANGE, lw=1.2)
+        ax.text(1.00, 0.04, " curve inverts (VIX9D = VIX)", transform=ax.get_xaxis_transform(), fontsize=8, color=fv.INK_2)
+        ax.text(1.01, 0.96, "flat or barely" + chr(10) + "inverted", transform=ax.get_xaxis_transform(), ha="center", va="top", fontsize=7.5,
+                color=fv.INK_2)
+        axes[0].set_ylabel("Sharpe")
+        axes[0].legend(loc="lower right")
+        fig.suptitle("The band's edges, 0.01 at a time, with every other setting on: why 1.02 and 0.87", x=0.01, ha="left")
+        fig.tight_layout()
+    return fig
+
+
 def tranche_sets(panel: pd.DataFrame, cal: fv.Calendars, selection: pd.DataFrame, selection_dd: pd.DataFrame) -> pd.DataFrame:
     """With every other setting on: the strategy's tranches against forward selection's peak, the previous live
     set and all 20 (trades, P/L, Sharpe per half, drawdown, and P/L per $ of drawdown)."""
@@ -678,6 +721,7 @@ class Cascade:
     walk_forward: pd.DataFrame
     tranche_sets: pd.DataFrame
     selection_dd: pd.DataFrame
+    band_fine: dict[str, pd.DataFrame]
 
 
 def compute(panel: pd.DataFrame) -> Cascade:
@@ -695,5 +739,5 @@ def compute(panel: pd.DataFrame) -> Cascade:
         ratio_quintiles=ratio_quintiles(panel), ratio_caps=ratio_caps(panel, cal), ratio_corr=ratio_correlation(panel),
         weekdays=weekdays(panel), tranches=tranche_table(panel, cal), tranche_corr=tranche_correlation(panel),
         selection=sel, walk_forward=tranche_walk_forward(panel, cal), tranche_sets=tranche_sets(panel, cal, sel, sel_dd), selection_dd=sel_dd,
-        sma_ab_dd=sma_ab(panel, cal, sel_dd.attrs["best"]),
+        sma_ab_dd=sma_ab(panel, cal, sel_dd.attrs["best"]), band_fine=band_fine(panel, cal),
     )
