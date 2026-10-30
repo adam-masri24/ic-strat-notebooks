@@ -161,8 +161,24 @@ def _pick(path: pd.DataFrame, criterion: str) -> int:
     return int(path["sharpe"].idxmax() if criterion == "sharpe" else path["pl_per_dd"].idxmax())
 
 
-def backward_elimination(daily: pd.DataFrame, criterion: str) -> pd.DataFrame:
-    """From the strategy's set, drop one tranche at a time; one row per number of tranches kept (all = the strategy)."""
+WING = 10   # points: a condor's margin is one wing less its credit
+
+
+def margin_matrix(panel: pd.DataFrame, cal: fv.Calendars, all_tranches: bool = False) -> pd.DataFrame:
+    """Session x tranche margin: each condor ties up one 10-point wing less its credit ($1,000 - credit) until 16:00,
+    so a set's margin on a day is the sum over its condors that day (all open together by the afternoon)."""
+    cfg = {**fv.STRATEGY, "drop": ()} if all_tranches else fv.STRATEGY
+    book = panel[fv.version_mask(panel, **cfg)].copy()
+    book["tranche"] = book["entry_time"].str[:5]
+    book["margin"] = WING * 100 - book["credit"]
+    cols = fv.ALL_TRANCHES if all_tranches else fv.SELECTED_TRANCHES
+    return book.pivot_table(index="date", columns="tranche", values="margin", aggfunc="sum").reindex(
+        cal.all).reindex(columns=cols).fillna(0.0)
+
+
+def backward_elimination(daily: pd.DataFrame, criterion: str, margin: pd.DataFrame | None = None) -> pd.DataFrame:
+    """From the strategy's set, drop one tranche at a time; one row per number of tranches kept (all = the strategy).
+    With ``margin``, also the set's peak daily margin, P/L per $ of that margin, and P/L per tranche."""
     first = pd.Series(daily.index).dt.year.to_numpy() <= fv.SPLIT_YEAR
     order = _elimination_path(daily, criterion)
     rows, kept = [], list(daily.columns)
@@ -172,7 +188,10 @@ def backward_elimination(daily: pd.DataFrame, criterion: str) -> pd.DataFrame:
         d = daily[kept].sum(axis=1).to_numpy()
         rows.append({"kept": len(kept), "removed": removed or "-", "total_pl": d.sum(), "sharpe": br.sharpe(d),
                      fv.H1: _sharpe(d[first]), fv.H2: _sharpe(d[~first]), "max_drawdown": max_drawdown(d),
-                     "pl_per_dd": _ret_dd(d), "tranches": ", ".join(kept)})
+                     "pl_per_dd": _ret_dd(d), "pl_per_tranche": d.sum() / len(kept), "tranches": ", ".join(kept)})
+        if margin is not None:
+            peak = float(margin[kept].sum(axis=1).max())
+            rows[-1].update(peak_margin=peak, pl_per_margin=d.sum() / peak)
     out = pd.DataFrame(rows).set_index("kept")
     best = _pick(out, criterion)
     out.attrs.update(criterion=criterion, best=best, best_set=out.loc[best, "tranches"].split(", "),
@@ -311,6 +330,48 @@ def fig_tranche_underwater(daily: pd.DataFrame):
     return fig
 
 
+def pareto(daily: pd.DataFrame, margin: pd.DataFrame) -> pd.DataFrame:
+    """Pareto table: each tranche's total P/L (every other setting on), largest first, with its share and the cumulative
+    share of the profit, its P/L per $ of peak margin, and whether the strategy trades it."""
+    pl = daily.sum().sort_values(ascending=False)
+    out = pd.DataFrame({"total_pl": pl})
+    out["share_pct"] = out["total_pl"] / out["total_pl"].sum() * 100
+    out["cumulative_pct"] = out["share_pct"].cumsum()
+    out["peak_margin"] = margin.max().reindex(out.index)
+    out["pl_per_margin"] = out["total_pl"] / out["peak_margin"]
+    out["in_strategy"] = [t in fv.SELECTED_TRANCHES for t in out.index]
+    out.index.name = "tranche"
+    return out
+
+
+def fig_pareto(par: pd.DataFrame):
+    """Pareto chart: each tranche's P/L, largest first (blue = in the strategy), and the cumulative share of the profit."""
+    with plt.rc_context(fv.STYLE):
+        fig, ax = plt.subplots(figsize=(15, 4.8))
+        x = np.arange(len(par))
+        ax.bar(x, par["total_pl"], width=0.66, color=[fv.BLUE if t else fv.GREY for t in par["in_strategy"]])
+        ax.axhline(0, color=fv.INK_2, lw=0.7)
+        ax.set_xticks(x, par.index, rotation=90)
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: fv._k(v)))
+        ax.set_ylabel("total P/L, every other setting on")
+        ax2 = ax.twinx()
+        ax2.plot(x, par["cumulative_pct"], color=fv.ORANGE, marker="o", ms=4.5, lw=1.8)
+        ax2.axhline(80, color=fv.ORANGE, ls=":", lw=1)
+        ax2.set_ylim(0, max(110, par["cumulative_pct"].max() + 5))
+        ax2.set_ylabel("cumulative share of the profit (%)")
+        ax2.spines["right"].set_visible(True)
+        ax2.grid(False)
+        n80 = int((par["cumulative_pct"] < 80).sum()) + 1
+        ax2.annotate(f"80% of the profit: top {n80} tranches", (n80 - 1, par["cumulative_pct"].iloc[n80 - 1]),
+                     xytext=(10, -22), textcoords="offset points", fontsize=8.5, color=fv.INK)
+        ax.legend([plt.Rectangle((0, 0), 1, 1, color=fv.BLUE), plt.Rectangle((0, 0), 1, 1, color=fv.GREY),
+                   plt.Line2D([], [], color=fv.ORANGE, marker="o")],
+                  ["in the strategy", "not traded", "cumulative share (right axis)"], loc="center right")
+        ax.set_title("Pareto: the 20 tranches by P/L, largest first, with every other setting of the strategy on")
+        fig.tight_layout()
+    return fig
+
+
 def daily_matrix_all(panel: pd.DataFrame, cal: fv.Calendars) -> pd.DataFrame:
     """Session x tranche P/L with every other setting of the strategy on and all 20 tranches allowed."""
     book = panel[fv.version_mask(panel, **{**fv.STRATEGY, "drop": ()})].copy()
@@ -327,19 +388,24 @@ def fig_elimination(paths: dict[str, pd.DataFrame], heading: str | None = None):
         fig, axes = plt.subplots(1, 3, figsize=(17, 4.6))
         for crit, p in paths.items():
             x = p.index.to_numpy()
-            for ax, col in zip(axes, ("sharpe", "total_pl", "max_drawdown")):
+            mid = "pl_per_margin" if "pl_per_margin" in p else "total_pl"
+            for ax, col in zip(axes, ("sharpe", mid, "max_drawdown")):
                 ax.plot(x, p[col], color=colors[crit], marker=markers[crit], ms=5, lw=1.6,
                         label=f"{CRITERIA[crit]} (picked: {p.attrs['best']} kept)")
                 b = p.attrs["best"]
                 ax.scatter([b], [p.loc[b, col]], s=120, facecolor="none", edgecolor=fv.INK, lw=1.2, zorder=4)
-        for ax, title in zip(axes, ("Sharpe", "Total P/L", "Max drawdown")):
+        per_margin = all("pl_per_margin" in p for p in paths.values())
+        for ax, title in zip(axes, ("Sharpe", "P/L per $ of peak margin" if per_margin else "Total P/L", "Max drawdown")):
             ax.set_title(title)
             ax.set_xticks(range(1, max(len(p) for p in paths.values()) + 1))
             ax.set_xlabel("tranches kept")
             ax.invert_xaxis()
             ax.axvline(len(fv.SELECTED_TRANCHES), color=fv.INK_2, ls=":", lw=1)
-        for ax in axes[1:]:
-            ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: fv._k(v)))
+        axes[2].yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: fv._k(v)))
+        if per_margin:
+            axes[1].yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: f"{v:.0f}x"))
+        else:
+            axes[1].yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: fv._k(v)))
         top = max(p["sharpe"].max() for p in paths.values())
         axes[0].set_ylim(-1, top + 0.3)
         axes[0].set_title("Sharpe (below -1 off the chart)")
@@ -363,6 +429,7 @@ class TrancheDrawdowns:
     by_year: pd.DataFrame
     paths: dict[str, pd.DataFrame]
     paths20: dict[str, pd.DataFrame]
+    pareto: pd.DataFrame
     walk_forward: dict[str, pd.DataFrame]
 
 
@@ -371,10 +438,12 @@ def compute(panel: pd.DataFrame) -> TrancheDrawdowns:
     book = strategy_book(panel)
     daily = daily_matrix(book, cal)
     eps = episodes(daily)
+    d20, m20 = daily_matrix_all(panel, cal), margin_matrix(panel, cal, all_tranches=True)
     return TrancheDrawdowns(
         daily=daily, episodes=eps, contrib=episode_contrib(daily, eps),
         table=tranche_drawdown_table(book, daily, eps), by_year=by_year(daily),
-        paths={c: backward_elimination(daily, c) for c in CRITERIA},
-        paths20={c: backward_elimination(daily_matrix_all(panel, cal), c) for c in CRITERIA},
+        paths={c: backward_elimination(daily, c, margin_matrix(panel, cal)) for c in CRITERIA},
+        paths20={c: backward_elimination(d20, c, m20) for c in CRITERIA},
+        pareto=pareto(d20, m20),
         walk_forward={c: elimination_walk_forward(daily, c) for c in CRITERIA},
     )

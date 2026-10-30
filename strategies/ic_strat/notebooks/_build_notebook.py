@@ -560,7 +560,42 @@ calm that a move breaks it (Section 6's profile: the short put breached on 42% o
 - **Both edges are single-point peaks:** one step either way costs 0.13-0.22 Sharpe. Part of that height is the noise of fitting a threshold
   on the same data; the robust reading is the zone around each edge, not the exact number.
 - **The zone holds up:** every cap from 1.01 to 1.05 scores 2.38-2.60, and every floor from 0.86 to 0.88 scores 2.43-2.60. Past 1.06 on
-  the cap (clearly inverted) and past 0.90 on the floor, Sharpe falls away, in both halves.""")
+  the cap (clearly inverted) and past 0.90 on the floor, Sharpe falls away, in both halves.
+
+**Is the peak statistically significant?** Two checks, both on the same resampled sessions for every value (2,000 session-bootstrap
+draws): the **95% interval of each value's Sharpe** (do they overlap the peak's?), and a **paired test of the peak against each value**: the
+Sharpe difference over its standard error (t), with a two-sided p. Overlapping intervals are a conservative check; the paired test is the
+sharper one, because the versions trade mostly the same days.""")
+
+code(r"""
+cs.fig_band_significance(casc.band_sig); plt.show()
+for name, t in casc.band_sig.items():
+    display(t.round(3))
+""")
+
+md(r"""| cap vs the strategy's 1.02 | 0.97 | 0.98 | 0.99 | 1.00 | 1.01 | 1.03 | 1.04 | 1.05 | 1.06 |
+|---|---|---|---|---|---|---|---|---|---|
+| Sharpe | 2.03 | 2.25 | 2.32 | 2.35 | 2.45 | 2.38 | 2.49 | 2.47 | 2.44 |
+| t (1.02 minus this) | **2.57** | 1.68 | 1.49 | 1.79 | 1.57 | 1.55 | 0.64 | 0.60 | 0.63 |
+| p | **0.010** | 0.094 | 0.137 | 0.074 | 0.116 | 0.122 | 0.520 | 0.550 | 0.528 |
+
+| floor vs the strategy's 0.87 | 0.84 | 0.85 | 0.86 | 0.88 | 0.89 | 0.90 | 0.91 | 0.92 |
+|---|---|---|---|---|---|---|---|---|
+| Sharpe | 2.17 | 2.27 | 2.43 | 2.47 | 2.31 | 2.02 | 1.90 | 1.64 |
+| t (0.87 minus this) | 1.46 | 1.43 | 1.28 | 1.64 | 1.83 | **2.93** | **3.01** | **3.66** |
+| p | 0.145 | 0.152 | 0.202 | 0.101 | 0.067 | **0.003** | **0.003** | **<0.001** |
+
+- **The intervals all overlap:** the strategy's Sharpe of 2.60 has a 95% interval of 1.75 to 3.45, and every cap and floor value's interval
+  overlaps it. By the conservative check nothing is distinguishable.
+- **By the paired test, the exact peak isn't significant either.** No cap from 0.98 to 1.08 is significantly worse than 1.02 (p 0.07-0.55);
+  1.04-1.06 are statistically level with it (p ~0.5). **What is significant is the direction:** caps of 0.97 and tighter are clearly worse
+  (p 0.010 and below). Cutting off before the curve flattens costs real money; where exactly past 1.00 the cap sits does not, within
+  this data.
+- **The floor is the same picture:** 0.86-0.89 are level with 0.87 (p 0.07-0.20), and lowering it towards 0.80 isn't significantly worse
+  (p 0.11-0.15), but **raising it to 0.90 or above is clearly worse** (p 0.003 and below).
+- **So the band's message is robust, its exact numbers are not:** keep the curve between "not too calm" (a floor in the mid-0.80s) and
+  "not clearly inverted" (a cap a little above 1.00). 0.87 and 1.02 are the best points of this sample, not significantly better than their
+  neighbours.""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 7. Step 5: the tranches, on the book after steps 1-4
@@ -931,8 +966,44 @@ md(r"""| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD |
   -$5.6k to -$3.8k at the last step alone (cutting 13:33).
 - **Cutting by drawdown from 20 picks a different book** (it also stops at 11, Sharpe 2.24, drawdown -$3.9k), and its 7 aren't the
   strategy's: the drawdown rule keeps weaker, rarely-traded tranches that smooth the curve.
+- **P/L per $ of margin (middle chart) rises all the way down to the 7:** each condor ties up one wing less its credit (~$700), and a set's
+  margin is its busiest day. All 20 tranches make 14.7x their peak margin over the four years ($211.4k on $14.4k); the 7 make **18.5x**
+  ($112.0k on $6.1k). Per tranche, $10.6k for all 20 against $16.0k for the 7. Cutting below 7 keeps raising P/L per $ of margin (to 20x)
+  but lowers Sharpe: fewer trading days, and every idle day pays the 4% hurdle.
 
-**Do the cuts hold out of sample?** The same rules re-run for each year on the earlier years only:""")
+**Pareto: how the profit is spread across the tranches.** Each tranche's total P/L with every other setting on, largest first (blue: the
+strategy's 7), and the cumulative share of the profit (right axis):""")
+
+code(r"""
+td.fig_pareto(tdd.pareto); plt.show()
+display(tdd.pareto.round(2))
+""")
+
+md(r"""| rank | tranche | P/L | share | cumulative | P/L per $ of margin | traded |
+|---|---|---|---|---|---|---|
+| 1 | 11:53 | $18.1k | 8.6% | 8.6% | 20.5x | **yes** |
+| 2 | 13:53 | $17.7k | 8.4% | 16.9% | 20.1x | **yes** |
+| 3 | 12:13 | $17.2k | 8.1% | 25.1% | 19.4x | **yes** |
+| 4 | 13:13 | $16.4k | 7.7% | 32.8% | 18.7x | **yes** |
+| 5 | 11:33 | $16.3k | 7.7% | 40.5% | 18.4x | **yes** |
+| 6 | 13:33 | $15.1k | 7.1% | 47.6% | 17.2x | no |
+| 7 | 14:13 | $14.8k | 7.0% | 54.6% | 17.5x | **yes** |
+| 8 | 11:13 | $14.7k | 7.0% | 61.6% | 16.5x | no |
+| 9 | 12:53 | $14.1k | 6.7% | 68.3% | 15.9x | no |
+| 10 | 12:33 | $11.7k | 5.5% | 73.8% | 13.3x | no |
+| 11 | 14:53 | $11.7k | 5.5% | 79.3% | 14.1x | **yes** |
+| 12 | 10:53 | $10.3k | 4.9% | 84.2% | 11.7x | no |
+| 13-20 | 14:33, first hour, 15:13, 15:33, 15:53 | $33.3k | 15.8% | 100% | 0.1-10.1x | no |
+
+- **It isn't an 80/20 book:** the profit is spread fairly evenly over the middle of the day (5-9% per tranche), and 80% of it takes the top
+  **12** of 20 tranches. The tail is the first hour (2-2.5% each), 15:13 and 14:33, and 15:33 / 15:53, which make nothing.
+- **The strategy's 7 are the top 5, the 7th and the 11th: 53% of the profit from 35% of the tranches** (and 37% of the trades), with 30%
+  of all-20's drawdown (-$3.8k against -$12.7k).
+- **13:33, 11:13 and 12:53 (ranks 6, 8 and 9) are the profitable tranches the strategy leaves out**, each about 7% of the profit; they are
+  the ones that lift Sharpe to the 2.75 plateau when added back, at the cost of a deeper drawdown. 14:53 (rank 11) earns less but trades
+  on fewer days and adds least to the drawdown, which is why forward selection keeps it.""")
+
+md(r"""**Do the cuts hold out of sample?** The same rules re-run for each year on the earlier years only:""")
 
 code(r"""
 for crit, w in tdd.walk_forward.items():
@@ -1240,6 +1311,8 @@ day (76% of days positive), an average win of $285 a condor against an average l
 - **The 10-day SMA is the most important setting:** removing it costs 1.28 Sharpe and triples the drawdown. With everything on it beats the
   20-day in every year (t = 1.73 on the Sharpe difference, p = 0.08: significant at 10%, not at 5%); the edge is lower risk, not more
   money. On the drawdown-picked tranches it still leads (2.29 against 1.97, a third of the drawdown) but not significantly (p = 0.38).
+- **The band's exact edges aren't significant** (no cap from 0.98 to 1.08 is significantly worse than 1.02, p 0.07-0.55); the direction
+  is (caps of 0.97 and tighter and floors of 0.90 and higher are clearly worse) (Section 6).
 - **No stop:** on this strategy every call-stop level lowers Sharpe and P/L and none reduces the drawdown, and a put stop is worse still
   (400%: Sharpe 1.91, -$21.8k; 42% of the stopped puts would have expired winning) (Section 9). The cost is exposure to a day worse than any
   in this sample.

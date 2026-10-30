@@ -594,6 +594,64 @@ def band_fine(panel: pd.DataFrame, cal: fv.Calendars) -> dict[str, pd.DataFrame]
     return out
 
 
+BAND_STRATEGY = {"ts_high": 1.02, "ts_low": 0.87}
+
+
+def band_significance(panel: pd.DataFrame, cal: fv.Calendars, n_boot: int = fv.AB_BOOT,
+                      seed: int = fv.SEED) -> dict[str, pd.DataFrame]:
+    """Is the band's peak significant? For each cap and floor value (everything else on): the Sharpe with a 95% session-
+    bootstrap interval, and a paired test against the strategy's value on the same resampled sessions: the Sharpe
+    difference, its standard error, t = difference / SE, a two-sided p and the share of resamples where the strategy's
+    value is better."""
+    out = {}
+    for name, values in BAND_FINE.items():
+        rows_daily = []
+        for v in values:
+            m = fv.version_mask(panel, **{**fv.STRATEGY, name: float(v)})
+            rows_daily.append(rs.daily_series(panel.loc[m, fv.PL], panel.loc[m, "date"], cal.all).to_numpy())
+        daily = np.vstack(rows_daily)
+        idx = np.random.default_rng(seed).integers(0, daily.shape[1], size=(n_boot, daily.shape[1]))
+        boots = np.vstack([br.sharpe_rows(row[idx]) for row in daily])           # values x draws
+        ref = int(np.flatnonzero(np.isclose(values, BAND_STRATEGY[name]))[0])
+        rows = []
+        for i, v in enumerate(values):
+            diff = boots[ref] - boots[i]
+            point = br.sharpe(daily[ref]) - br.sharpe(daily[i])
+            se = diff.std(ddof=1)
+            t = point / se if se > 0 else np.nan
+            rows.append({"value": f"{v:.2f}", "sharpe": br.sharpe(daily[i]), "ci_low": np.percentile(boots[i], 2.5),
+                         "ci_high": np.percentile(boots[i], 97.5), "strategy_minus_this": point, "se": se, "t": t,
+                         "p": float(2 * stats.norm.sf(abs(t))) if i != ref else np.nan,
+                         "strategy_better_pct": float((diff > 0).mean() * 100) if i != ref else np.nan})
+        t_ = pd.DataFrame(rows).set_index("value")
+        t_.index.name = name
+        out[name] = t_
+    return out
+
+
+def fig_band_significance(sig: dict[str, pd.DataFrame]):
+    """Sharpe with its 95% interval at each cap and floor value; the strategy's value and its interval shaded."""
+    with plt.rc_context(fv.STYLE):
+        fig, axes = plt.subplots(1, 2, figsize=(16, 4.6))
+        for ax, name, title in ((axes[0], "ts_high", "Cap: VIX9D/VIX at entry <= x"), (axes[1], "ts_low", "Floor: VIX9D/VIX at entry >= x")):
+            t = sig[name]
+            x = t.index.astype(float).to_numpy()
+            mine = f"{BAND_STRATEGY[name]:.2f}"
+            ax.axhspan(t.loc[mine, "ci_low"], t.loc[mine, "ci_high"], color=fv.BLUE, alpha=0.08, lw=0)
+            sigd = (t["p"] < 0.05).to_numpy()
+            ax.errorbar(x, t["sharpe"], yerr=[t["sharpe"] - t["ci_low"], t["ci_high"] - t["sharpe"]], fmt="none",
+                        ecolor=fv.INK_2, lw=0.9, capsize=3)
+            ax.scatter(x, t["sharpe"], s=40, zorder=3, color=[fv.BLUE if v == mine else (fv.RED if s_ else fv.GREY)
+                                                            for v, s_ in zip(t.index, sigd)])
+            ax.set_title(f"{title} (blue: the strategy {mine}; red: significantly worse, p < 0.05)")
+            ax.set_xlabel("x")
+        axes[0].set_ylabel("Sharpe, with 95% session-bootstrap interval")
+        fig.suptitle("Is the band's peak significant? Sharpe and its 95% interval at each edge, everything else on (shaded: "
+                     "the strategy's interval)", x=0.01, ha="left")
+        fig.tight_layout()
+    return fig
+
+
 def fig_band_reading(fine: dict[str, pd.DataFrame]):
     """Sharpe as the cap and the floor move 0.01 at a time (everything else on), with the curve's inversion at 1.00."""
     with plt.rc_context(fv.STYLE):
@@ -722,6 +780,7 @@ class Cascade:
     tranche_sets: pd.DataFrame
     selection_dd: pd.DataFrame
     band_fine: dict[str, pd.DataFrame]
+    band_sig: dict[str, pd.DataFrame]
 
 
 def compute(panel: pd.DataFrame) -> Cascade:
@@ -739,5 +798,5 @@ def compute(panel: pd.DataFrame) -> Cascade:
         ratio_quintiles=ratio_quintiles(panel), ratio_caps=ratio_caps(panel, cal), ratio_corr=ratio_correlation(panel),
         weekdays=weekdays(panel), tranches=tranche_table(panel, cal), tranche_corr=tranche_correlation(panel),
         selection=sel, walk_forward=tranche_walk_forward(panel, cal), tranche_sets=tranche_sets(panel, cal, sel, sel_dd), selection_dd=sel_dd,
-        sma_ab_dd=sma_ab(panel, cal, sel_dd.attrs["best"]), band_fine=band_fine(panel, cal),
+        sma_ab_dd=sma_ab(panel, cal, sel_dd.attrs["best"]), band_fine=band_fine(panel, cal), band_sig=band_significance(panel, cal),
     )
