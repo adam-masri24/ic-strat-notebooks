@@ -117,6 +117,7 @@ from strategies.ic_strat.analysis import cascade as cs
 from strategies.ic_strat.analysis import tranche_drawdown as td
 from strategies.ic_strat.analysis import thursday as th
 from strategies.ic_strat.analysis import log_2026 as lg
+from strategies.ic_strat.analysis import vix1d as vx
 from strategies.ic_strat.analysis.notebook_display import compact_figures
 
 compact_figures()   # charts as compact PNGs, so GitHub renders the notebook
@@ -1064,7 +1065,68 @@ out of the ranking (`DROPPED_FEATURES` in `final_version.py`). **That was missin
 2022 to April 2023 and lost ~$31k. **With those days kept (a filter can't act on a day its feature doesn't exist), VIX1D at the open scores
 +0.05 and VIX1D/VIX30 -0.04**: mid-table, above the noise control, below the bar, and neither works in both halves. On the days it exists,
 VIX1D at the open is only weakly related to the condor's P/L (rank correlation -0.15; P/L per condor $99-160 across its quintiles, lowest
-at the highest VIX1D): it measures today's priced risk, which the band and the move filter already capture.""")
+at the highest VIX1D): it measures today's priced risk, which the band and the move filter already capture.
+
+**The three pictures below show it.** First, when VIX1D exists against when the strategy made its money:""")
+
+code(r"""
+v1d = vx.compute(panel)
+vx.fig_coverage(panel, v1d.coverage); plt.show()
+cov = v1d.coverage.copy(); cov.attrs = {}
+display(cov)
+""")
+
+md(r"""| | from | to | sessions | condors | share | P/L |
+|---|---|---|---|---|---|---|
+| **before VIX1D exists** | 2022-05-31 | 2023-04-18 | 32 | **152** | **20%** | **+$30.8k** |
+| VIX1D exists | 2023-05-08 | 2026-05-04 | 150 | 612 | 80% | +$84.7k |
+
+- **The strategy made 27% of its money before VIX1D was published** (a steep stretch of the equity curve in mid-2022). A rule like "VIX1D at
+  the open >= x" can't be true on a day with no VIX1D, so if blanks count as failing, every one of those 152 condors is thrown out.
+
+Second, the same search for the best VIX1D cut, with those blank days dropped (the old treatment) and kept (the fix), against the noise
+feature and the noise bar:""")
+
+code(r"""
+vx.fig_scores(v1d.scores, study.addon_scan.loc["noise", "sharpe_gain"], study.addon_scan.attrs["noise_p95"]); plt.show()
+sc1 = v1d.scores.copy(); sc1.attrs = {}
+display(sc1.round(2))
+""")
+
+md(r"""| feature | treatment of the days before VIX1D | best cut | condors kept | Sharpe gain | P/L change |
+|---|---|---|---|---|---|
+| VIX1D at the open | dropped (old) | >= 6.72 | 73% | **-0.66** | -$32.1k |
+| VIX1D at the open | **kept (fix)** | >= 6.72 | 93% | **+0.05** | -$1.4k |
+| VIX1D / VIX30 | dropped (old) | <= 0.716 | 73% | **-0.76** | -$34.6k |
+| VIX1D / VIX30 | **kept (fix)** | <= 0.716 | 92% | **-0.04** | -$3.8k |
+
+- **The same cut, the same threshold: only the treatment of the missing days changes,** and the score jumps by 0.7. Almost all of the old
+  -0.66 / -0.76 is the ~$31k of pre-2023 P/L the rule threw away, not anything VIX1D said.
+- **Fixed, both land between the noise feature (-0.16) and the noise bar (+0.28):** no better than luck.
+
+Third, what VIX1D says about P/L on the days it exists:""")
+
+code(r"""
+vx.fig_quintiles(v1d.quintiles); plt.show()
+for name, t in v1d.quintiles.items():
+    t2 = t.copy(); t2.attrs = {}
+    print(name); display(t2.round(1))
+""")
+
+md(r"""| VIX1D at the open (quintile) | 5.6-7.4 | 7.4-8.5 | 8.5-9.3 | 9.3-10.8 | 10.8-25.0 |
+|---|---|---|---|---|---|
+| avg P/L per condor | +$122 | +$158 | +$160 | +$151 | **+$99** |
+| 95% interval | $29 to $200 | $64 to $238 | $81 to $227 | $72 to $221 | -$28 to $180 |
+
+| VIX1D / VIX30 (quintile) | 0.40-0.51 | 0.51-0.55 | 0.55-0.61 | 0.61-0.67 | 0.67-1.07 |
+|---|---|---|---|---|---|
+| avg P/L per condor | +$131 | +$127 | **+$198** | +$97 | +$137 |
+
+- **No clear direction:** every quintile makes money, and all the intervals overlap. The highest VIX1D days earn the least (+$99, interval
+  reaching below zero) but even that isn't separable from the rest. Rank correlations with P/L are -0.15 and -0.07.
+- **Why there's little left for VIX1D to say:** it prices today's expected move, and the strategy only trades when the VIX9D/VIX curve is
+  calm and SPX has pulled back below its open in an uptrend. On those days VIX1D sits in a narrow, ordinary range (mostly 6-13); the few
+  high readings (around the spring 2025 selloff) are too rare to build a filter on.""")
 
 code(r"""
 fv.fig_feature_corr(study.feature_corr); plt.show()

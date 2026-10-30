@@ -22,7 +22,7 @@ The notebooks only call the code in `strategies/ic_strat/analysis/` and explain 
 
 - `final_version.py`: the strategy, its scoring (the backtester's Sharpe) and most of the studies;
 - `backtester_rules.py`: the filters measured the way the backtester measures them;
-- `cascade.py`, `tranche_drawdown.py`, `thursday.py`, `log_2026.py`: the cascade, the drawdown study, the Thursday diagnosis and the 2026 drawdown in the backtest log;
+- `cascade.py`, `tranche_drawdown.py`, `thursday.py`, `vix1d.py`, `log_2026.py`: the cascade, the drawdown study, the Thursday diagnosis, why the VIX1D features failed, and the 2026 drawdown in the backtest log;
 - `correlation_mo.py`: the IC vs MO correlation study;
 - `notebook_display.py`: compact chart output, so GitHub renders the notebooks.
 
