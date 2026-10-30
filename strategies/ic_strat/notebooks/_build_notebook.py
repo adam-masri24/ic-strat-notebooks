@@ -916,8 +916,8 @@ md(r"""| tranche | trades | total P/L | own max drawdown | P/L per $ of drawdown
   shrink it by $0.7k-1.0k, but each is among the best earners.
 
 **Cutting further, one tranche at a time.** Starting from the 7, each step drops the tranche whose removal gives the best book: by Sharpe
-(blue), or by max drawdown (orange). The circle marks where each rule stops: the highest Sharpe, or (by drawdown) the most P/L per $ of
-drawdown.""")
+(blue), or by max drawdown (orange). Each rule stops at the highest Sharpe or (by drawdown) the most P/L per $ of drawdown; the printed
+line under the chart names where.""")
 
 code(r"""
 td.fig_elimination(tdd.paths); plt.show()
@@ -940,7 +940,7 @@ md(r"""| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD | cut by
 **The same cut, starting from all 20 tranches** (every other setting on), to see how the curve goes and where the 7 sit on it:""")
 
 code(r"""
-td.fig_elimination(tdd.paths20, heading="Cutting from all 20 tranches one at a time (dotted: the strategy's 7; circled: where each rule stops)"); plt.show()
+td.fig_elimination(tdd.paths20, heading="Cutting from all 20 tranches one at a time (dotted: the strategy's 7)"); plt.show()
 for crit, p20 in tdd.paths20.items():
     k7 = p20.loc[7, "tranches"].split(", ")
     print(f"{td.CRITERIA[crit]}: stops at {p20.attrs['best']} tranches; the 7 it keeps: {', '.join(sorted(k7))} "

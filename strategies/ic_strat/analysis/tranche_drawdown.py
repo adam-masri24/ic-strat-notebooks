@@ -392,8 +392,6 @@ def fig_elimination(paths: dict[str, pd.DataFrame], heading: str | None = None):
             for ax, col in zip(axes, ("sharpe", mid, "max_drawdown")):
                 ax.plot(x, p[col], color=colors[crit], marker=markers[crit], ms=5, lw=1.6,
                         label=f"{CRITERIA[crit]} (picked: {p.attrs['best']} kept)")
-                b = p.attrs["best"]
-                ax.scatter([b], [p.loc[b, col]], s=120, facecolor="none", edgecolor=fv.INK, lw=1.2, zorder=4)
         per_margin = all("pl_per_margin" in p for p in paths.values())
         for ax, title in zip(axes, ("Sharpe", "P/L per $ of peak margin" if per_margin else "Total P/L", "Max drawdown")):
             ax.set_title(title)
@@ -411,7 +409,7 @@ def fig_elimination(paths: dict[str, pd.DataFrame], heading: str | None = None):
         axes[0].set_title("Sharpe (below -1 off the chart)")
         axes[0].legend(loc="lower left")
         n, start = len(fv.SELECTED_TRANCHES), max(len(p) for p in paths.values())
-        fig.suptitle(heading or f"Cutting the {start} one tranche at a time (dotted: the strategy's {n}; circled: where each rule stops)",
+        fig.suptitle(heading or f"Cutting the {start} one tranche at a time (dotted: the strategy's {n})",
                      x=0.01, ha="left")
         fig.tight_layout()
     return fig
