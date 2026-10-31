@@ -1149,6 +1149,51 @@ curve's shape, not its level. Correlation with P/L is small everywhere (credit +
 
 **Nothing tested improves the finished strategy.**""")
 
+md(r"""### Shape against level: an A/B on the band
+
+The cluster claim says VIX9D/VIX adds something VIX and VIX9D don't. The test: **every other setting on**, and the band replaced by a
+filter on the level.
+
+- **A, the strategy:** VIX9D/VIX between 0.87 and 1.02 (shape).
+- **B, VIX level, no band:** only days with VIX at the open inside a range. The range is the best of every decile pair on this data (keeping
+  at least half the condors), so the level filter gets every advantage.
+- **C, VIX9D level, no band:** the same search on VIX9D at the open.
+- **D, shape plus level:** the band, plus the best VIX range searched on top of it.
+
+Each is compared with A: the Sharpe difference with a paired session bootstrap, and the same two t-tests as the SMA A/B in Section 13.""")
+
+code(r"""
+sl = casc.shape_level
+cs.fig_shape_vs_level(sl); plt.show()
+print(f"correlation on the no-band book: VIX vs VIX9D {sl.attrs['corr_vix_vix9d']:.2f}, VIX9D/VIX vs VIX {sl.attrs['corr_shape_vix']:.2f}, "
+      f"VIX9D/VIX vs VIX9D {sl.attrs['corr_shape_vix9d']:.2f}")
+view = sl[["trades", "total_pl", "sharpe", "sharpe_to_2024", "sharpe_from_2025", "max_drawdown", "sharpe_vs_A", "ci_low", "ci_high",
+           "p_better_than_A", "t_sharpe", "p_sharpe", "t_daily_pl", "p_daily_pl"]].astype(float).round(3)
+view.attrs = {}
+display(view.T)
+""")
+
+md(r"""**Shape beats level, and level adds nothing on top of it.**
+
+| everything else on | trades | total P/L | Sharpe | 2022-24 / 2025-26 | max DD | Sharpe vs A (95% CI) | p (Sharpe z) |
+|---|---|---|---|---|---|---|---|
+| **A: VIX9D/VIX 0.87-1.02 (strategy)** | 1,528 | \$115.5k | **2.49** | 2.48 / 2.52 | -\$6.5k | | |
+| B: VIX at the open 13.4-32.2, no band | 2,204 | \$124.5k | 2.08 | 2.17 / 1.94 | -\$5.8k | -0.41 (-1.25 to +0.46) | 0.35 |
+| C: VIX9D at the open 12.0-37.2, no band | 2,214 | \$113.7k | 1.82 | 1.69 / 2.10 | -\$6.4k | -0.67 (-1.46 to +0.11) | 0.10 |
+| D: the band + VIX at the open 13.4-31.5 | 1,378 | \$107.9k | 2.42 | 2.36 / 2.52 | -\$4.5k | -0.08 (-0.41 to +0.27) | 0.66 |
+
+- **The level filters score lower even with their range picked on the same data.** VIX at its best range gives 2.08 (-0.41) and VIX9D 1.82
+  (-0.67); A wins in both halves against both. Neither gap is significant on its own: B is behind in 82% of resamples (p 0.35 on the Sharpe
+  z), C in 96% (p 0.10). The level ranges are fitted in-sample and the band isn't re-fitted here, so the true gap is, if anything, larger.
+- **The best "level" ranges barely filter.** VIX 13.4-32.2 and VIX9D 12.0-37.2 only cut the quiet tails and the panic days; they keep about
+  45% more condors than the band. B earns \$9k more in total by trading those extra condors, at a lower Sharpe. Level can't find what the
+  band finds because the band's days aren't a VIX range: 91% of A's condors also pass B's filter, and the band picks among them by shape.
+- **Level on top of shape: nothing.** D adds the best VIX range to the band and loses 0.08 of Sharpe (not significant, p 0.66) and \$7.6k.
+  Its smaller drawdown comes from 150 fewer condors, not from a better selection.
+- **Why:** VIX and VIX9D carry the same information (correlation 0.96), while VIX9D/VIX
+  is only loosely tied to them (0.36 with VIX, 0.60 with VIX9D, on the no-band book). The ratio says whether the next week is priced
+  above or below the next month, which a level doesn't. That matches the clusters: one vol-level cluster, and the shape on its own.""")
+
 # ---------------------------------------------------------------------------
 md(r"""## 13. A/B with everything on: above the 10-day SMA vs the 20-day
 

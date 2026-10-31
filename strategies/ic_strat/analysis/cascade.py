@@ -652,6 +652,84 @@ def fig_band_significance(sig: dict[str, pd.DataFrame]):
     return fig
 
 
+LEVELS = {"vix30_open": "VIX at the open", "vix9d_open": "VIX9D at the open"}
+LEVEL_MIN_KEEP = 0.5   # a level range must keep at least half the no-band book's condors (the band keeps ~62%)
+
+
+def _best_level_range(panel: pd.DataFrame, cal: fv.Calendars, cfg: dict, feat: str) -> tuple[pd.Series, str]:
+    """The VIX (or VIX9D) range [lo, hi] at deciles of the book that gives the highest Sharpe, keeping at least half its
+    condors: the level filter's best shot, searched on the same data."""
+    base = fv.version_mask(panel, **cfg)
+    x = panel.loc[base, feat]
+    qs = x.quantile(np.arange(0, 1.01, 0.1)).to_numpy()
+    best = None
+    for i, lo in enumerate(qs[:-1]):
+        for hi in qs[i + 1:]:
+            k = base & panel[feat].between(lo, hi)
+            if k.sum() < LEVEL_MIN_KEEP * base.sum() or k.sum() == base.sum():
+                continue
+            sh = fv.score(panel, k, cal)["sharpe"]
+            if best is None or sh > best[0]:
+                best = (sh, k, f"{lo:.1f}-{hi:.1f}")
+    return best[1], best[2]
+
+
+def shape_vs_level(panel: pd.DataFrame, cal: fv.Calendars) -> pd.DataFrame:
+    """A/B with every other setting on: the band on VIX9D/VIX (shape, the strategy) against the band replaced by the best
+    VIX range or the best VIX9D range (level), and the band plus the best VIX range. Paired session bootstrap and t-tests
+    against the strategy; ``attrs`` hold the level ranges and the correlations behind the comparison."""
+    no_band = {**fv.STRATEGY, "ts_low": None, "ts_high": None}
+    a = fv.version_mask(panel, **fv.STRATEGY)
+    vix_k, vix_r = _best_level_range(panel, cal, no_band, "vix30_open")
+    v9_k, v9_r = _best_level_range(panel, cal, no_band, "vix9d_open")
+    both_k, both_r = _best_level_range(panel, cal, fv.STRATEGY, "vix30_open")
+    versions = {"A: VIX9D/VIX 0.87-1.02 (shape, strategy)": a,
+                f"B: VIX at the open {vix_r} (level, no band)": vix_k,
+                f"C: VIX9D at the open {v9_r} (level, no band)": v9_k,
+                f"D: the band + VIX at the open {both_r}": both_k}
+    daily = {k: rs.daily_series(panel.loc[m, fv.PL], panel.loc[m, "date"], cal.all).to_numpy() for k, m in versions.items()}
+    ref = next(iter(versions))
+    rows = {}
+    for k, m in versions.items():
+        st = _stats(panel, m, fv.PL, cal)
+        lo, hi, pb = (np.nan,) * 3 if k == ref else fv._paired_boot(daily[ref], daily[k])
+        tt = dict.fromkeys(["t_daily_pl", "p_daily_pl", "t_sharpe", "p_sharpe"], np.nan) if k == ref else ab_t_tests(daily[ref], daily[k])
+        rows[k] = {**st, "sharpe_vs_A": br.sharpe(daily[k]) - br.sharpe(daily[ref]), "ci_low": lo, "ci_high": hi,
+                   "p_better_than_A": pb, **tt}
+    out = pd.DataFrame(rows).T
+    b = panel[fv.version_mask(panel, **no_band)]
+    out.attrs.update(
+        corr_vix_vix9d=b["vix30_open"].corr(b["vix9d_open"]),
+        corr_shape_vix=b[fv.TS_9D_30].corr(b["vix30_open"]),
+        corr_shape_vix9d=b[fv.TS_9D_30].corr(b["vix9d_open"]),
+        overlap_a_b=float((a & vix_k).sum() / a.sum() * 100))
+    return out
+
+
+def fig_shape_vs_level(t: pd.DataFrame):
+    """Sharpe, total P/L and max drawdown of each version (A = the strategy's shape band)."""
+    labels = ["A: shape\n(strategy)", "B: VIX level", "C: VIX9D level", "D: shape +\nVIX level"]
+    colors = [fv.BLUE, fv.GREY, fv.GREY, fv.ORANGE]
+    with plt.rc_context(fv.STYLE):
+        fig, axes = plt.subplots(1, 3, figsize=(16, 4.2))
+        for ax, col, title in ((axes[0], "sharpe", "Sharpe"), (axes[1], "total_pl", "Total P/L"), (axes[2], "max_drawdown", "Max drawdown")):
+            v = t[col].astype(float).to_numpy()
+            x = np.arange(len(v))
+            ax.bar(x, v, width=0.6, color=colors)
+            for xi, val in zip(x, v):
+                ax.text(xi, val, f"{val:.2f}" if col == "sharpe" else f"{'-' if val < 0 else ''}${abs(val) / 1000:.1f}k",
+                        ha="center", va="bottom" if val >= 0 else "top", fontsize=8.5, color=fv.INK_2)
+            ax.set_xticks(x, labels, fontsize=8)
+            ax.axhline(0, color=fv.INK_2, lw=0.7)
+            ax.set_title(title)
+        for ax in axes[1:]:
+            ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: fv._k(v)))
+        fig.suptitle("A/B, everything else on: the band on the curve's shape (VIX9D/VIX) against filters on the level (VIX, VIX9D)",
+                     x=0.01, ha="left")
+        fig.tight_layout()
+    return fig
+
+
 def fig_band_reading(fine: dict[str, pd.DataFrame]):
     """Sharpe as the cap and the floor move 0.01 at a time (everything else on), with the curve's inversion at 1.00."""
     with plt.rc_context(fv.STYLE):
@@ -782,6 +860,7 @@ class Cascade:
     selection_dd: pd.DataFrame
     band_fine: dict[str, pd.DataFrame]
     band_sig: dict[str, pd.DataFrame]
+    shape_level: pd.DataFrame
 
 
 def compute(panel: pd.DataFrame) -> Cascade:
@@ -800,4 +879,5 @@ def compute(panel: pd.DataFrame) -> Cascade:
         weekdays=weekdays(panel), tranches=tranche_table(panel, cal), tranche_corr=tranche_correlation(panel),
         selection=sel, walk_forward=tranche_walk_forward(panel, cal), tranche_sets=tranche_sets(panel, cal, sel, sel_dd), selection_dd=sel_dd,
         sma_ab_dd=sma_ab(panel, cal, sel_dd.attrs["best"]), band_fine=band_fine(panel, cal), band_sig=band_significance(panel, cal),
+        shape_level=shape_vs_level(panel, cal),
     )
