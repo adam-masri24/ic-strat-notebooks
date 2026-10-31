@@ -65,6 +65,7 @@ other features, and test the 10-day SMA against the 20-day.
 | 13 | A/B with everything on: above the 10-day SMA vs the 20-day |
 | 14 | The 2026 drawdown, in the backtester's own log (past the end of the export) |
 | 15 | Summary |
+| 16 | Robustness checks: every test used, what it asks and what it found |
 
 **How to read the numbers.**
 
@@ -1431,6 +1432,70 @@ day (75% of days positive).
 **What this notebook doesn't establish:** out-of-sample performance (apart from the walk-forward checks); the backtester's totals on the
 new tranche set (the rebuild matches the backtester trade by trade on the previous 7; the set with 13:33 hasn't been backtested); the first
 sessions, which need SPX closes before the export.""")
+
+# ---------------------------------------------------------------------------
+md(r"""## 16. Robustness checks
+
+Every check this notebook uses, grouped by the question it answers. "Section" says where to find it.
+
+### 1. Is the difference real, or luck?
+
+| check | how it works | where it's used | what it found | section |
+|---|---|---|---|---|
+| **Session bootstrap** | Resample whole trading days (all tranches of a day together) 2,000 times; the spread of the results gives a 95% interval | P/L per condor in every profile, the ratio quintiles, the VIX1D quintiles | Most profile buckets overlap; the clear ones are named in the text | 3-12 |
+| **Paired bootstrap** | Resample the same days for two versions at once and look at the Sharpe *difference*; reports a 95% interval and how often one beats the other | Band caps and floors, SMA10 vs SMA20, shape vs level | A difference counts only when its interval excludes zero | 6, 12, 13 |
+| **t-test on daily P/L** | Paired t-test: do the two versions make different money per day? | SMA A/B, shape vs level | SMA10 vs SMA20: the daily P/L difference is small; the edge is lower risk | 12, 13 |
+| **Sharpe z-score** | Sharpe difference divided by its bootstrap standard error | SMA A/B, shape vs level | SMA10 over SMA20: t = 1.77, p = 0.08 (10% level, not 5%); shape over VIX level p = 0.35, over VIX9D level p = 0.10 | 12, 13 |
+| **Peak against its neighbours** | 95% interval at the chosen value against each nearby value, plus a z-test for each pair | Term-structure cap (1.02) and floor (0.87) | No cap from 0.98 to 1.08 is significantly worse than 1.02; caps of 0.97 and lower, and floors of 0.90 and higher, are | 6 |
+| **Regression, errors clustered by session** | Condor P/L on a Thursday dummy, controlling for everything known at entry | The no-Thursday rule | The Thursday loss stays (-$51 -> -$55, p = 0.008) with every entry feature in; it fades only once the day's realized range is added | 3 |
+
+### 2. Did we find a signal, or fit noise?
+
+| check | how it works | what it found | section |
+|---|---|---|---|
+| **Noise feature** | A random feature goes through the same threshold search as the real ones | It "gains" -0.16: the yardstick for a meaningless filter | 12 |
+| **Family-wise noise bar** | The best of 33 random features, 200 times over; the bar is the 95th percentile (+0.28). A real feature must beat the best of 33 random ones, not just one | **No candidate feature clears it**: nothing tested improves the finished strategy | 12 |
+| **Feature correlation clusters** | Groups features that say the same thing so one signal isn't counted twice | Five clusters (vol level, premium, trend, intraday path, VIX1D); VIX9D/VIX stands alone | 12 |
+| **Shape vs level A/B** | The band against VIX and VIX9D level filters given their *best in-sample* range | The band still scores higher (2.49 against 2.08 and 1.82); level on top of it adds nothing | 12 |
+| **Missing-data rule** | A filter keeps the days its feature is blank, instead of silently dropping them | Fixed a false VIX1D result: VIX1D starts 2023-04-24, so dropping blank days threw out a fifth of the strategy | 12 |
+
+### 3. Does it hold over time?
+
+| check | how it works | what it found | section |
+|---|---|---|---|
+| **Split halves** | Every table reports 2022-24 and 2025-26 separately | Each filter is flagged when it pays in one half only | all |
+| **By year** | Results for each calendar year | SMA10 beats SMA20 in every year with everything on; the Thursday loss shows up in all five years; the 2026 drawdown is broken down by year | 3, 13, 14 |
+| **Walk-forward tranche selection** | Re-run the selection on earlier years only, trade its pick in the next year | Re-chosen each year it does worse than all 20 (1.77 against 2.30); what holds every year is dropping the first hour | 8, 11 |
+| **Live log reconciliation** | The rebuild against the backtester's own 2026 trade log | Matches on the previous 7: 1,446 against 1,450 trades, $111.3k against $112.0k | 14 |
+
+### 4. Is the setting on a plateau or a spike?
+
+| check | how it works | what it found | section |
+|---|---|---|---|
+| **Greedy cascade** | Add the setting with the biggest Sharpe gain at each step | Order: Thursday, move, SMA10, band, ratio, tranches | 2-8 |
+| **Leave-one-out** | Turn each setting off with all the others on | Every entry filter pays in both halves; the 10-day SMA matters most (-1.33 Sharpe without it) | 12 |
+| **Everything-on sweeps** | Sweep each threshold with every other setting fixed | Every threshold sits at the top of its sweep | 10 |
+| **Fine band sweep** | Cap and floor in steps of 0.01 | 1.02 is the highest cap, but its neighbours from 0.99 to 1.05 score 2.30-2.41 and none is significantly worse: the edge is the region, not the exact value | 6 |
+| **SMA10 vs SMA20** | Compared at step 3 and again with everything on | SMA10 wins with everything on; the edge is lower risk | 5, 13 |
+| **Stop scans** | Call and put stops across levels, $0.20 exit slippage | Every stop lowers Sharpe; hence no stop | 9 |
+
+### 5. Which tranches, and where do the losses come from?
+
+| check | how it works | what it found | section |
+|---|---|---|---|
+| **Tranche-set comparison** | The live 7, the previous 7 (14:53), the earlier 15, all 20, and the sets picked by Sharpe and by drawdown | The previous 7 (with 14:53) scores higher than the live set: 2.60 against 2.49, drawdown -$3.8k against -$6.5k | 8 |
+| **Forward selection** by Sharpe and by P/L per $ of drawdown | Add the tranche that helps most, one at a time; the drawdown version starts from all 20 and ignores the live set | Both stop at 11 tranches | 8 |
+| **Drawdown episodes** | Each tranche's share of every drawdown | 13:33 loses in all 5 of the deepest drawdowns | 11 |
+| **Backward elimination** from 7 and from 20 | Remove the tranche that hurts most, one at a time, tracking P/L per $ of peak margin | 13:33 is the first tranche both rules cut | 11 |
+| **Pareto** | Tranches sorted by P/L, with a cumulative-share line | Shows how much of the P/L the top tranches carry | 11 |
+
+### What isn't tested
+
+- **A true out-of-sample period.** Every threshold and the tranche set were chosen on the same 998 sessions they are scored on; only the
+  tranche selection has a walk-forward check.
+- **Entry costs.** Entries are taken at the backtester's fills; slippage is varied only on stop exits.
+- **Structural breaks.** Stability is judged by halves and by year, not with a formal break test.
+- **Event days.** FOMC and CPI days are the likely cause of the Thursday loss and the 2026 drawdown; there's no filter for them yet.""")
 
 nb["cells"] = cells
 nb["metadata"]["kernelspec"] = {"display_name": "py313-quant", "language": "python", "name": "py313-quant"}
