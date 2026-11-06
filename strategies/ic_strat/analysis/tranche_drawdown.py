@@ -339,10 +339,118 @@ def pareto(daily: pd.DataFrame, margin: pd.DataFrame) -> pd.DataFrame:
     out["cumulative_pct"] = out["share_pct"].cumsum()
     out["peak_margin"] = margin.max().reindex(out.index)
     out["pl_per_margin"] = out["total_pl"] / out["peak_margin"]
+    out["max_drawdown"] = [max_drawdown(daily[t].to_numpy()) for t in out.index]
+    out["dd_pct_margin"] = -out["max_drawdown"] / out["peak_margin"] * 100
+    corr = tranche_correlation(daily)
+    strat = [t for t in fv.SELECTED_TRANCHES if t in daily]
+    out["avg_corr_strategy"] = [corr.loc[t, [u for u in strat if u != t]].mean() for t in out.index]
+    out["corr_rest_of_strategy"] = [_active(daily)[t].corr(_active(daily)[[u for u in strat if u != t]].sum(axis=1))
+                                    for t in out.index]
     out["in_strategy"] = [t in fv.SELECTED_TRANCHES for t in out.index]
     out["status"] = [fv.tranche_status(t) for t in out.index]
     out.index.name = "tranche"
     return out
+
+
+def _active(daily: pd.DataFrame) -> pd.DataFrame:
+    """Only the sessions on which at least one tranche trades: days every filter rules out are zero for all tranches and
+    would inflate the correlations."""
+    return daily[(daily != 0).any(axis=1)]
+
+
+def tranche_correlation(daily: pd.DataFrame) -> pd.DataFrame:
+    """Correlation of daily P/L between tranches, on the sessions the book trades (a tranche that sits a day out counts 0)."""
+    return _active(daily).corr()
+
+
+def set_summary(daily: pd.DataFrame, margin: pd.DataFrame, sets: dict[str, list[str]]) -> pd.DataFrame:
+    """For a few tranche sets: P/L, Sharpe, max drawdown, peak margin, P/L per $ of margin, drawdown as % of margin, and the
+    average correlation between the set's tranches."""
+    corr = tranche_correlation(daily)
+    rows = {}
+    for name, ts in sets.items():
+        d = daily[ts].sum(axis=1).to_numpy()
+        pm = margin[ts].sum(axis=1).max()
+        c = corr.loc[ts, ts].to_numpy()
+        rows[name] = {"tranches": len(ts), "total_pl": d.sum(), "sharpe": _sharpe(d), "max_drawdown": max_drawdown(d),
+                      "peak_margin": pm, "pl_per_margin": d.sum() / pm, "dd_pct_margin": -max_drawdown(d) / pm * 100,
+                      "avg_pair_corr": c[np.triu_indices_from(c, 1)].mean(),
+                      "sum_own_dd": sum(max_drawdown(daily[t].to_numpy()) for t in ts)}
+    out = pd.DataFrame(rows).T
+    out["dd_vs_sum_own_pct"] = out["max_drawdown"] / out["sum_own_dd"] * 100
+    return out
+
+
+def fig_pareto_margin(par: pd.DataFrame):
+    """The 20 tranches ranked by P/L per $ of peak margin, with each one's drawdown as % of its margin and its correlation with
+    the rest of the strategy, in the same order (blue = in the strategy)."""
+    t = par.sort_values("pl_per_margin", ascending=False)
+    colors = [fv.BLUE if v else fv.GREY for v in t["in_strategy"]]
+    x = np.arange(len(t))
+    with plt.rc_context(fv.STYLE):
+        fig, axes = plt.subplots(3, 1, figsize=(15, 9), sharex=True)
+        for ax, col, title, fmt in (
+                (axes[0], "pl_per_margin", "P/L per $ of peak margin (higher is better)", "{:.1f}x"),
+                (axes[1], "dd_pct_margin", "Own max drawdown as % of peak margin (lower is better)", "{:.0f}%"),
+                (axes[2], "corr_rest_of_strategy", "Correlation of daily P/L with the rest of the strategy's 7 (lower diversifies more)",
+                 "{:.2f}")):
+            ax.bar(x, t[col], width=0.66, color=colors)
+            for xi, v in zip(x, t[col]):
+                ax.text(xi, v, fmt.format(v), ha="center", va="bottom" if v >= 0 else "top", fontsize=7.5, color=fv.INK_2)
+            ax.axhline(0, color=fv.INK_2, lw=0.7)
+            ax.set_title(title)
+        axes[2].set_xticks(x, t.index, rotation=90)
+        axes[0].legend([plt.Rectangle((0, 0), 1, 1, color=fv.BLUE), plt.Rectangle((0, 0), 1, 1, color=fv.GREY)],
+                       ["in the strategy", "not traded"], loc="upper right")
+        fig.suptitle("The 20 tranches ranked by P/L per $ of margin, every other setting on", x=0.01, ha="left")
+        fig.tight_layout()
+    return fig
+
+
+def fig_tranche_corr(corr: pd.DataFrame):
+    """Heatmap of the daily P/L correlation between the 20 tranches (strategy tranches in bold)."""
+    with plt.rc_context(fv.STYLE):
+        fig, ax = plt.subplots(figsize=(11, 9.5))
+        cmap = LinearSegmentedColormap.from_list("seq", ["#ffffff", fv.BLUE])
+        im = ax.imshow(corr.to_numpy(), cmap=cmap, vmin=0, vmax=1)
+        n = len(corr)
+        for i in range(n):
+            for j in range(n):
+                v = corr.iat[i, j]
+                ax.text(j, i, "1" if v >= 0.995 else ("0" if abs(v) < 0.005 else f"{v:.2f}".replace("0.", ".")), ha="center", va="center", fontsize=6.5,
+                        color="white" if v > 0.6 else fv.INK)
+        ax.set_xticks(range(n), corr.columns, rotation=90)
+        ax.set_yticks(range(n), corr.index)
+        for lab in list(ax.get_xticklabels()) + list(ax.get_yticklabels()):
+            if lab.get_text() in fv.SELECTED_TRANCHES:
+                lab.set_fontweight("bold")
+                lab.set_color(fv.BLUE)
+        ax.grid(False)
+        fig.colorbar(im, ax=ax, shrink=0.7, label="correlation of daily P/L")
+        ax.set_title("Daily P/L correlation between tranches, every other setting on (blue labels: the strategy's 7)", loc="left")
+        fig.tight_layout()
+    return fig
+
+
+def fig_tranche_map(par: pd.DataFrame):
+    """Each tranche: correlation with the rest of the strategy (x) against P/L per $ of margin (y), marker area = drawdown as %
+    of margin. Bottom right is the worst place to be: little return per $ and nothing gained in diversification."""
+    with plt.rc_context(fv.STYLE):
+        fig, ax = plt.subplots(figsize=(12, 6.5))
+        for inside, color, label in ((True, fv.BLUE, "in the strategy"), (False, fv.GREY, "not traded")):
+            t = par[par["in_strategy"] == inside]
+            ax.scatter(t["corr_rest_of_strategy"], t["pl_per_margin"], s=40 + t["dd_pct_margin"].clip(lower=0) * 2, color=color, alpha=0.8,
+                       edgecolor="white", lw=1.5, label=label)
+            for name, r in t.iterrows():
+                ax.annotate(name, (r["corr_rest_of_strategy"], r["pl_per_margin"]), xytext=(6, 4), textcoords="offset points",
+                            fontsize=8, color=fv.INK)
+        ax.set_xlabel("correlation of daily P/L with the rest of the strategy's 7 tranches")
+        ax.set_ylabel("P/L per $ of peak margin")
+        ax.legend([plt.Line2D([], [], ls="", marker="o", ms=9, color=fv.BLUE), plt.Line2D([], [], ls="", marker="o", ms=9, color=fv.GREY)],
+                  ["in the strategy", "not traded"], loc="upper left")
+        ax.set_title("Return on margin against diversification; marker area = own max drawdown as % of margin", loc="left")
+        fig.tight_layout()
+    return fig
 
 
 def fig_pareto(par: pd.DataFrame):
@@ -429,6 +537,8 @@ class TrancheDrawdowns:
     paths: dict[str, pd.DataFrame]
     paths20: dict[str, pd.DataFrame]
     pareto: pd.DataFrame
+    corr: pd.DataFrame
+    sets: pd.DataFrame
     walk_forward: dict[str, pd.DataFrame]
 
 
@@ -443,6 +553,8 @@ def compute(panel: pd.DataFrame) -> TrancheDrawdowns:
         table=tranche_drawdown_table(book, daily, eps), by_year=by_year(daily),
         paths={c: backward_elimination(daily, c, margin_matrix(panel, cal)) for c in CRITERIA},
         paths20={c: backward_elimination(d20, c, m20) for c in CRITERIA},
-        pareto=pareto(d20, m20),
+        pareto=pareto(d20, m20), corr=tranche_correlation(d20),
+        sets=set_summary(d20, m20, {"the strategy's 7": fv.SELECTED_TRANCHES, "previous 7 (with 14:53)": fv.PREVIOUS_SEVEN,
+                                    "all 20": fv.ALL_TRANCHES}),
         walk_forward={c: elimination_walk_forward(daily, c) for c in CRITERIA},
     )

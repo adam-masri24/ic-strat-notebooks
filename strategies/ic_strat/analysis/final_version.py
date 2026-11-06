@@ -825,7 +825,7 @@ def sma_ab(panel: pd.DataFrame, spreads: pd.DataFrame, cal: Calendars) -> pd.Dat
 
 
 def fig_sma_ab(ab: pd.DataFrame, note: str | None = None):
-    """The strategy's SMA vs the other vs both: Sharpe, total P/L, win rate per spread and max drawdown."""
+    """The strategy's SMA vs the other: Sharpe, total P/L, win rate per spread and max drawdown."""
     colors = [BLUE, ORANGE, AQUA]
     with plt.rc_context(STYLE):
         fig, axes = plt.subplots(1, 4, figsize=(17, 3.9))

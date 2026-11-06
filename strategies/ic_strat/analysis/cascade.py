@@ -288,16 +288,15 @@ def ab_t_tests(a: np.ndarray, b: np.ndarray, n_boot: int = fv.AB_BOOT, seed: int
 
 
 def sma_ab(panel: pd.DataFrame, cal: fv.Calendars, tranches: list[str] | None = None) -> pd.DataFrame:
-    """With every other setting on (the finished strategy, 400% call stop): above the 10-day SMA (A, the strategy)
-    against the 20-day (B) and both, with a paired session bootstrap of the Sharpe difference. ``attrs`` hold the trades only
+    """With every other setting on (the finished strategy, held to expiry): above the 10-day SMA (A, the strategy)
+    against the 20-day (B), with a paired session bootstrap of the Sharpe difference. ``attrs`` hold the trades only
     one rule takes and each version's Sharpe and P/L by year."""
     cfg, col = {**fv.STRATEGY, "sma10_min": None}, fv.PL
     if tranches is not None:   # the same test on another tranche set
         cfg["drop"] = tuple(f"{t}:00" for t in fv.ALL_TRANCHES if t not in tranches)
     above10, above20 = panel["spx_vs_sma10_pct"] > 0, panel["spx_vs_sma20_pct"] > 0
     versions = {"A: above 10-day SMA (strategy)": fv.version_mask(panel, **cfg, trend=above10),
-                "B: above 20-day SMA": fv.version_mask(panel, **cfg, trend=above20),
-                "above both": fv.version_mask(panel, **cfg, trend=above10 & above20)}
+                "B: above 20-day SMA": fv.version_mask(panel, **cfg, trend=above20)}
     daily = {k: rs.daily_series(panel.loc[m, col], panel.loc[m, "date"], cal.all) for k, m in versions.items()}
     base = next(iter(versions))
     rows = {}
@@ -312,8 +311,8 @@ def sma_ab(panel: pd.DataFrame, cal: fv.Calendars, tranches: list[str] | None = 
     out = pd.DataFrame(rows).T
     years = pd.DatetimeIndex(cal.all).year
     by_year = pd.DataFrame({
-        **{f"sharpe {k.split(':')[0]}": [br.sharpe(daily[k][years == y]) for y in sorted(set(years))] for k in list(versions)[:2]},
-        **{f"P/L {k.split(':')[0]}": [daily[k][years == y].sum() for y in sorted(set(years))] for k in list(versions)[:2]},
+        **{f"sharpe {k.split(':')[0]}": [br.sharpe(daily[k][years == y]) for y in sorted(set(years))] for k in versions},
+        **{f"P/L {k.split(':')[0]}": [daily[k][years == y].sum() for y in sorted(set(years))] for k in versions},
     }, index=pd.Index([str(y) for y in sorted(set(years))], name="year"))
     a_only = versions[base] & ~above20
     b_only = versions["B: above 20-day SMA"] & ~above10
@@ -674,6 +673,12 @@ def _best_level_range(panel: pd.DataFrame, cal: fv.Calendars, cfg: dict, feat: s
     return best[1], best[2]
 
 
+def _events():
+    """The event-calendar module (imported late: it imports this one)."""
+    from . import events
+    return events
+
+
 def shape_vs_level(panel: pd.DataFrame, cal: fv.Calendars) -> pd.DataFrame:
     """A/B with every other setting on: the band on VIX9D/VIX (shape, the strategy) against the band replaced by the best
     VIX range or the best VIX9D range (level), and the band plus the best VIX range. Paired session bootstrap and t-tests
@@ -860,6 +865,8 @@ class Cascade:
     selection_dd: pd.DataFrame
     band_fine: dict[str, pd.DataFrame]
     band_sig: dict[str, pd.DataFrame]
+    blackout: pd.DataFrame
+    blackout_split: pd.DataFrame
     shape_level: pd.DataFrame
 
 
@@ -880,4 +887,5 @@ def compute(panel: pd.DataFrame) -> Cascade:
         selection=sel, walk_forward=tranche_walk_forward(panel, cal), tranche_sets=tranche_sets(panel, cal, sel, sel_dd), selection_dd=sel_dd,
         sma_ab_dd=sma_ab(panel, cal, sel_dd.attrs["best"]), band_fine=band_fine(panel, cal), band_sig=band_significance(panel, cal),
         shape_level=shape_vs_level(panel, cal),
+        blackout=_events().blackout_ab(panel, cal), blackout_split=_events().thursday_split(panel, cal),
     )
