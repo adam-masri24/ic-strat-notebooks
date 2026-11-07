@@ -867,6 +867,8 @@ class Cascade:
     band_sig: dict[str, pd.DataFrame]
     blackout: pd.DataFrame
     blackout_split: pd.DataFrame
+    blackout_ba: dict[str, pd.DataFrame]
+    blackout_by_event: pd.DataFrame
     shape_level: pd.DataFrame
 
 
@@ -888,4 +890,5 @@ def compute(panel: pd.DataFrame) -> Cascade:
         sma_ab_dd=sma_ab(panel, cal, sel_dd.attrs["best"]), band_fine=band_fine(panel, cal), band_sig=band_significance(panel, cal),
         shape_level=shape_vs_level(panel, cal),
         blackout=_events().blackout_ab(panel, cal), blackout_split=_events().thursday_split(panel, cal),
+        blackout_ba=_events().blackout_before_after(panel, cal), blackout_by_event=_events().blackout_by_event(panel, cal),
     )

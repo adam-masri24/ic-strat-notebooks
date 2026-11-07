@@ -381,102 +381,49 @@ def set_summary(daily: pd.DataFrame, margin: pd.DataFrame, sets: dict[str, list[
     return out
 
 
-def fig_pareto_margin(par: pd.DataFrame):
-    """The 20 tranches ranked by P/L per $ of peak margin, with each one's drawdown as % of its margin and its correlation with
-    the rest of the strategy, in the same order (blue = in the strategy)."""
+PARETO_LINES = {"cum_pct": ("cumulative share of the profit (%)", fv.ORANGE, "o", "{:.0f}%"),
+                "dd_pct_margin": ("own max drawdown as % of margin (lower is better)", fv.AQUA, "s", "{:.0f}%"),
+                "corr_rest_of_strategy": ("correlation with the rest of the strategy's 7 (lower diversifies more)", fv.INK_2, "D", "{:.2f}")}
+
+
+def fig_pareto(par: pd.DataFrame, line: str):
+    """A Pareto chart with two y-axes: the 20 tranches ranked by P/L per $ of peak margin (bars, left axis; blue = in the
+    strategy) and one other measure as a line on the right axis: the cumulative share of the profit, the tranche's own drawdown as
+    % of its margin, or its correlation with the rest of the strategy's 7."""
     t = par.sort_values("pl_per_margin", ascending=False)
-    colors = [fv.BLUE if v else fv.GREY for v in t["in_strategy"]]
+    t = t.assign(cum_pct=t["total_pl"].cumsum() / t["total_pl"].sum() * 100)
+    label, color, marker, fmt = PARETO_LINES[line]
     x = np.arange(len(t))
     with plt.rc_context(fv.STYLE):
-        fig, axes = plt.subplots(3, 1, figsize=(15, 9), sharex=True)
-        for ax, col, title, fmt in (
-                (axes[0], "pl_per_margin", "P/L per $ of peak margin (higher is better)", "{:.1f}x"),
-                (axes[1], "dd_pct_margin", "Own max drawdown as % of peak margin (lower is better)", "{:.0f}%"),
-                (axes[2], "corr_rest_of_strategy", "Correlation of daily P/L with the rest of the strategy's 7 (lower diversifies more)",
-                 "{:.2f}")):
-            ax.bar(x, t[col], width=0.66, color=colors)
-            for xi, v in zip(x, t[col]):
-                ax.text(xi, v, fmt.format(v), ha="center", va="bottom" if v >= 0 else "top", fontsize=7.5, color=fv.INK_2)
-            ax.axhline(0, color=fv.INK_2, lw=0.7)
-            ax.set_title(title)
-        axes[2].set_xticks(x, t.index, rotation=90)
-        axes[0].legend([plt.Rectangle((0, 0), 1, 1, color=fv.BLUE), plt.Rectangle((0, 0), 1, 1, color=fv.GREY)],
-                       ["in the strategy", "not traded"], loc="upper right")
-        fig.suptitle("The 20 tranches ranked by P/L per $ of margin, every other setting on", x=0.01, ha="left")
-        fig.tight_layout()
-    return fig
-
-
-def fig_tranche_corr(corr: pd.DataFrame):
-    """Heatmap of the daily P/L correlation between the 20 tranches (strategy tranches in bold)."""
-    with plt.rc_context(fv.STYLE):
-        fig, ax = plt.subplots(figsize=(11, 9.5))
-        cmap = LinearSegmentedColormap.from_list("seq", ["#ffffff", fv.BLUE])
-        im = ax.imshow(corr.to_numpy(), cmap=cmap, vmin=0, vmax=1)
-        n = len(corr)
-        for i in range(n):
-            for j in range(n):
-                v = corr.iat[i, j]
-                ax.text(j, i, "1" if v >= 0.995 else ("0" if abs(v) < 0.005 else f"{v:.2f}".replace("0.", ".")), ha="center", va="center", fontsize=6.5,
-                        color="white" if v > 0.6 else fv.INK)
-        ax.set_xticks(range(n), corr.columns, rotation=90)
-        ax.set_yticks(range(n), corr.index)
-        for lab in list(ax.get_xticklabels()) + list(ax.get_yticklabels()):
-            if lab.get_text() in fv.SELECTED_TRANCHES:
-                lab.set_fontweight("bold")
-                lab.set_color(fv.BLUE)
-        ax.grid(False)
-        fig.colorbar(im, ax=ax, shrink=0.7, label="correlation of daily P/L")
-        ax.set_title("Daily P/L correlation between tranches, every other setting on (blue labels: the strategy's 7)", loc="left")
-        fig.tight_layout()
-    return fig
-
-
-def fig_tranche_map(par: pd.DataFrame):
-    """Each tranche: correlation with the rest of the strategy (x) against P/L per $ of margin (y), marker area = drawdown as %
-    of margin. Bottom right is the worst place to be: little return per $ and nothing gained in diversification."""
-    with plt.rc_context(fv.STYLE):
-        fig, ax = plt.subplots(figsize=(12, 6.5))
-        for inside, color, label in ((True, fv.BLUE, "in the strategy"), (False, fv.GREY, "not traded")):
-            t = par[par["in_strategy"] == inside]
-            ax.scatter(t["corr_rest_of_strategy"], t["pl_per_margin"], s=40 + t["dd_pct_margin"].clip(lower=0) * 2, color=color, alpha=0.8,
-                       edgecolor="white", lw=1.5, label=label)
-            for name, r in t.iterrows():
-                ax.annotate(name, (r["corr_rest_of_strategy"], r["pl_per_margin"]), xytext=(6, 4), textcoords="offset points",
-                            fontsize=8, color=fv.INK)
-        ax.set_xlabel("correlation of daily P/L with the rest of the strategy's 7 tranches")
-        ax.set_ylabel("P/L per $ of peak margin")
-        ax.legend([plt.Line2D([], [], ls="", marker="o", ms=9, color=fv.BLUE), plt.Line2D([], [], ls="", marker="o", ms=9, color=fv.GREY)],
-                  ["in the strategy", "not traded"], loc="upper left")
-        ax.set_title("Return on margin against diversification; marker area = own max drawdown as % of margin", loc="left")
-        fig.tight_layout()
-    return fig
-
-
-def fig_pareto(par: pd.DataFrame):
-    """Pareto chart: each tranche's P/L, largest first (blue = in the strategy), and the cumulative share of the profit."""
-    with plt.rc_context(fv.STYLE):
-        fig, ax = plt.subplots(figsize=(15, 4.8))
-        x = np.arange(len(par))
-        ax.bar(x, par["total_pl"], width=0.66, color=[fv.BLUE if t else fv.GREY for t in par["in_strategy"]])
-        ax.axhline(0, color=fv.INK_2, lw=0.7)
-        ax.set_xticks(x, par.index, rotation=90)
-        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v, _: fv._k(v)))
-        ax.set_ylabel("total P/L, every other setting on")
+        fig, ax = plt.subplots(figsize=(15, 5.4))
+        ax.bar(x, t["pl_per_margin"], width=0.66, color=[fv.BLUE if v else fv.GREY for v in t["in_strategy"]])
+        for xi, v in zip(x, t["pl_per_margin"]):
+            ax.text(xi, v, f"{v:.1f}x", ha="center", va="bottom", fontsize=7.5, color=fv.INK_2)
+        ax.set_xticks(x, t.index, rotation=90)
+        ax.set_ylabel("P/L per $ of peak margin (bars)")
+        ax.set_ylim(0, t["pl_per_margin"].max() * 1.15)
         ax2 = ax.twinx()
-        ax2.plot(x, par["cumulative_pct"], color=fv.ORANGE, marker="o", ms=4.5, lw=1.8)
-        ax2.axhline(80, color=fv.ORANGE, ls=":", lw=1)
-        ax2.set_ylim(0, max(110, par["cumulative_pct"].max() + 5))
-        ax2.set_ylabel("cumulative share of the profit (%)")
+        v = t[line].to_numpy()
+        ax2.plot(x, v, color=color, marker=marker, ms=5, lw=1.6)
+        for xi, val in zip(x, v):
+            ax2.annotate(fmt.format(0.0 if abs(val) < 0.005 else val), (xi, val), xytext=(0, 6), textcoords="offset points",
+                         ha="center", fontsize=7, color=fv.INK)
+        if line == "cum_pct":
+            ax2.axhline(80, color=color, ls=":", lw=1)
+            n80 = int((t["cum_pct"] < 80).sum()) + 1
+            ax2.annotate(f"80% of the profit: top {n80} tranches", (n80 - 1, v[n80 - 1]), xytext=(12, -20),
+                         textcoords="offset points", fontsize=8.5, color=fv.INK)
+            ax2.set_ylim(0, 112)
+        else:
+            ax2.set_ylim(min(0, v.min() * 1.2), v.max() * 1.2)
+        ax2.set_ylabel(label.split(" (")[0])
         ax2.spines["right"].set_visible(True)
         ax2.grid(False)
-        n80 = int((par["cumulative_pct"] < 80).sum()) + 1
-        ax2.annotate(f"80% of the profit: top {n80} tranches", (n80 - 1, par["cumulative_pct"].iloc[n80 - 1]),
-                     xytext=(10, -22), textcoords="offset points", fontsize=8.5, color=fv.INK)
         ax.legend([plt.Rectangle((0, 0), 1, 1, color=fv.BLUE), plt.Rectangle((0, 0), 1, 1, color=fv.GREY),
-                   plt.Line2D([], [], color=fv.ORANGE, marker="o")],
-                  ["in the strategy", "not traded", "cumulative share (right axis)"], loc="center right")
-        ax.set_title("Pareto: the 20 tranches by P/L, largest first, with every other setting of the strategy on")
+                   plt.Line2D([], [], color=color, marker=marker)],
+                  ["P/L per $ of margin, in the strategy", "P/L per $ of margin, not traded", f"{label} (right axis)"],
+                  loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=3, fontsize=8.5, frameon=False)
+        ax.set_title(f"Pareto by P/L per $ of margin, with {label.split(' (')[0]}; every other setting on", loc="left")
         fig.tight_layout()
     return fig
 

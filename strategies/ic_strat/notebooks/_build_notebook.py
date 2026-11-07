@@ -44,6 +44,7 @@ short strikes a median 11.3 points (call) and 12.9 points (put) from spot.
 | 4 | term structure | **VIX9D/VIX: min 0.87, max 1.02**, read at each trade's entry minute |
 | 5 | short/long ratio | **max 4** for the whole condor: the two short prices over the two long prices |
 | 6 | entry times | **7 tranches: 11:33 AM, 11:53 AM, 12:13 PM, 1:13 PM, 1:33 PM, 1:53 PM, 2:13 PM** (1:33 PM in place of 2:53 PM since 2026-10-30) |
+| | event days | **blacked out** (live): no trading on FOMC, CPI, NFP, monthly opex, quad witching, VIX expiry and early-close days. Studied in Section 3 (before and after); **the rest of the notebook is scored without it** |
 | | exit | **none: every condor held to expiry**. The 400% call stop is studied in Section 9 (why it isn't used), not as a step |
 | | always | 0DTE, exact strike offsets, 10-wide wings; 1 contract per trade; $0.97 per contract to open and to close, $0.05 entry slippage |
 
@@ -334,8 +335,8 @@ that removes it (the event-day test below).""")
 md(r"""### Is it the event calendar? Thursdays against event-day blackouts
 
 If the Thursday loss came from scheduled events, a blackout on event days should do the job of the no-Thursday rule. The calendar
-(`analysis/event_calendar.json`): FOMC, CPI, NFP, monthly opex, quad witching, VIX expiry, early closes and the session before an NYSE
-holiday. **Every other setting on.** The versions:
+(`analysis/event_calendar.json`): FOMC, CPI, NFP, monthly opex, quad witching, VIX expiry and early closes (NYSE holidays have no
+session). **Every other setting on.** The versions:
 
 - **A, the strategy:** no Thursdays.
 - **B:** Thursdays back in.
@@ -357,14 +358,14 @@ display(view.T)
 display(evsplit.round(1))
 """)
 
-md(r"""**Events don't explain the Thursday loss, and a blackout costs money.**
+md(r"""**Events don't explain the Thursday loss.**
 
 | everything else on | sessions | total P/L | Sharpe | 2022-24 / 2025-26 | max DD | Sharpe vs A (95% CI) | p (Sharpe z) |
 |---|---|---|---|---|---|---|---|
-| **A: no Thursdays (strategy)** | 182 | $115.5k | **2.49** | 2.48 / 2.52 | -$6.5k | | |
+| **A: no Thursdays** | 182 | $115.5k | **2.49** | 2.48 / 2.52 | -$6.5k | | |
 | B: Thursdays back in | 232 | $107.4k | 1.86 | 1.90 / 1.80 | -$14.6k | -0.63 (-1.34 to +0.01) | 0.06 |
-| C: Thursdays back in, event days blacked out | 180 | $83.9k | 1.39 | 1.55 / 1.07 | -$12.5k | -1.10 (-1.86 to -0.41) | 0.004 |
-| D: no Thursdays, event days blacked out | 135 | $91.4k | 1.94 | 2.03 / 1.76 | -$5.4k | -0.55 (-0.95 to -0.18) | 0.005 |
+| C: Thursdays back in, event days blacked out | 183 | $87.8k | 1.48 | 1.68 / 1.07 | -$11.8k | -1.01 (-1.77 to -0.32) | 0.007 |
+| D: no Thursdays, event days blacked out (live) | 138 | $95.3k | 2.04 | 2.18 / 1.76 | **-$5.4k** | -0.45 (-0.83 to -0.08) | 0.017 |
 | E: Thursdays back in except the day after FOMC | 223 | $117.4k | 2.22 | 2.09 / 2.52 | -$12.0k | -0.27 (-0.85 to +0.28) | 0.34 |
 
 | session P/L, Thursdays back in | sessions | total | average (95% interval) | sessions won |
@@ -372,23 +373,120 @@ md(r"""**Events don't explain the Thursday loss, and a blackout costs money.**
 | Thursday, day after FOMC | 9 | **-$10.0k** | **-$1,112** (-$2,265 to -$73) | 44% |
 | Thursday, event day | 5 | -$0.5k | -$107 (-$1,616 to +$1,249) | 60% |
 | Thursday, no event | 36 | +$2.5k | +$69 (-$403 to +$546) | 58% |
-| other days, event day | 47 | +$24.1k | +$512 (+$262 to +$764) | 79% |
-| other days, no event | 135 | +$91.4k | +$677 (+$466 to +$881) | 74% |
+| other days, event day | 44 | +$20.2k | +$459 (+$195 to +$709) | 77% |
+| other days, no event | 138 | +$95.3k | +$691 (+$496 to +$882) | 75% |
 
-- **Few events fall on a Thursday.** The event days are mostly Wednesdays (FOMC, VIX expiry) and Fridays (NFP, opex, quad witching): 19 of
-  240 are Thursdays, against 93 Wednesdays and 109 Fridays. A blackout can't remove a Thursday effect it barely touches.
-- **The blackout hurts the strategy.** Event days are good days for the condor (+$512 a session, 79% won): blacking them out (D) costs
-  $24.1k and 0.55 of Sharpe, significant (p 0.005), and worse in both halves. It cuts the drawdown (-$5.4k against -$6.5k), not the risk
-  per dollar earned. **This matches the backtester: the blackout drives the strategy down.**
-- **Thursdays plus the blackout is the worst version** (C, Sharpe 1.39, p 0.004): it keeps the bad Thursdays and drops the good event days.
-- **The one event that matters is the day after FOMC.** Those 9 Thursdays lose $10.0k, the only group whose interval is below zero. Skipping
-  only them (E) gets back most of the gap (2.22, not significantly below A, p 0.34) and slightly more money ($117.4k), but nearly double the
-  drawdown (-$12.0k).
-- **The rest of the Thursdays still lag**: +$69 a session against +$677 on other non-event days. The 36 non-event Thursdays earn $2.5k in
-  total, so skipping every Thursday gives up little and removes the post-FOMC days and the drawdown with them.
+- **Few events fall on a Thursday.** The event days are mostly Wednesdays (FOMC, VIX expiry) and Fridays (NFP, opex, quad witching): 15 of
+  215 are Thursdays, against 87 Wednesdays and 95 Fridays. A blackout can't remove a Thursday effect it barely touches.
+- **Thursdays plus the blackout is the worst version** (C, Sharpe 1.48, p 0.007): it keeps the bad Thursdays and drops event days, which
+  on the other weekdays are good days (+$459 a session, 77% won).
+- **The one event that matters for Thursdays is the day after FOMC.** Those 9 Thursdays lose $10.0k, the only group whose interval is below
+  zero. Skipping only them (E) gets back most of the gap (2.22, p 0.34) and slightly more money ($117.4k), but nearly double the drawdown.
+- **The rest of the Thursdays still lag**: +$69 a session against +$691 on other non-event days. Skipping every Thursday gives up little.
 
-**Verdict:** keep no Thursdays and no blackout. The Thursday loss isn't the event calendar: the only event it concentrates on is the day
-after FOMC, and even without those days Thursdays barely make money.""")
+**So no Thursdays stays, and the blackout is a separate rule, not a substitute for it.** The live strategy uses both (D); what the blackout
+does to it is below.""")
+
+md(r"""### The live strategy before and after the blackout
+
+**The live strategy blacks out event days** (FOMC, CPI, NFP, monthly opex, quad witching, VIX expiry, early closes) on top of every
+other setting. Before: the strategy as scored in the rest of this notebook. After: the same, with the event days skipped (version D
+above). Then what the blackout removes, event by event, and what it does on the backtester's 2026 log.""")
+
+code(r"""
+ba = casc.blackout_ba
+evm.fig_before_after(ba); plt.show()
+st = ba["stats"]
+att = dict(st.attrs); st.attrs = {}
+display(st.astype(float).round(2).T)
+print(f"after vs before: Sharpe {st['sharpe'].iloc[1] - st['sharpe'].iloc[0]:+.2f} (95% CI {att['ci_low']:+.2f} to {att['ci_high']:+.2f}), "
+      f"t (Sharpe) = {att['t_sharpe']:.2f}, p = {att['p_sharpe']:.3f}; t (daily P/L) = {att['t_daily_pl']:.2f}, p = {att['p_daily_pl']:.3f}")
+display(ba["by_year"].round(2))
+display(ba["removed"].round(1))
+""")
+
+md(r"""| the live strategy | trades | sessions | total P/L | Sharpe | 2022-24 / 2025-26 | max DD | P/L per $ of drawdown | avg P/L per condor |
+|---|---|---|---|---|---|---|---|---|
+| before: no blackout | 1,528 | 182 | $115.5k | **2.49** | 2.48 / 2.52 | -$6.5k | 17.8 | $151 |
+| **after: event days blacked out** | 1,220 | 138 | $95.3k | 2.04 | 2.18 / 1.76 | **-$5.4k** | 17.7 | $156 |
+
+| year | Sharpe before -> after | P/L before -> after |
+|---|---|---|
+| 2022 | 2.92 -> 2.16 | $21.5k -> $16.3k |
+| 2023 | 2.51 -> 2.29 | $29.2k -> $24.9k |
+| 2024 | 2.18 -> 2.09 | $27.7k -> $26.3k |
+| 2025 | 2.19 -> 1.67 | $25.6k -> $20.8k |
+| 2026 (to 05-07) | 3.62 -> 2.17 | $11.5k -> $6.9k |
+
+| what the blackout removes (sessions the strategy would trade) | sessions | P/L removed | avg per session | won |
+|---|---|---|---|---|
+| VIX expiry | 15 | $8.2k | +$546 | 80% |
+| FOMC | 10 | $5.3k | +$535 | 90% |
+| CPI | 5 | $3.4k | +$678 | 100% |
+| NFP | 6 | $3.0k | +$494 | 67% |
+| opex | 10 | $2.0k | +$198 | 60% |
+| quad witching | 4 | $0.8k | +$210 | 75% |
+| early closes | 0 | | | |
+| **any event (a day can carry several)** | **44** | **$20.2k** | +$459 | 77% |
+| not an event day (kept) | 138 | $95.3k | +$691 | 75% |
+
+- **On the export (2022-05 to 2026-05) the blackout costs money and Sharpe:** 44 sessions and $20.2k (17% of the P/L) go, Sharpe falls
+  from 2.49 to 2.04 (-0.45, 95% CI -0.83 to -0.08, p 0.017), **lower in every year**. The drawdown is smaller (-$5.4k against -$6.5k), but
+  only in line with the smaller book: P/L per $ of drawdown is the same (17.7 against 17.8).
+- **Every event type was profitable here**, the release days included (CPI won 5 of 5, FOMC 9 of 10). Event days earn less than ordinary
+  days (+$459 against +$691 a session), not a loss.
+- **The case for it is the tail the export doesn't contain.** On the backtester's log (Section 14, the previous 7 with 14:53, to
+  2026-09-28), two of the three days of the 2026 drawdown were a CPI and an FOMC day. With the blackout the log makes $89.2k instead of
+  $100.1k, at about the same Sharpe (1.65 against 1.70), and its **max drawdown falls from -$13.4k to -$3.9k**; in 2026 alone it turns
+  -$13.4k of drawdown into -$3.9k. Before 2026 the log's event days made money every year (+$4.9k, +$3.8k, +$1.5k, +$6.5k).
+
+**Reading:** the blackout is insurance. On four years of the export it costs about 0.45 of Sharpe and a sixth of the P/L for no gain in
+return per $ of drawdown; on the 2026 log it removed most of the worst drawdown the strategy has had. Whether that's worth the premium is a
+sizing decision, not something this data can settle: one bad stretch on two events is the evidence for it.""")
+
+md(r"""### Which event days to black out
+
+The same test one event type at a time, on top of the live strategy with no other blackout, to find which days are worth skipping. Each
+is scored twice:
+
+- **on the export** (2022-05 to 2026-05, the live 7): the Sharpe change against no blackout, with a paired session bootstrap and the Sharpe
+  z-test;
+- **on the backtester's log** (the previous 7 with 14:53, to 2026-09-28): P/L, Sharpe and max drawdown, which is where the 2026 drawdown is.
+
+NYSE holidays have no session, so the holiday row skips the sessions either side of one. Early closes never coincide with a session the
+strategy trades. FOMC + CPI is the pair that covers the 2026 drawdown.""")
+
+code(r"""
+bbe = casc.blackout_by_event
+evm.fig_blackout_by_event(bbe); plt.show()
+display(bbe.astype(float).round(3))
+""")
+
+md(r"""| blacked out (on top of the live strategy) | sessions removed | export: Sharpe (change, 95% CI) | export P/L | log P/L | log Sharpe | **log max DD** |
+|---|---|---|---|---|---|---|
+| nothing | 0 | 2.49 | $115.5k | $100.1k | 1.70 | -$13.4k |
+| FOMC | 10 | 2.38 (-0.11, -0.32 to +0.15) | $110.1k | $98.1k | 1.74 | -$8.5k |
+| CPI | 5 | 2.40 (-0.09, -0.20 to -0.01) | $112.1k | $101.5k | 1.83 | -$8.7k |
+| NFP | 6 | 2.43 (-0.06) | $112.5k | $97.5k | 1.64 | -$13.4k |
+| monthly opex | 10 | 2.46 (-0.03) | $113.5k | $97.7k | 1.65 | -$12.9k |
+| quad witching | 4 | 2.47 (-0.02) | $114.6k | $99.2k | 1.67 | -$13.4k |
+| VIX expiry | 15 | 2.31 (-0.19, -0.41 to +0.01) | $107.3k | $97.9k | 1.74 | -$8.5k |
+| sessions either side of a holiday | 18 | 2.21 (-0.28, -0.56 to -0.03) | $102.3k | $94.8k | 1.57 | -$13.4k |
+| early closes | 0 | 2.49 | $115.5k | $100.1k | 1.70 | -$13.4k |
+| **FOMC + CPI** | 15 | 2.29 (-0.20, -0.45 to +0.07) | $106.7k | **$99.5k** | **1.89** | **-$4.1k** |
+| all listed (the live blackout) | 44 | 2.04 (-0.45, -0.83 to -0.08) | $95.3k | $89.2k | 1.65 | -$3.9k |
+
+- **Only FOMC and CPI touch the 2026 drawdown.** Each alone cuts the log's max drawdown by about a third (-$13.4k to -$8.5k and -$8.7k);
+  VIX expiry does the same only because 2026-06-17 was both an FOMC and a VIX-expiry day. NFP, opex, quad witching and the holiday
+  sessions leave it at -$12.9k to -$13.4k: they remove profitable days and nothing else.
+- **FOMC + CPI does almost everything the full blackout does, for a third of the cost.** On the log the drawdown falls to -$4.1k (against
+  -$3.9k for everything), the P/L barely moves ($99.5k against $100.1k) and Sharpe is the best of any version (1.89). On the export it
+  removes 15 sessions and costs 0.20 of Sharpe and $8.7k, not significant (p 0.12), against 0.45 and $20.2k for the full list.
+- **The rest of the list is pure cost.** The holiday sessions are the most expensive single rule (-0.28, significant), then VIX expiry
+  (-0.19); NFP, opex and quad witching cost little but add nothing.
+
+**Suggestion:** black out **FOMC and CPI days only**. It keeps the protection against the 2026 drawdown and gives back most of what the
+full blackout costs. The evidence for any blackout is still one stretch of 2026: on 2022-26 every event type was profitable.""")
 
 # ---------------------------------------------------------------------------
 md(r"""## 4. Step 2: max move up 0%, on the book after step 1
@@ -823,7 +921,7 @@ md(r"""| tranche set (everything else on) | trades | total P/L | Sharpe | 2022-2
 - **The swap (13:33 for 14:53) adds $3.4k and costs 0.11 Sharpe, and the drawdown is 70% deeper** (-$6.5k against -$3.8k): 13:33 lost the
   most of any tranche in the winter 2024-25 drawdown, while 14:53 made money through it (Section 11). It is better in 2022-24 (2.48 against
   2.44) and clearly worse in 2025-26 (2.51 against 2.92).
-- **13:33 is the better tranche on its own** (rank 6 by P/L against 11 for 14:53, Section 11's Pareto), **but the worse addition to the
+- **13:33 is the better tranche on its own** (rank 6 by P/L against 11 for 14:53, Section 11), **but the worse addition to the
   other six:** it moves with 13:13 and 13:53 and adds to their bad stretch, where 14:53 diversifies it.
 - **Of the sets tested, the new 7 have the second-lowest P/L per $ of drawdown** (17.8, only ahead of all 20) and a drawdown as deep as the
   earlier 15 tranches' (-$6.5k) with less than two-thirds of their P/L.""")
@@ -1020,53 +1118,23 @@ md(r"""| tranches kept | cut by Sharpe: removed | Sharpe | P/L | max DD | P/L pe
   new 7 are never on this path.
 - **P/L per $ of margin rises steadily down the path** (14.7x for all 20, 18.5x at the previous 7); the new 7 make 18.9x ($115.5k on $6.1k of
   peak margin), about the same.
-- **Cutting by drawdown from 20 picks a different book** (it also stops at 11, Sharpe 2.24, drawdown -$3.9k).
+- **Cutting by drawdown from 20 picks a different book** (it also stops at 11, Sharpe 2.24, drawdown -$3.9k).""")
 
-**Pareto: how the profit is spread across the tranches.** Each tranche's total P/L with every other setting on, largest first (blue: the
-strategy's 7), and the cumulative share of the profit (right axis):""")
+md(r"""**Pareto: return on margin, drawdown on margin and correlation.** P/L alone ignores the capital a tranche ties up and
+how it moves with the others. The 20 tranches, every other setting on, ranked by P/L per $ of margin (the bars of all three charts), each chart with one more measure on its right axis:
 
-code(r"""
-td.fig_pareto(tdd.pareto); plt.show()
-display(tdd.pareto.round(2))
-""")
-
-md(r"""| rank | tranche | P/L | share | cumulative | P/L per $ of margin | traded |
-|---|---|---|---|---|---|---|
-| 1 | 11:53 | $18.1k | 8.6% | 8.6% | 20.5x | **yes** |
-| 2 | 13:53 | $17.7k | 8.4% | 16.9% | 20.1x | **yes** |
-| 3 | 12:13 | $17.2k | 8.1% | 25.1% | 19.4x | **yes** |
-| 4 | 13:13 | $16.4k | 7.7% | 32.8% | 18.7x | **yes** |
-| 5 | 11:33 | $16.3k | 7.7% | 40.5% | 18.4x | **yes** |
-| **6** | **13:33** | **$15.1k** | **7.1%** | 47.6% | 17.2x | **yes (swapped in)** |
-| 7 | 14:13 | $14.8k | 7.0% | 54.6% | 17.5x | **yes** |
-| 8 | 11:13 | $14.7k | 7.0% | 61.6% | 16.5x | no |
-| 9 | 12:53 | $14.1k | 6.7% | 68.3% | 15.9x | no |
-| 10 | 12:33 | $11.7k | 5.5% | 73.8% | 13.3x | no |
-| **11** | **14:53** | **$11.7k** | **5.5%** | 79.3% | 14.1x | **no (swapped out)** |
-| 12 | 10:53 | $10.3k | 4.9% | 84.2% | 11.7x | no |
-| 13-20 | 14:33, first hour, 15:13, 15:33, 15:53 | $33.3k | 15.8% | 100% | 0.1-10.1x | no |
-
-- **With the swap the strategy trades exactly the top 7 tranches by P/L: 54.6% of the profit from 35% of the tranches.** 14:53, swapped out,
-  is 11th.
-- **It isn't an 80/20 book:** the profit is spread fairly evenly over the middle of the day (5-9% per tranche), and 80% of it takes the top
-  **12** of 20.
-- **Ranking by P/L and ranking by contribution to the book disagree:** 13:33 earns $3.4k more than 14:53, but adds $2.7k of drawdown;
-  Sections 8 and 11 show the book is steadier with 14:53.""")
-
-md(r"""**P/L per $ of margin, drawdown as % of margin, and the correlation between tranches.** P/L alone ignores the capital a tranche ties
-up and how it moves with the others. Every other setting on, all 20 tranches:
-
-- **P/L per $ of peak margin:** total P/L over the most margin the tranche ever needs on one day (one condor: $1,000 less its credit).
-- **Drawdown as % of margin:** the tranche's own max drawdown over that peak margin. Above 100% means the worst run of losses took more than
-  the margin of one condor.
-- **Correlation:** of daily P/L, on the sessions the book trades (a tranche that sits a day out counts as 0). "With the rest of the strategy"
-  is against the sum of the strategy's 7, leaving the tranche itself out.""")
+- **P/L per $ of peak margin** (the bars, left axis): total P/L over the most margin the tranche ever needs on one day (one condor: $1,000 less
+  its credit). Blue: the strategy's 7.
+- **Chart 1, right axis: the cumulative share of the profit**, in that order.
+- **Chart 2, right axis: own drawdown as % of margin:** the tranche's max drawdown over its peak margin. Above 100% means its worst
+  run of losses took more than the margin of one condor.
+- **Chart 3, right axis: correlation with the rest of the strategy's 7:** daily P/L, on the sessions the book trades, against
+  the sum of the strategy's tranches leaving the tranche itself out. Pair by pair correlations are in Section 8.""")
 
 code(r"""
-td.fig_pareto_margin(tdd.pareto); plt.show()
-td.fig_tranche_corr(tdd.corr); plt.show()
-td.fig_tranche_map(tdd.pareto); plt.show()
-view = tdd.pareto.sort_values("pl_per_margin", ascending=False)[["total_pl", "peak_margin", "pl_per_margin", "max_drawdown",
+for line in td.PARETO_LINES:
+    td.fig_pareto(tdd.pareto, line); plt.show()
+view = tdd.pareto.sort_values("pl_per_margin", ascending=False)[["total_pl", "share_pct", "peak_margin", "pl_per_margin", "max_drawdown",
                                                                   "dd_pct_margin", "avg_corr_strategy", "corr_rest_of_strategy", "status"]]
 display(view.round(2))
 display(tdd.sets.round(2))
@@ -1093,8 +1161,11 @@ md(r"""| tranche | P/L per $ of margin | drawdown % of margin | corr. with the r
 | previous 7 (with 14:53) | $112.0k | **2.60** | **-$3.8k** | $6.1k | 18.5x | **63%** | **0.30** | **33%** |
 | all 20 | $211.4k | 2.40 | -$12.7k | $14.4k | 14.7x | 88% | 0.22 | 34% |
 
-- **Ranked by P/L per $ of margin, the top 7 are exactly the strategy's 7** (20.5x down to 17.2x). Every tranche needs about the same margin
-  ($710-$890 at peak), so this ranking is nearly the P/L ranking.
+- **Ranked by P/L per $ of margin, the top 7 are exactly the strategy's 7** (20.5x down to 17.2x): 54.6% of the profit from 35% of the
+  tranches. Every tranche needs about the same margin ($710-$890 at peak), so this ranking is nearly the P/L ranking (by P/L alone 13:33 is
+  6th and 14:53 11th).
+- **It isn't an 80/20 book:** the profit is spread fairly evenly over the middle of the day (5-9% per tranche), and 80% of it takes the top
+  **12** of 20.
 - **Tranches correlate with their neighbours, not across the day.** The median pair is 0.18; the highest are next-door pairs (12:33 with
   12:53, 0.79). Correlation falls with the time between entries: 11:33 and 14:13 correlate 0.05. 15:53 almost never trades (the ratio cap),
   so it correlates with nothing.
@@ -1497,10 +1568,10 @@ md(r"""| year | SPX (median) | credit per spread | short strike from spot | cond
 - **The risk was always there, it just hadn't shown up.** Seven tranches spread over three hours on one day, with no stop, are close to one
   big position: a day that runs through one side costs ~$5k. The four years before simply had no such day on a day the filters let through.
 - **Two of the three days were scheduled news:** 2026-05-12 was a CPI release (-$5.2k) and 2026-06-17 an FOMC decision (-$4.8k);
-  2026-06-16, the first day of that FOMC meeting, isn't on the calendar. In the log, event days lost $6.3k in 2026 but **made money in every
-  year before** (+$4.9k, +$3.8k, +$1.5k, +$6.5k in 2022-25). On the rebuild an event blackout costs 0.55 of Sharpe and $24.1k (Section 3).
-  **A blackout would have avoided this drawdown, and cost more than it saves in every earlier year:** one bad year on two events isn't
-  enough to add it.
+  2026-06-16, the first day of that FOMC meeting, isn't on the calendar. In the log, event days lost $5.9k in 2026 but **made money in every
+  year before** (+$4.9k, +$3.8k, +$1.5k, +$6.5k in 2022-25). **The live strategy now blacks these days out:** on this log the blackout cuts
+  the max drawdown from -$13.4k to -$3.9k for $10.9k less P/L, at about the same Sharpe (1.65 against 1.70); on the export it costs 0.45 of
+  Sharpe (Section 3).
 - **On the rebuild this set's drawdowns were shallow** (-$3.8k at most in 2022-2026). The log shows the tail those four years didn't
   contain, and it is the number to size the strategy on.""")
 
@@ -1526,8 +1597,10 @@ day (75% of days positive).
   and 2025-26 much weaker (2.92 -> 2.51). 13:33 earns more on its own (the 6th tranche by P/L, against 11th) but is the biggest single
   loser in the deepest drawdown and the first tranche both cutting rules remove (Sections 8 and 11).
 - **No Thursdays isn't a VIX regime:** nothing known at entry differs on Thursdays, but they move more than VIX prices (the realized range
-  explains two-thirds of the loss on the raw book), on a few big days every year. **It isn't the event calendar:** few events fall on Thursdays, an event-day blackout costs 0.55 of
-  Sharpe (event days are good days), and the only event the loss concentrates on is the day after FOMC (9 Thursdays, -$10.0k).
+  explains two-thirds of the loss on the raw book), on a few big days every year. **It isn't the event calendar:** few events fall on Thursdays, and the only event the loss
+  concentrates on is the day after FOMC (9 Thursdays, -$10.0k).
+- **The live event-day blackout costs on the export, and insures the tail:** 2.49 -> 2.04 Sharpe (p 0.017), $115.5k -> $95.3k, lower in
+  every year, drawdown -$6.5k -> -$5.4k; on the 2026 log it cuts the max drawdown from -$13.4k to -$3.9k (Section 3).
 - **The settings work together.** The band is the worst entry filter on the raw book and adds the most at step 4; with everything on, every
   threshold is at the top of its sweep, but **the band's exact edges aren't significant** (no cap from 0.98 to 1.08 is significantly worse
   than 1.02); the direction is (caps of 0.97 and tighter and floors of 0.90 and higher are clearly worse).
@@ -1539,8 +1612,7 @@ day (75% of days positive).
   starts in April 2023 (Section 12).
 - **The backtester's log shows a 2026 drawdown the export doesn't reach** (on the previous 7, with 14:53): -$13.4k from 2026-05-11 to 06-17,
   not recovered by 2026-09-28, from three days on which all seven tranches lost a full wing (Section 14). Two of the three were CPI and FOMC days,
-  but event days made money in every earlier year: size the strategy on that tail rather than black out events, and backtest the new
-  tranche set.
+  which the live blackout now skips; backtest the new tranche set with the blackout.
 
 **What this notebook doesn't establish:** out-of-sample performance (apart from the walk-forward checks); the backtester's totals on the
 new tranche set (the rebuild matches the backtester trade by trade on the previous 7; the set with 13:33 hasn't been backtested); the first
@@ -1561,7 +1633,8 @@ Every check this notebook uses, grouped by the question it answers. "Section" sa
 | **Sharpe z-score** | Sharpe difference divided by its bootstrap standard error | SMA A/B, shape vs level | SMA10 over SMA20: t = 1.77, p = 0.08 (10% level, not 5%); shape over VIX level p = 0.35, over VIX9D level p = 0.10 | 12, 13 |
 | **Peak against its neighbours** | 95% interval at the chosen value against each nearby value, plus a z-test for each pair | Term-structure cap (1.02) and floor (0.87) | No cap from 0.98 to 1.08 is significantly worse than 1.02; caps of 0.97 and lower, and floors of 0.90 and higher, are | 6 |
 | **Regression, errors clustered by session** | Condor P/L on a Thursday dummy, controlling for everything known at entry | The no-Thursday rule | The Thursday loss stays (-$51 -> -$55, p = 0.008) with every entry feature in; it fades only once the day's realized range is added | 3 |
-| **Event-day blackout A/B** | FOMC, CPI, NFP, opex, quad witching, VIX expiry, early closes and pre-holiday sessions blacked out, against and alongside the no-Thursday rule | The blackout costs 0.55 Sharpe (p 0.005): event days are good days; the Thursday loss concentrates only on the day after FOMC | 3 |
+| **Event-day blackout: A/B and before/after** | FOMC, CPI, NFP, opex, quad witching, VIX expiry and early closes blacked out, against and alongside the no-Thursday rule, and on the live strategy before vs after | It doesn't replace no Thursdays; on the export it costs 0.45 Sharpe (p 0.017) and is lower in every year; on the 2026 log it cuts the max drawdown from -$13.4k to -$3.9k | 3 |
+| **Blackout by event type** | Each event type blacked out on its own (and FOMC + CPI), on the export and on the backtester's 2026 log | Only FOMC and CPI touch the 2026 drawdown; FOMC + CPI cuts the log's max drawdown from -$13.4k to -$4.1k for 0.20 Sharpe on the export (not significant) | 3 |
 
 ### 2. Did we find a signal, or fit noise?
 
@@ -1601,7 +1674,7 @@ Every check this notebook uses, grouped by the question it answers. "Section" sa
 | **Forward selection** by Sharpe and by P/L per $ of drawdown | Add the tranche that helps most, one at a time; the drawdown version starts from all 20 and ignores the live set | Both stop at 11 tranches | 8 |
 | **Drawdown episodes** | Each tranche's share of every drawdown | 13:33 loses in all 5 of the deepest drawdowns | 11 |
 | **Backward elimination** from 7 and from 20 | Remove the tranche that hurts most, one at a time, tracking P/L per $ of peak margin | 13:33 is the first tranche both rules cut | 11 |
-| **Pareto** | Tranches sorted by P/L, with a cumulative-share line | Shows how much of the P/L the top tranches carry | 11 |
+| **Pareto** | Tranches ranked by P/L per $ of margin, with the cumulative share of the profit, drawdown as % of margin and correlation with the rest of the 7 on the right axis of three charts | The top 7 by return on margin are the live 7; 80% of the profit takes 12 of 20 | 11 |
 | **P/L per $ of margin, drawdown % of margin, correlation** | Each tranche's return on the margin it ties up, its drawdown against that margin, and its daily P/L correlation with the other tranches | The live 7 lead on return on margin; the previous 7 (with 14:53) match it (18.5x against 18.9x) with a drawdown of 63% of margin against 106%, because 14:53 correlates least with the rest | 11 |
 
 ### What isn't tested
@@ -1610,8 +1683,8 @@ Every check this notebook uses, grouped by the question it answers. "Section" sa
   tranche selection has a walk-forward check.
 - **Entry costs.** Entries are taken at the backtester's fills; slippage is varied only on stop exits.
 - **Structural breaks.** Stability is judged by halves and by year, not with a formal break test.
-- **Event days beyond Thursday.** The blackout is tested against the no-Thursday rule (Section 3: it costs Sharpe); whether events drove
-  the 2026 drawdown isn't tested.""")
+- **The blackout in the rest of the notebook.** The live strategy blacks out event days, but Sections 2 and 4-14 are scored without it
+  (Section 3 has the before and after). The blackout's benefit rests on one stretch of the 2026 log.""")
 
 nb["cells"] = cells
 nb["metadata"]["kernelspec"] = {"display_name": "py313-quant", "language": "python", "name": "py313-quant"}
